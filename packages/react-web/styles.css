@@ -1,0 +1,249 @@
+@import "@saystack/web/styles.css";
+
+.saystack-player {
+  --saystack-player-background: color-mix(in srgb, Canvas 86%, transparent);
+  --saystack-player-border: color-mix(in srgb, CanvasText 12%, transparent);
+  --saystack-player-text: CanvasText;
+  --saystack-player-muted: color-mix(in srgb, CanvasText 62%, transparent);
+  --saystack-player-faint: color-mix(in srgb, CanvasText 40%, transparent);
+  --saystack-player-accent: CanvasText;
+  --saystack-player-on-accent: Canvas;
+  --saystack-player-track: color-mix(in srgb, CanvasText 16%, transparent);
+  --saystack-player-hover: color-mix(in srgb, CanvasText 8%, transparent);
+  --saystack-player-danger: #d9534f;
+  --saystack-player-radius: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--saystack-player-border);
+  border-radius: var(--saystack-player-radius);
+  background: var(--saystack-player-background);
+  color: var(--saystack-player-text);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  font-size: 13.5px;
+  line-height: 1.4;
+  container: saystack-player / inline-size;
+}
+
+.saystack-player__main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.saystack-player__primary,
+.saystack-player__button {
+  display: grid;
+  flex: none;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+}
+
+.saystack-player__primary {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--saystack-player-accent);
+  color: var(--saystack-player-on-accent);
+}
+
+.saystack-player__button {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--saystack-player-muted);
+}
+
+.saystack-player__button:hover:not(:disabled) {
+  background: var(--saystack-player-hover);
+  color: var(--saystack-player-text);
+}
+
+.saystack-player__button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.saystack-player__primary:focus-visible,
+.saystack-player__button:focus-visible,
+.saystack-player__segment:focus-visible {
+  outline: 2px solid var(--saystack-player-accent);
+  outline-offset: 2px;
+}
+
+.saystack-player__icon {
+  display: block;
+}
+
+.saystack-player__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: saystack-spin 0.8s linear infinite;
+}
+
+.saystack-spectrum {
+  display: block;
+}
+
+.saystack-player__spectrum {
+  flex: none;
+  width: 64px;
+  height: 28px;
+}
+
+.saystack-player__now {
+  flex: 1;
+  min-width: 0;
+}
+
+.saystack-player__status {
+  overflow: hidden;
+  margin: 0;
+  color: var(--saystack-player-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.saystack-player[data-phase="loading"] .saystack-player__status {
+  animation: saystack-breathe 1.4s ease-in-out infinite;
+}
+
+.saystack-player[data-phase="error"] .saystack-player__status {
+  color: var(--saystack-player-danger);
+}
+
+.saystack-player__ticker {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 10px, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(90deg, transparent 0, #000 10px, #000 calc(100% - 28px), transparent);
+}
+
+.saystack-player__line {
+  padding-left: 10px;
+  color: var(--saystack-player-faint);
+  white-space: nowrap;
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.saystack-player__word {
+  transition: color 0.2s ease;
+}
+
+.saystack-player__word + .saystack-player__word {
+  margin-left: 0.28em;
+}
+
+.saystack-player__word--read {
+  color: var(--saystack-player-muted);
+}
+
+.saystack-player__word--now {
+  color: var(--saystack-player-text);
+}
+
+.saystack-player__tools {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+}
+
+.saystack-player__time {
+  padding: 0 6px;
+  color: var(--saystack-player-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.saystack-player__track {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 14px;
+}
+
+.saystack-player__segment {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 4px;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.saystack-player__segment::before,
+.saystack-player__fill {
+  position: absolute;
+  top: 5px;
+  right: 0;
+  left: 0;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.saystack-player__segment::before {
+  content: "";
+  background: var(--saystack-player-track);
+  transition: background 0.2s ease;
+}
+
+.saystack-player__segment:hover::before {
+  background: var(--saystack-player-faint);
+}
+
+.saystack-player__fill {
+  background: var(--saystack-player-text);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+@keyframes saystack-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes saystack-breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@container saystack-player (max-width: 520px) {
+  .saystack-player__spectrum {
+    display: none;
+  }
+}
+
+@container saystack-player (max-width: 400px) {
+  .saystack-player__time {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .saystack-player__line,
+  .saystack-player__word,
+  .saystack-player__segment::before {
+    transition: none;
+  }
+
+  .saystack-player__spinner,
+  .saystack-player[data-phase="loading"] .saystack-player__status {
+    animation: none;
+  }
+}

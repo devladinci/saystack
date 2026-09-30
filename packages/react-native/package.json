@@ -1,0 +1,74 @@
+{
+  "name": "@saystack/react-native",
+  "version": "0.0.1",
+  "description": "React Native voice UI: the spectral aura on the GPU, a blurred spotlight for dictation and read-aloud, live captions and a player.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "peerDependencies": {
+    "expo-audio": ">=57.0.0",
+    "expo-blur": ">=57.0.0",
+    "expo-file-system": ">=57.0.0",
+    "expo-gl": ">=57.0.0",
+    "expo-modules-core": ">=57.0.0",
+    "react": "^19.0.0",
+    "react-native": ">=0.81.0"
+  },
+  "dependencies": {
+    "@saystack/core": "workspace:*",
+    "@saystack/react": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "expo-audio": "57.0.4",
+    "expo-blur": "57.0.3",
+    "expo-file-system": "57.0.6",
+    "expo-gl": "57.0.2",
+    "expo-modules-core": "57.0.16",
+    "react": "^19.3.0",
+    "react-native": "0.86.3",
+    "typescript": "7.0.2",
+    "vitest": "5.0.2"
+  },
+  "keywords": [
+    "voice",
+    "react-native",
+    "expo",
+    "speech",
+    "tts",
+    "stt",
+    "dictation",
+    "read-along",
+    "visualizer"
+  ],
+  "peerDependenciesMeta": {
+    "expo-blur": {
+      "optional": true
+    },
+    "expo-gl": {
+      "optional": true
+    }
+  }
+}

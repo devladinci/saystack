@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<!-- page -->
+<title>Saystack Voice Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..700&family=Geist:wght@400..600&family=Geist+Mono:wght@400..500&display=swap">
+<link rel="stylesheet" href="styles.css">
+
+<div class="app" id="app">
+  <main class="chat">
+    <header class="chat-head">
+      <div class="brand"><span class="wordmark">saystack</span><span class="brand-sub">Voice lab</span></div>
+      <div class="head-actions">
+        <button type="button" class="icon-btn" id="theme" aria-label="Switch theme"></button>
+        <button type="button" class="icon-btn tune" id="tune" aria-label="Tune the animations" aria-expanded="false" aria-controls="panel"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+      </div>
+    </header>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <div class="scroll" id="scroll">
+      <div class="thread" id="thread">
+        <p class="thread-note">A playground for saystack's voice UI. The replies are canned. Press the mic to dictate, or Read aloud under a reply.</p>
+
+        <article class="msg user"><div class="bubble">Hey, can you read replies out loud?</div></article>
+
+        <article class="msg bot" id="m-hello" data-clip="hello">
+          <div class="body">
+            <p>Yes. Press the speaker under any reply and I'll read it to you, one word at a time.</p>
+          </div>
+          <div class="msg-actions">
+            <button type="button" class="speak" aria-pressed="false"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6.5 9h-3v6h3L11 19V5z"/><path d="M15.5 9a4.5 4.5 0 0 1 0 6M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span class="speak-label">Read aloud</span></button>
+            <button type="button" class="icon-btn copy" aria-label="Copy"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg></button>
+          </div>
+        </article>
+
+        <article class="msg user"><div class="bubble">How does the voice aura turn my voice into colors?</div></article>
+
+        <article class="msg bot" id="m-reply" data-clip="reply">
+          <div class="body">
+            <p>Sure. The aura splits your voice into <strong>six frequency bands</strong>, from the low hum of vowels up to the hiss of an s.</p>
+            <p>Each band has its own color. When you are silent, all six sit on top of each other and add up to <em>white</em>. When you speak, each band rises with its own energy, so the colors pull apart. Where two bands still overlap, their colors mix, like light through a prism.</p>
+            <div class="table-wrap ss-block" data-kind="table">
+              <table>
+                <thead><tr><th>Band</th><th>Range</th><th>Color</th><th>Carries</th></tr></thead>
+                <tbody>
+                  <tr><td class="num">1</td><td class="num">80–170 Hz</td><td><span class="swatch" data-band="0"></span>Red</td><td>Low voices</td></tr>
+                  <tr><td class="num">2</td><td class="num">170–370 Hz</td><td><span class="swatch" data-band="1"></span>Amber</td><td>High voices</td></tr>
+                  <tr><td class="num">3</td><td class="num">370–800 Hz</td><td><span class="swatch" data-band="2"></span>Green</td><td>Vowel body</td></tr>
+                  <tr><td class="num">4</td><td class="num">0.8–1.7 kHz</td><td><span class="swatch" data-band="3"></span>Cyan</td><td>Vowel color</td></tr>
+                  <tr><td class="num">5</td><td class="num">1.7–3.7 kHz</td><td><span class="swatch" data-band="4"></span>Blue</td><td>Consonants</td></tr>
+                  <tr><td class="num">6</td><td class="num">3.7–8 kHz</td><td><span class="swatch" data-band="5"></span>Violet</td><td>Hiss: s, sh, f</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="code ss-block" data-kind="code">
+              <div class="code-head"><span>js</span><span>composer.js</span></div>
+<pre><code><span class="kw">const</span> aura = <span class="fn">createAura</span>({ anchor: composer, bands: <span class="num">6</span> });
+<span class="kw">const</span> mic = <span class="kw">await</span> navigator.mediaDevices.<span class="fn">getUserMedia</span>({ audio: <span class="kw">true</span> });
+aura.<span class="fn">listen</span>(mic); <span class="com">// white at rest, colors while you talk</span></code></pre>
+            </div>
+            <figure class="fig ss-block" data-kind="image">
+              <canvas class="fig-bands" role="img" aria-label="Six colored lines, spread apart on the left, merging into one white line on the right"></canvas>
+              <figcaption>Six bands, one white line</figcaption>
+            </figure>
+            <p>Vowels light up the warm colors. Sounds like s and sh push the blue and violet bands.</p>
+          </div>
+          <div class="msg-actions">
+            <button type="button" class="speak" aria-pressed="false"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6.5 9h-3v6h3L11 19V5z"/><path d="M15.5 9a4.5 4.5 0 0 1 0 6M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span class="speak-label">Read aloud</span></button>
+            <button type="button" class="icon-btn copy" aria-label="Copy"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg></button>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <div class="dock">
+      <div class="player" id="player" role="region" aria-label="Read aloud player" hidden></div>
+      <form class="composer" id="composer" data-voice="idle">
+        <div class="field"><textarea id="input" rows="1" placeholder="Message" aria-label="Message"></textarea></div>
+        <span class="mic-timer" id="mic-timer" hidden>0:00</span>
+        <button type="button" class="mic" id="mic" aria-pressed="false" aria-label="Dictate"></button>
+        <button type="submit" class="send" id="send" aria-label="Send"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+      </form>
+      <p class="dock-note" id="dock-note"></p>
+    </div>
+  </main>
+
+  <aside class="panel" id="panel" aria-label="Tune the animations">
+    <div class="panel-head">
+      <h2 class="panel-title">Tune</h2>
+      <button type="button" class="text-btn" id="reset">Reset</button>
+    </div>
+    <div class="panel-scroll">
+      <section class="p-section">
+        <div class="p-title-row"><h2 class="p-title">Live bands</h2><span class="meter-label" id="meter-label">Idle</span></div>
+        <div class="meters" id="meters"></div>
+        <p class="p-note">Centre of each band in Hz. Each band is scaled against its own noise floor, so the quiet high bands move as much as the loud low ones.</p>
+      </section>
+      <div class="panel-body" id="panel-body"></div>
+      <section class="p-section">
+        <h2 class="p-title">Keys</h2>
+        <dl class="keys">
+          <dt><kbd>M</kbd></dt><dd>Start or stop dictation</dd>
+          <dt><kbd>Space</kbd></dt><dd>Pause or resume reading</dd>
+          <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Previous or next sentence</dd>
+          <dt><kbd>Esc</kbd></dt><dd>Cancel dictation or stop reading</dd>
+        </dl>
+        <p class="p-note">While a reply is being read, click any word to jump there.</p>
+      </section>
+    </div>
+  </aside>
+</div>
+<div class="scrim" id="scrim" hidden></div>
+
+<template id="tpl-canned">
+  <article class="msg bot" data-clip="canned">
+    <div class="body">
+      <p>This is a playground, so my replies are canned. Press the speaker under any reply to hear it again.</p>
+    </div>
+    <div class="msg-actions">
+      <button type="button" class="speak" aria-pressed="false"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6.5 9h-3v6h3L11 19V5z"/><path d="M15.5 9a4.5 4.5 0 0 1 0 6M18.5 6a8.5 8.5 0 0 1 0 12"/></svg><span class="speak-label">Read aloud</span></button>
+      <button type="button" class="icon-btn copy" aria-label="Copy"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg></button>
+    </div>
+  </article>
+</template>
+
+<script type="module" src="src/main.js"></script>
+<!-- /page -->
+</body>
+</html>

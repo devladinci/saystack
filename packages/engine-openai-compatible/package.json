@@ -1,0 +1,47 @@
+{
+  "name": "@saystack/engine-openai-compatible",
+  "version": "0.0.1",
+  "description": "OpenAI-compatible STT/TTS engine adapter: oMLX today, any /v1 server tomorrow.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@saystack/core": "workspace:*",
+    "ws": "^8.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.0",
+    "@types/ws": "^8.18.1",
+    "typescript": "7.0.2",
+    "vitest": "5.0.2"
+  },
+  "keywords": [
+    "stt",
+    "tts",
+    "speech",
+    "voice",
+    "openai-compatible",
+    "omlx"
+  ]
+}

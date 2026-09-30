@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Saystack Voice Spotlight</title>
+<link rel="stylesheet" href="styles.css">
+<script type="importmap">
+{
+  "imports": {
+    "@saystack/core": "../../packages/core/dist/index.js",
+    "@saystack/web": "../../packages/web/dist/index.js"
+  }
+}
+</script>
+<script type="module" src="src/main.js"></script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></symbol>
+  <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2.5"/><path d="M15.5 8.5v-2a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4.5V9H15"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 18.5v-13M6.5 11 12 5.5l5.5 5.5"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.5"/><path d="m4.5 17 4.5-4 3.5 3 2.5-2 4.5 3.5"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1.4" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8.5 6.2v11.6c0 .6.7 1 1.2.7l9.3-5.8c.5-.3.5-1 0-1.3L9.7 5.5c-.5-.3-1.2 0-1.2.7z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8.5 6v12M15.5 6v12" stroke-width="3"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2.2" fill="currentColor" stroke="none"/></symbol>
+</svg>
+
+<main class="wrap">
+  <header class="head">
+    <h1>Voice spotlight</h1>
+    <p>A playground for saystack's voice spotlight. When you talk or listen, the rest of the chat steps back and the part that matters lifts forward. The wave is saystack's own aura.</p>
+  </header>
+
+  <div class="stage">
+    <div class="device">
+      <div class="phone" id="phone" data-phone="light">
+        <div class="island"></div>
+        <div class="status">
+          <span>9:41</span>
+          <svg viewBox="0 0 64 12" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/><path d="M31 2.2c2.6 0 5 1 6.8 2.7l-1.3 1.3A7.7 7.7 0 0 0 31 4a7.7 7.7 0 0 0-5.5 2.2l-1.3-1.3A9.6 9.6 0 0 1 31 2.2zm0 3.6c1.6 0 3.1.6 4.2 1.7L33.9 8.8a4.1 4.1 0 0 0-5.8 0l-1.3-1.3A5.9 5.9 0 0 1 31 5.8zm0 3.6c.6 0 1.1.2 1.5.6L31 11.5 29.5 10c.4-.4.9-.6 1.5-.6z"/><rect x="42" y="1" width="19" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1"/><rect x="44" y="3" width="13" height="6" rx="1.5"/><rect x="62" y="4" width="1.6" height="4" rx=".8"/></svg>
+        </div>
+        <div class="nav">
+          <button class="nav-back" aria-label="Back"><svg class="i" aria-hidden="true"><use href="#i-back"/></svg></button>
+          <div class="nav-title">Weekend hike</div>
+          <div class="nav-right"><span class="badge">8%</span><svg class="i" aria-hidden="true"><use href="#i-more"/></svg></div>
+        </div>
+
+        <div class="list" id="list"></div>
+
+        <div class="composer-wrap" id="composerWrap">
+          <div class="composer">
+            <textarea id="draft" rows="1" placeholder="Message — runs on your Mac" aria-label="Message"></textarea>
+            <button class="send" id="send" aria-label="Send message"><svg class="i" aria-hidden="true"><use href="#i-up"/></svg></button>
+          </div>
+          <div class="tools">
+            <button class="tool" aria-label="Attach images"><svg class="i" aria-hidden="true"><use href="#i-image"/></svg></button>
+            <button class="tool mic" id="mic" aria-label="Hold to dictate"><svg class="i" aria-hidden="true"><use href="#i-mic"/></svg></button>
+            <span class="spacer"></span>
+            <span class="chip">qwen3-30b</span>
+            <span class="chip">autopilot</span>
+          </div>
+        </div>
+
+        <div class="backdrop" id="backdrop"></div>
+        <div class="captions" aria-live="polite">
+          <div class="cap-text" id="capText"></div>
+          <div class="cap-hint" id="capHint"></div>
+          <div class="cap-measure" id="capMeasure" aria-hidden="true"></div>
+        </div>
+        <div class="reader" id="reader"><div class="reader-scroll" id="readerScroll"></div></div>
+        <div class="player" id="player">
+          <div class="p-top"><span class="p-title" id="pTitle">Reading reply</span><span class="p-time" id="pTime">0:00 / 0:00</span></div>
+          <div class="track" id="track"><div class="track-fill" id="trackFill"></div></div>
+          <div class="p-controls">
+            <button class="p-rate" id="pRate" aria-label="Playback speed">1×</button>
+            <button class="p-main" id="pMain" aria-label="Pause"><svg class="i" aria-hidden="true"><use href="#i-pause"/></svg></button>
+            <button class="p-stop" id="pStop" aria-label="Stop reading"><svg class="i" aria-hidden="true"><use href="#i-stop"/></svg></button>
+          </div>
+        </div>
+        <div class="aura-anchor" id="auraAnchor"></div>
+        <div class="aura-clip" id="auraClip"></div>
+        <div class="home"></div>
+      </div>
+      <div class="bezel" aria-hidden="true"></div>
+    </div>
+
+    <aside class="panel">
+      <div class="group">
+        <div class="label">Try it</div>
+        <ol class="steps">
+          <li>Hold the mic. The words stream into the middle; let go and they drop into your draft.</li>
+          <li>Keep holding. A long dictation shrinks twice, then scrolls with the newest line at the bottom.</li>
+          <li>While holding, slide your finger away from the mic to cancel.</li>
+          <li>Tap the speaker under the long reply. Tap any word to jump there.</li>
+          <li>The blur stays while it reads. Stop it in the player, or let it finish, and the reply settles back.</li>
+        </ol>
+        <button class="btn" id="longDemo">Play a long dictation</button>
+        <p class="note">Speech is simulated; nothing uses your microphone. The long dictation plays at 1.5× so you don't have to hold for half a minute.</p>
+      </div>
+
+      <div class="group">
+        <div class="label">Setup</div>
+        <div class="row"><span>Model streams words</span><label class="switch"><input type="checkbox" id="streaming" checked aria-label="Model streams words"><span></span></label></div>
+        <p class="note" id="streamNote">Words appear while you speak, like Whisper on oMLX.</p>
+        <div class="row"><span>Phone</span><div class="seg"><button data-phone-theme="light" aria-pressed="true">Light</button><button data-phone-theme="dark" aria-pressed="false">Dark</button></div></div>
+        <div class="row"><span>Backdrop blur</span><span class="slider"><input type="range" id="blur" min="0" max="20" step="1" value="8" aria-label="Blur"><output id="blurOut">8 px</output></span></div>
+        <div class="row"><span>Backdrop dim</span><span class="slider"><input type="range" id="dim" min="0" max="70" step="5" value="35" aria-label="Dim"><output id="dimOut">35%</output></span></div>
+      </div>
+
+      <div class="group">
+        <div class="label">Aura</div>
+        <div class="ctrls" id="auraControls"></div>
+        <button class="btn" id="auraReset">Reset aura</button>
+        <p class="note">The same controls, ranges and defaults as the web playground, straight from saystack's aura style.</p>
+      </div>
+
+      <div class="group">
+        <div class="label">Motion</div>
+        <dl class="spec">
+          <dt>Backdrop</dt><dd>fade 220 ms</dd>
+          <dt>Composer</dt><dd>−6 px, 1.02×, 260 ms</dd>
+          <dt>Wave</dt><dd>saystack aura, from the top edge</dd>
+          <dt>Words</dt><dd>fade + unblur 180 ms</dd>
+          <dt>Long text</dt><dd>26 → 21 → 18 px, then scroll</dd>
+          <dt>Drop</dt><dd>into draft 340 ms</dd>
+          <dt>Reply</dt><dd>lift in place 360 ms</dd>
+          <dt>Player</dt><dd>slide up 320 ms</dd>
+        </dl>
+        <button class="btn" id="reset">Reset chat</button>
+      </div>
+    </aside>
+  </div>
+</main>
+</body>
+</html>

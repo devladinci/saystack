@@ -1,0 +1,8124 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`createAura frames > draws around an element on a dark page 1`] = `
+[
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          448,
+          288,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          448,
+          288,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          448,
+          288,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          204,
+          144,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          160,
+          32,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          16,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          16,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.01667,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.02594,
+            0.00136,
+            2,
+            1,
+            0.11022,
+            -0.00367,
+            3,
+            1,
+            0.06484,
+            0.00313,
+            3,
+            1,
+            0.12319,
+            -0.00556,
+            5,
+            1,
+            0.0389,
+            0.0032,
+            6,
+            1,
+            0.07781,
+            -0.00524,
+            8,
+            1,
+            0.01297,
+            0.00279,
+            11,
+            1,
+            0,
+            -0.00241,
+            14,
+            1,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.02594,
+            -0.0015,
+            0,
+            0,
+            0.11022,
+            0.00381,
+            0,
+            0,
+            0.06484,
+            -0.00313,
+            0,
+            0,
+            0.12319,
+            0.0054,
+            0,
+            0,
+            0.0389,
+            -0.00304,
+            0,
+            0,
+            0.07781,
+            0.00489,
+            0,
+            0,
+            0.01297,
+            -0.00257,
+            0,
+            0,
+            0,
+            0.00219,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            1,
+            0.30215,
+            0.26804,
+            0.84737,
+            0.39454,
+            0.02838,
+            0.33095,
+            0.58425,
+            0.09933,
+            0,
+            0.66085,
+            0.48842,
+            0.05006,
+            0.56781,
+            1,
+            0.41143,
+            0.42374,
+            1,
+            0.87156,
+            0.2827,
+            0.74078,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          1.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55349,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.11223,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.21482,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          -1000000,
+          -1000000,
+          1000000,
+          1000000,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "plus-lighter",
+      "clipPath": "none",
+      "cssHeight": "288px",
+      "cssWidth": "448px",
+      "display": "block",
+      "filter": "",
+      "height": 288,
+      "transform": "translate(-4px, 188px)",
+      "width": 448,
+      "zIndex": "2147483000",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          448,
+          288,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          448,
+          288,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          448,
+          288,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          204,
+          144,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          160,
+          32,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          16,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          16,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.03267,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.04766,
+            0.00305,
+            2,
+            1,
+            0.20257,
+            -0.00925,
+            3,
+            1,
+            0.11916,
+            0.00759,
+            3,
+            1,
+            0.2264,
+            -0.01413,
+            5,
+            1,
+            0.07149,
+            0.00744,
+            6,
+            1,
+            0.14299,
+            -0.01289,
+            8,
+            1,
+            0.02383,
+            0.00596,
+            11,
+            1,
+            0,
+            -0.00472,
+            14,
+            1,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.04766,
+            -0.00336,
+            0,
+            0,
+            0.20257,
+            0.00962,
+            0,
+            0,
+            0.11916,
+            -0.00759,
+            0,
+            0,
+            0.2264,
+            0.01372,
+            0,
+            0,
+            0.07149,
+            -0.00707,
+            0,
+            0,
+            0.14299,
+            0.01203,
+            0,
+            0,
+            0.02383,
+            -0.00548,
+            0,
+            0,
+            0,
+            0.00429,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            1,
+            0.30215,
+            0.26804,
+            0.84737,
+            0.39454,
+            0.02838,
+            0.33095,
+            0.58425,
+            0.09933,
+            0,
+            0.66085,
+            0.48842,
+            0.05006,
+            0.56781,
+            1,
+            0.41143,
+            0.42374,
+            1,
+            0.87156,
+            0.2827,
+            0.74078,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.03556,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          1.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55434,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.20811,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.21482,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          -1000000,
+          -1000000,
+          1000000,
+          1000000,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "plus-lighter",
+      "clipPath": "none",
+      "cssHeight": "288px",
+      "cssWidth": "448px",
+      "display": "block",
+      "filter": "",
+      "height": 288,
+      "transform": "translate(-4px, 188px)",
+      "width": 448,
+      "zIndex": "2147483000",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          448,
+          288,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          448,
+          288,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          448,
+          288,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          204,
+          144,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          160,
+          32,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          16,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          16,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.04867,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.06668,
+            0.00509,
+            2,
+            1,
+            0.28338,
+            -0.01665,
+            3,
+            1,
+            0.1667,
+            0.01333,
+            3,
+            1,
+            0.31672,
+            -0.02553,
+            5,
+            1,
+            0.10002,
+            0.01271,
+            6,
+            1,
+            0.20004,
+            -0.02285,
+            8,
+            1,
+            0.03334,
+            0.00955,
+            11,
+            1,
+            0,
+            -0.00703,
+            14,
+            1,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.06668,
+            -0.0056,
+            0,
+            0,
+            0.28338,
+            0.01732,
+            0,
+            0,
+            0.1667,
+            -0.01333,
+            0,
+            0,
+            0.31672,
+            0.0248,
+            0,
+            0,
+            0.10002,
+            -0.01207,
+            0,
+            0,
+            0.20004,
+            0.02132,
+            0,
+            0,
+            0.03334,
+            -0.00879,
+            0,
+            0,
+            0,
+            0.00639,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            1,
+            0.30215,
+            0.26804,
+            0.84737,
+            0.39454,
+            0.02838,
+            0.33095,
+            0.58425,
+            0.09933,
+            0,
+            0.66085,
+            0.48842,
+            0.05006,
+            0.56781,
+            1,
+            0.41143,
+            0.42374,
+            1,
+            0.87156,
+            0.2827,
+            0.74078,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.07111,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          1.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55368,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.29363,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.21482,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          -1000000,
+          -1000000,
+          1000000,
+          1000000,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "plus-lighter",
+      "clipPath": "none",
+      "cssHeight": "288px",
+      "cssWidth": "448px",
+      "display": "block",
+      "filter": "",
+      "height": 288,
+      "transform": "translate(-4px, 188px)",
+      "width": 448,
+      "zIndex": "2147483000",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          448,
+          288,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          448,
+          288,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          448,
+          288,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          204,
+          144,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          160,
+          32,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          16,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          16,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.06467,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.08332,
+            0.00742,
+            2,
+            1,
+            0.35411,
+            -0.02563,
+            3,
+            1,
+            0.2083,
+            0.02019,
+            3,
+            1,
+            0.39577,
+            -0.03941,
+            5,
+            1,
+            0.12498,
+            0.01887,
+            6,
+            1,
+            0.24996,
+            -0.03482,
+            8,
+            1,
+            0.04166,
+            0.01352,
+            11,
+            1,
+            0,
+            -0.00934,
+            14,
+            1,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.08332,
+            -0.00816,
+            0,
+            0,
+            0.35411,
+            0.02666,
+            0,
+            0,
+            0.2083,
+            -0.02019,
+            0,
+            0,
+            0.39577,
+            0.03828,
+            0,
+            0,
+            0.12498,
+            -0.01793,
+            0,
+            0,
+            0.24996,
+            0.03249,
+            0,
+            0,
+            0.04166,
+            -0.01244,
+            0,
+            0,
+            0,
+            0.00849,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            1,
+            0.30215,
+            0.26804,
+            0.84737,
+            0.39454,
+            0.02838,
+            0.33095,
+            0.58425,
+            0.09933,
+            0,
+            0.66085,
+            0.48842,
+            0.05006,
+            0.56781,
+            1,
+            0.41143,
+            0.42374,
+            1,
+            0.87156,
+            0.2827,
+            0.74078,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.10667,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          1.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55218,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.36992,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.21482,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          -1000000,
+          -1000000,
+          1000000,
+          1000000,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "plus-lighter",
+      "clipPath": "none",
+      "cssHeight": "288px",
+      "cssWidth": "448px",
+      "display": "block",
+      "filter": "",
+      "height": 288,
+      "transform": "translate(-4px, 188px)",
+      "width": 448,
+      "zIndex": "2147483000",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          448,
+          288,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          448,
+          288,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          448,
+          288,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          204,
+          144,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          160,
+          32,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          16,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          16,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.08067,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.09789,
+            0.01002,
+            2,
+            1,
+            0.41601,
+            -0.036,
+            3,
+            1,
+            0.24471,
+            0.02803,
+            3,
+            1,
+            0.46496,
+            -0.05546,
+            5,
+            1,
+            0.14683,
+            0.02581,
+            6,
+            1,
+            0.29366,
+            -0.04855,
+            8,
+            1,
+            0.04894,
+            0.01781,
+            11,
+            1,
+            0,
+            -0.01165,
+            14,
+            1,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.09789,
+            -0.01102,
+            0,
+            0,
+            0.41601,
+            0.03744,
+            0,
+            0,
+            0.24471,
+            -0.02803,
+            0,
+            0,
+            0.46496,
+            0.05388,
+            0,
+            0,
+            0.14683,
+            -0.02452,
+            0,
+            0,
+            0.29366,
+            0.04531,
+            0,
+            0,
+            0.04894,
+            -0.01639,
+            0,
+            0,
+            0,
+            0.01059,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            1,
+            0.30215,
+            0.26804,
+            0.84737,
+            0.39454,
+            0.02838,
+            0.33095,
+            0.58425,
+            0.09933,
+            0,
+            0.66085,
+            0.48842,
+            0.05006,
+            0.56781,
+            1,
+            0.41143,
+            0.42374,
+            1,
+            0.87156,
+            0.2827,
+            0.74078,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.14222,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          1.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55031,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.43796,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.21482,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          -1000000,
+          -1000000,
+          1000000,
+          1000000,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "plus-lighter",
+      "clipPath": "none",
+      "cssHeight": "288px",
+      "cssWidth": "448px",
+      "display": "block",
+      "filter": "",
+      "height": 288,
+      "transform": "translate(-4px, 188px)",
+      "width": 448,
+      "zIndex": "2147483000",
+    },
+  },
+]
+`;
+
+exports[`createAura frames > fades out and hides 1`] = `
+[
+  "block",
+  "block",
+  "block",
+  "block",
+  "block",
+  "block",
+  "block",
+  "block",
+  "block",
+  "block",
+  "block",
+  "block",
+]
+`;
+
+exports[`createAura frames > fades out and hides 2`] = `
+{
+  "calls": [
+    {
+      "args": [
+        0,
+        0,
+        448,
+        320,
+      ],
+      "name": "viewport",
+    },
+    {
+      "args": [
+        "u_px",
+        448,
+        320,
+      ],
+      "name": "uniform2f",
+    },
+    {
+      "args": [
+        "u_size",
+        448,
+        320,
+      ],
+      "name": "uniform2f",
+    },
+    {
+      "args": [
+        "u_center",
+        194,
+        152,
+      ],
+      "name": "uniform2f",
+    },
+    {
+      "args": [
+        "u_half",
+        150,
+        40,
+      ],
+      "name": "uniform2f",
+    },
+    {
+      "args": [
+        "u_radius",
+        0,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_pradius",
+        0,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_inner",
+        0,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_time",
+        50.16467,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_count",
+        7,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_band",
+        [
+          0.03621,
+          0.01778,
+          2,
+          1,
+          0.1539,
+          -0.05931,
+          3,
+          1,
+          0.09053,
+          0.04721,
+          4,
+          1,
+          0.172,
+          -0.09102,
+          5,
+          1,
+          0.05432,
+          0.04468,
+          6,
+          1,
+          0.10863,
+          -0.08108,
+          8,
+          1,
+          0.01811,
+          0.03303,
+          11,
+          1,
+          0,
+          -0.02377,
+          14,
+          1,
+        ],
+      ],
+      "name": "uniform4fv",
+    },
+    {
+      "args": [
+        "u_band2",
+        [
+          0.05493,
+          -0.02245,
+          0,
+          0,
+          0.23345,
+          0.07626,
+          0,
+          0,
+          0.13732,
+          -0.0571,
+          0,
+          0,
+          0.26091,
+          0.10972,
+          0,
+          0,
+          0.08239,
+          -0.04996,
+          0,
+          0,
+          0.16479,
+          0.09229,
+          0,
+          0,
+          0.02746,
+          -0.03342,
+          0,
+          0,
+          0,
+          0.02161,
+          0,
+          0,
+        ],
+      ],
+      "name": "uniform4fv",
+    },
+    {
+      "args": [
+        "u_colors",
+        [
+          0.64777,
+          0.07312,
+          0.0672,
+          0.40276,
+          0.17492,
+          0,
+          0.12963,
+          0.28057,
+          0,
+          0,
+          0.30082,
+          0.22231,
+          0,
+          0.26224,
+          0.49366,
+          0.17271,
+          0.15551,
+          0.75434,
+          0.48777,
+          0.08455,
+          0.40201,
+          0,
+          0,
+          0,
+        ],
+      ],
+      "name": "uniform3fv",
+    },
+    {
+      "args": [
+        "u_mix",
+        0.55111,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_height",
+        43,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_line",
+        1.8,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_gap",
+        1.5,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_glow",
+        12,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_gain",
+        0.55084,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_emph",
+        1,
+        0.3,
+        0.05,
+      ],
+      "name": "uniform3f",
+    },
+    {
+      "args": [
+        "u_vis",
+        0.24386,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_orbit",
+        0,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_lightMode",
+        1,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_layout",
+        2,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_specCenter",
+        0,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_span",
+        0.19737,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_dir",
+        1,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_pxSize",
+        1,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_aura",
+        0.75,
+      ],
+      "name": "uniform1f",
+    },
+    {
+      "args": [
+        "u_clip",
+        -1000000,
+        -1000000,
+        1000000,
+        1000000,
+      ],
+      "name": "uniform4f",
+    },
+    {
+      "args": [
+        0,
+        0,
+        0,
+        0,
+      ],
+      "name": "clearColor",
+    },
+    {
+      "args": [
+        16384,
+      ],
+      "name": "clear",
+    },
+    {
+      "args": [
+        4,
+        0,
+        3,
+      ],
+      "name": "drawArrays",
+    },
+  ],
+  "canvas": {
+    "blend": "normal",
+    "clipPath": "none",
+    "cssHeight": "320px",
+    "cssWidth": "448px",
+    "display": "block",
+    "filter": "",
+    "height": 320,
+    "transform": "translate(-4px, 88px)",
+    "width": 448,
+    "zIndex": "2147483000",
+  },
+}
+`;
+
+exports[`createAura frames > glides to a new anchor and restyles 1`] = `
+[
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          384,
+          320,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          384,
+          320,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          384,
+          320,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          150.40625,
+          148.50781,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          113.20313,
+          35.88281,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.09867,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.11211,
+            0.01399,
+            2,
+            1,
+            0.47646,
+            -0.05328,
+            2,
+            2,
+            0.28027,
+            0.04081,
+            3,
+            2,
+            0.53252,
+            -0.08231,
+            4,
+            3,
+            0.16816,
+            0.03679,
+            5,
+            4,
+            0.33633,
+            -0.07113,
+            6,
+            5,
+            0.05605,
+            0.02396,
+            9,
+            7,
+            0,
+            -0.01424,
+            11,
+            9,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.02594,
+            -0.01008,
+            0,
+            0,
+            0.11022,
+            0.02875,
+            0,
+            0,
+            0.06484,
+            -0.02272,
+            0,
+            0,
+            0.12319,
+            0.04099,
+            0,
+            0,
+            0.0389,
+            -0.0212,
+            0,
+            0,
+            0.07781,
+            0.03599,
+            0,
+            0,
+            0.01297,
+            -0.0165,
+            0,
+            0,
+            0,
+            0.01295,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            1,
+            0.30215,
+            0.26804,
+            0.84737,
+            0.39454,
+            0.02838,
+            0.33095,
+            0.58425,
+            0.09933,
+            0,
+            0.66085,
+            0.48842,
+            0.05006,
+            0.56781,
+            1,
+            0.41143,
+            0.42374,
+            1,
+            0.87156,
+            0.2827,
+            0.74078,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          1.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.50577,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.18983,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          -1000000,
+          -1000000,
+          1000000,
+          1000000,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "plus-lighter",
+      "clipPath": "none",
+      "cssHeight": "320px",
+      "cssWidth": "384px",
+      "display": "block",
+      "filter": "",
+      "height": 320,
+      "transform": "translate(-4px, 93px)",
+      "width": 384,
+      "zIndex": "2147483000",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          416,
+          320,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          416,
+          320,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          416,
+          320,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          170.25,
+          156.8125,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          123.125,
+          44.8125,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.14867,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.14206,
+            0.02457,
+            2,
+            1,
+            0.60375,
+            -0.09883,
+            2,
+            2,
+            0.35515,
+            0.07458,
+            3,
+            2,
+            0.67478,
+            -0.15303,
+            4,
+            3,
+            0.21309,
+            0.06591,
+            5,
+            4,
+            0.42618,
+            -0.13074,
+            6,
+            5,
+            0.07103,
+            0.04047,
+            9,
+            7,
+            0,
+            -0.02146,
+            11,
+            9,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.06668,
+            -0.01708,
+            0,
+            0,
+            0.28338,
+            0.0528,
+            0,
+            0,
+            0.1667,
+            -0.04066,
+            0,
+            0,
+            0.31672,
+            0.0756,
+            0,
+            0,
+            0.10002,
+            -0.03683,
+            0,
+            0,
+            0.20004,
+            0.06502,
+            0,
+            0,
+            0.03334,
+            -0.02683,
+            0,
+            0,
+            0,
+            0.01951,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            1,
+            0.30215,
+            0.26804,
+            0.84737,
+            0.39454,
+            0.02838,
+            0.33095,
+            0.58425,
+            0.09933,
+            0,
+            0.66085,
+            0.48842,
+            0.05006,
+            0.56781,
+            1,
+            0.41143,
+            0.42374,
+            1,
+            0.87156,
+            0.2827,
+            0.74078,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.13333,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          1.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.6542,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.18329,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          -1000000,
+          -1000000,
+          1000000,
+          1000000,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "plus-lighter",
+      "clipPath": "none",
+      "cssHeight": "320px",
+      "cssWidth": "416px",
+      "display": "block",
+      "filter": "",
+      "height": 320,
+      "transform": "translate(-4px, 173px)",
+      "width": 416,
+      "zIndex": "2147483000",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          448,
+          352,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          448,
+          352,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          448,
+          352,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          184.46875,
+          164.08594,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          130.23438,
+          51.21094,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.19867,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.1618,
+            0.03626,
+            2,
+            1,
+            0.68766,
+            -0.15025,
+            2,
+            2,
+            0.40451,
+            0.1125,
+            3,
+            2,
+            0.76856,
+            -0.23294,
+            4,
+            3,
+            0.2427,
+            0.09834,
+            5,
+            4,
+            0.48541,
+            -0.1978,
+            6,
+            5,
+            0.0809,
+            0.05836,
+            9,
+            7,
+            0,
+            -0.02868,
+            11,
+            9,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.11211,
+            -0.02687,
+            0,
+            0,
+            0.47646,
+            0.0909,
+            0,
+            0,
+            0.28027,
+            -0.06814,
+            0,
+            0,
+            0.53252,
+            0.13076,
+            0,
+            0,
+            0.16816,
+            -0.05971,
+            0,
+            0,
+            0.33633,
+            0.11009,
+            0,
+            0,
+            0.05605,
+            -0.04009,
+            0,
+            0,
+            0,
+            0.02607,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            1,
+            0.30215,
+            0.26804,
+            0.84737,
+            0.39454,
+            0.02838,
+            0.33095,
+            0.58425,
+            0.09933,
+            0,
+            0.66085,
+            0.48842,
+            0.05006,
+            0.56781,
+            1,
+            0.41143,
+            0.42374,
+            1,
+            0.87156,
+            0.2827,
+            0.74078,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.26667,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          1.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.75806,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.17944,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          -1000000,
+          -1000000,
+          1000000,
+          1000000,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "plus-lighter",
+      "clipPath": "none",
+      "cssHeight": "352px",
+      "cssWidth": "448px",
+      "display": "block",
+      "filter": "",
+      "height": 352,
+      "transform": "translate(-4px, 229px)",
+      "width": 448,
+      "zIndex": "2147483000",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          448,
+          352,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          448,
+          352,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          448,
+          352,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          194,
+          167.5,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          135,
+          55.5,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.24867,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.17482,
+            0.04867,
+            2,
+            1,
+            0.74298,
+            -0.20554,
+            2,
+            2,
+            0.43705,
+            0.15315,
+            3,
+            2,
+            0.83039,
+            -0.31892,
+            4,
+            3,
+            0.26223,
+            0.13296,
+            5,
+            4,
+            0.52446,
+            -0.26979,
+            6,
+            5,
+            0.08741,
+            0.07716,
+            9,
+            7,
+            0,
+            -0.0359,
+            11,
+            9,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.14206,
+            -0.03851,
+            0,
+            0,
+            0.60375,
+            0.13826,
+            0,
+            0,
+            0.35515,
+            -0.10191,
+            0,
+            0,
+            0.67478,
+            0.19946,
+            0,
+            0,
+            0.21309,
+            -0.08737,
+            0,
+            0,
+            0.42618,
+            0.16572,
+            0,
+            0,
+            0.07103,
+            -0.05527,
+            0,
+            0,
+            0,
+            0.03264,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            1,
+            0.30215,
+            0.26804,
+            0.84737,
+            0.39454,
+            0.02838,
+            0.33095,
+            0.58425,
+            0.09933,
+            0,
+            0.66085,
+            0.48842,
+            0.05006,
+            0.56781,
+            1,
+            0.41143,
+            0.42374,
+            1,
+            0.87156,
+            0.2827,
+            0.74078,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.4,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          1.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.83072,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.17717,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          -1000000,
+          -1000000,
+          1000000,
+          1000000,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "plus-lighter",
+      "clipPath": "none",
+      "cssHeight": "352px",
+      "cssWidth": "448px",
+      "display": "block",
+      "filter": "",
+      "height": 352,
+      "transform": "translate(-4px, 268px)",
+      "width": 448,
+      "zIndex": "2147483000",
+    },
+  },
+]
+`;
+
+exports[`createAura frames > glides to a new anchor and restyles 2`] = `
+[
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          448,
+          384,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          448,
+          384,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          448,
+          384,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          195.86963,
+          179.81985,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          146.71526,
+          67.12178,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          10.78044,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          10.78044,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.26467,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.17796,
+            0.0527,
+            2,
+            2,
+            0.75634,
+            -0.22353,
+            3,
+            2,
+            0.44491,
+            0.16637,
+            5,
+            3,
+            0.84532,
+            -0.34689,
+            8,
+            4,
+            0.26694,
+            0.14421,
+            12,
+            5,
+            0,
+            -0.27168,
+            18,
+            6,
+            0,
+            0.07926,
+            28,
+            9,
+            0,
+            -0.03821,
+            43,
+            11,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.14206,
+            -0.04223,
+            0,
+            0,
+            0.60375,
+            0.15342,
+            0,
+            0,
+            0.35515,
+            -0.11271,
+            0,
+            0,
+            0.67478,
+            0.22145,
+            0,
+            0,
+            0.21309,
+            -0.09622,
+            0,
+            0,
+            0.42618,
+            0.18352,
+            0,
+            0,
+            0.07103,
+            -0.06013,
+            0,
+            0,
+            0,
+            0.03474,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            0.15855,
+            0.63243,
+            0.24046,
+            0,
+            0.64601,
+            0.59304,
+            0.04336,
+            0.57052,
+            1,
+            0.33065,
+            0.45563,
+            1,
+            0.64989,
+            0.33689,
+            0.95623,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          1.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          1,
+          1,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.849,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.17458,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          -1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          -1000000,
+          -1000000,
+          1000000,
+          1000000,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "plus-lighter",
+      "clipPath": "none",
+      "cssHeight": "384px",
+      "cssWidth": "448px",
+      "display": "block",
+      "filter": "blur(6px)",
+      "height": 384,
+      "transform": "translate(-4px, 264px)",
+      "width": 448,
+      "zIndex": "2147483000",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          448,
+          384,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          448,
+          384,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          448,
+          384,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          197.49037,
+          181.03215,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          147.76874,
+          68.09422,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          11.02356,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          11.02356,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.28067,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.18071,
+            0.05678,
+            2,
+            2,
+            0.76803,
+            -0.24178,
+            3,
+            2,
+            0.45178,
+            0.17977,
+            5,
+            3,
+            0.85839,
+            -0.37528,
+            8,
+            4,
+            0.27107,
+            0.1556,
+            12,
+            5,
+            0,
+            -0.27357,
+            18,
+            6,
+            0,
+            0.08136,
+            28,
+            9,
+            0,
+            -0.04052,
+            43,
+            11,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.1618,
+            -0.04635,
+            0,
+            0,
+            0.68766,
+            0.17053,
+            0,
+            0,
+            0.40451,
+            -0.12485,
+            0,
+            0,
+            0.76856,
+            0.24629,
+            0,
+            0,
+            0.2427,
+            -0.10608,
+            0,
+            0,
+            0.48541,
+            0.20355,
+            0,
+            0,
+            0.0809,
+            -0.0654,
+            0,
+            0,
+            0,
+            0.03684,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            0.15855,
+            0.63243,
+            0.24046,
+            0,
+            0.64601,
+            0.59304,
+            0.04336,
+            0.57052,
+            1,
+            0.33065,
+            0.45563,
+            1,
+            0.64989,
+            0.33689,
+            0.95623,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.03556,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          1.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          1,
+          1,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.86531,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.17422,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          -1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          -1000000,
+          -1000000,
+          1000000,
+          1000000,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "plus-lighter",
+      "clipPath": "none",
+      "cssHeight": "384px",
+      "cssWidth": "448px",
+      "display": "block",
+      "filter": "blur(6px)",
+      "height": 384,
+      "transform": "translate(-4px, 270px)",
+      "width": 448,
+      "zIndex": "2147483000",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          448,
+          384,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          448,
+          384,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          448,
+          384,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          198.88,
+          181.216,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          148.672,
+          68.928,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          11.232,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          11.232,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.29667,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.18312,
+            0.0609,
+            2,
+            2,
+            0.77826,
+            -0.26026,
+            3,
+            2,
+            0.4578,
+            0.19334,
+            5,
+            3,
+            0.86982,
+            -0.40403,
+            8,
+            4,
+            0.27468,
+            0.16713,
+            12,
+            5,
+            0,
+            -0.27546,
+            18,
+            6,
+            0,
+            0.08346,
+            28,
+            9,
+            0,
+            -0.04283,
+            43,
+            11,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.1618,
+            -0.05046,
+            0,
+            0,
+            0.68766,
+            0.18764,
+            0,
+            0,
+            0.40451,
+            -0.13698,
+            0,
+            0,
+            0.76856,
+            0.27113,
+            0,
+            0,
+            0.2427,
+            -0.11594,
+            0,
+            0,
+            0.48541,
+            0.22358,
+            0,
+            0,
+            0.0809,
+            -0.07066,
+            0,
+            0,
+            0,
+            0.03894,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            0.15855,
+            0.63243,
+            0.24046,
+            0,
+            0.64601,
+            0.59304,
+            0.04336,
+            0.57052,
+            1,
+            0.33065,
+            0.45563,
+            1,
+            0.64989,
+            0.33689,
+            0.95623,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.07111,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          1.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          1,
+          1,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.87985,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.17392,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          -1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          -1000000,
+          -1000000,
+          1000000,
+          1000000,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "plus-lighter",
+      "clipPath": "none",
+      "cssHeight": "384px",
+      "cssWidth": "448px",
+      "display": "block",
+      "filter": "blur(6px)",
+      "height": 384,
+      "transform": "translate(-4px, 276px)",
+      "width": 448,
+      "zIndex": "2147483000",
+    },
+  },
+]
+`;
+
+exports[`createAura frames > hangs from the top edge of a wide box, clipped, on a light page 1`] = `
+[
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          420,
+          860,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          210,
+          700,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          290,
+          700,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          44,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          107.7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.01667,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.02594,
+            0.00136,
+            10,
+            1,
+            0.11022,
+            -0.00367,
+            13,
+            1,
+            0.06484,
+            0.00313,
+            17,
+            1,
+            0.12319,
+            -0.00556,
+            23,
+            1,
+            0.0389,
+            0.0032,
+            31,
+            1,
+            0.07781,
+            -0.00524,
+            41,
+            1,
+            0.01297,
+            0.00279,
+            54,
+            1,
+            0,
+            -0.00241,
+            71,
+            1,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.02594,
+            -0.0015,
+            0,
+            0,
+            0.11022,
+            0.00381,
+            0,
+            0,
+            0.06484,
+            -0.00313,
+            0,
+            0,
+            0.12319,
+            0.0054,
+            0,
+            0,
+            0.0389,
+            -0.00304,
+            0,
+            0,
+            0.07781,
+            0.00489,
+            0,
+            0,
+            0.01297,
+            -0.00257,
+            0,
+            0,
+            0,
+            0.00219,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            0.64777,
+            0.07312,
+            0.0672,
+            0.40276,
+            0.17492,
+            0,
+            0.12963,
+            0.28057,
+            0,
+            0,
+            0.30082,
+            0.22231,
+            0,
+            0.26224,
+            0.49366,
+            0.17271,
+            0.15551,
+            0.75434,
+            0.48777,
+            0.08455,
+            0.40201,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55349,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.11223,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.07518,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          0,
+          -40,
+          420,
+          1060,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "normal",
+      "clipPath": "inset(0px 0px 0px 0px)",
+      "cssHeight": "860px",
+      "cssWidth": "420px",
+      "display": "block",
+      "filter": "",
+      "height": 860,
+      "transform": "translate(0px, 0px)",
+      "width": 420,
+      "zIndex": "25",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          420,
+          860,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          210,
+          700,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          290,
+          700,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          44,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          107.7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.03267,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.04766,
+            0.00305,
+            10,
+            1,
+            0.20257,
+            -0.00925,
+            13,
+            1,
+            0.11916,
+            0.00759,
+            17,
+            1,
+            0.2264,
+            -0.01413,
+            23,
+            1,
+            0.07149,
+            0.00744,
+            31,
+            1,
+            0.14299,
+            -0.01289,
+            41,
+            1,
+            0.02383,
+            0.00596,
+            54,
+            1,
+            0,
+            -0.00472,
+            71,
+            1,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.04766,
+            -0.00336,
+            0,
+            0,
+            0.20257,
+            0.00962,
+            0,
+            0,
+            0.11916,
+            -0.00759,
+            0,
+            0,
+            0.2264,
+            0.01372,
+            0,
+            0,
+            0.07149,
+            -0.00707,
+            0,
+            0,
+            0.14299,
+            0.01203,
+            0,
+            0,
+            0.02383,
+            -0.00548,
+            0,
+            0,
+            0,
+            0.00429,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            0.64777,
+            0.07312,
+            0.0672,
+            0.40276,
+            0.17492,
+            0,
+            0.12963,
+            0.28057,
+            0,
+            0,
+            0.30082,
+            0.22231,
+            0,
+            0.26224,
+            0.49366,
+            0.17271,
+            0.15551,
+            0.75434,
+            0.48777,
+            0.08455,
+            0.40201,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.03556,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55434,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.20811,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.07518,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          0,
+          -40,
+          420,
+          1060,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "normal",
+      "clipPath": "inset(0px 0px 0px 0px)",
+      "cssHeight": "860px",
+      "cssWidth": "420px",
+      "display": "block",
+      "filter": "",
+      "height": 860,
+      "transform": "translate(0px, 0px)",
+      "width": 420,
+      "zIndex": "25",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          420,
+          860,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          210,
+          700,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          290,
+          700,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          44,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          107.7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.04867,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.06668,
+            0.00509,
+            10,
+            1,
+            0.28338,
+            -0.01665,
+            13,
+            1,
+            0.1667,
+            0.01333,
+            17,
+            1,
+            0.31672,
+            -0.02553,
+            23,
+            1,
+            0.10002,
+            0.01271,
+            31,
+            1,
+            0.20004,
+            -0.02285,
+            41,
+            1,
+            0.03334,
+            0.00955,
+            54,
+            1,
+            0,
+            -0.00703,
+            71,
+            1,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.06668,
+            -0.0056,
+            0,
+            0,
+            0.28338,
+            0.01732,
+            0,
+            0,
+            0.1667,
+            -0.01333,
+            0,
+            0,
+            0.31672,
+            0.0248,
+            0,
+            0,
+            0.10002,
+            -0.01207,
+            0,
+            0,
+            0.20004,
+            0.02132,
+            0,
+            0,
+            0.03334,
+            -0.00879,
+            0,
+            0,
+            0,
+            0.00639,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            0.64777,
+            0.07312,
+            0.0672,
+            0.40276,
+            0.17492,
+            0,
+            0.12963,
+            0.28057,
+            0,
+            0,
+            0.30082,
+            0.22231,
+            0,
+            0.26224,
+            0.49366,
+            0.17271,
+            0.15551,
+            0.75434,
+            0.48777,
+            0.08455,
+            0.40201,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.07111,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55368,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.29363,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.07518,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          0,
+          -40,
+          420,
+          1060,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "normal",
+      "clipPath": "inset(0px 0px 0px 0px)",
+      "cssHeight": "860px",
+      "cssWidth": "420px",
+      "display": "block",
+      "filter": "",
+      "height": 860,
+      "transform": "translate(0px, 0px)",
+      "width": 420,
+      "zIndex": "25",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          420,
+          860,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          210,
+          700,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          290,
+          700,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          44,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          107.7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.06467,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.08332,
+            0.00742,
+            10,
+            1,
+            0.35411,
+            -0.02563,
+            13,
+            1,
+            0.2083,
+            0.02019,
+            17,
+            1,
+            0.39577,
+            -0.03941,
+            23,
+            1,
+            0.12498,
+            0.01887,
+            31,
+            1,
+            0.24996,
+            -0.03482,
+            41,
+            1,
+            0.04166,
+            0.01352,
+            54,
+            1,
+            0,
+            -0.00934,
+            71,
+            1,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.08332,
+            -0.00816,
+            0,
+            0,
+            0.35411,
+            0.02666,
+            0,
+            0,
+            0.2083,
+            -0.02019,
+            0,
+            0,
+            0.39577,
+            0.03828,
+            0,
+            0,
+            0.12498,
+            -0.01793,
+            0,
+            0,
+            0.24996,
+            0.03249,
+            0,
+            0,
+            0.04166,
+            -0.01244,
+            0,
+            0,
+            0,
+            0.00849,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            0.64777,
+            0.07312,
+            0.0672,
+            0.40276,
+            0.17492,
+            0,
+            0.12963,
+            0.28057,
+            0,
+            0,
+            0.30082,
+            0.22231,
+            0,
+            0.26224,
+            0.49366,
+            0.17271,
+            0.15551,
+            0.75434,
+            0.48777,
+            0.08455,
+            0.40201,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.10667,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55218,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.36992,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.07518,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          0,
+          -40,
+          420,
+          1060,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "normal",
+      "clipPath": "inset(0px 0px 0px 0px)",
+      "cssHeight": "860px",
+      "cssWidth": "420px",
+      "display": "block",
+      "filter": "",
+      "height": 860,
+      "transform": "translate(0px, 0px)",
+      "width": 420,
+      "zIndex": "25",
+    },
+  },
+]
+`;
+
+exports[`createAura frames > hangs from the top edge of a wide box, clipped, on a light page 2`] = `
+[
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          420,
+          860,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          210,
+          700,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          290,
+          700,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          44,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          107.7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.10467,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.0597,
+            0.0122,
+            10,
+            1,
+            0.25373,
+            -0.04247,
+            13,
+            1,
+            0.14925,
+            0.03337,
+            17,
+            1,
+            0.28358,
+            -0.06532,
+            23,
+            1,
+            0.08955,
+            0.03109,
+            31,
+            1,
+            0.17911,
+            -0.05759,
+            41,
+            1,
+            0.02985,
+            0.02211,
+            54,
+            1,
+            0,
+            -0.01511,
+            71,
+            1,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.02594,
+            -0.01175,
+            0,
+            0,
+            0.11022,
+            0.03581,
+            0,
+            0,
+            0.06484,
+            -0.0277,
+            0,
+            0,
+            0.12319,
+            0.05124,
+            0,
+            0,
+            0.0389,
+            -0.02523,
+            0,
+            0,
+            0.07781,
+            0.04422,
+            0,
+            0,
+            0.01297,
+            -0.0186,
+            0,
+            0,
+            0,
+            0.01374,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            0.64777,
+            0.07312,
+            0.0672,
+            0.40276,
+            0.17492,
+            0,
+            0.12963,
+            0.28057,
+            0,
+            0,
+            0.30082,
+            0.22231,
+            0,
+            0.26224,
+            0.49366,
+            0.17271,
+            0.15551,
+            0.75434,
+            0.48777,
+            0.08455,
+            0.40201,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.19556,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55325,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.52651,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0.13312,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.07518,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          0,
+          -40,
+          420,
+          1060,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "normal",
+      "clipPath": "inset(0px 0px 0px 0px)",
+      "cssHeight": "860px",
+      "cssWidth": "420px",
+      "display": "block",
+      "filter": "",
+      "height": 860,
+      "transform": "translate(0px, 0px)",
+      "width": 420,
+      "zIndex": "25",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          420,
+          860,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          210,
+          700,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          290,
+          700,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          44,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          107.7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.14467,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.04278,
+            0.01621,
+            10,
+            1,
+            0.18181,
+            -0.05527,
+            13,
+            1,
+            0.10695,
+            0.04371,
+            17,
+            1,
+            0.2032,
+            -0.08492,
+            23,
+            1,
+            0.06417,
+            0.04104,
+            31,
+            1,
+            0.12833,
+            -0.07526,
+            41,
+            1,
+            0.02139,
+            0.02976,
+            54,
+            1,
+            0,
+            -0.02089,
+            71,
+            1,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.08332,
+            -0.01817,
+            0,
+            0,
+            0.35411,
+            0.05916,
+            0,
+            0,
+            0.2083,
+            -0.04485,
+            0,
+            0,
+            0.39577,
+            0.08495,
+            0,
+            0,
+            0.12498,
+            -0.03986,
+            0,
+            0,
+            0.24996,
+            0.07215,
+            0,
+            0,
+            0.04166,
+            -0.02773,
+            0,
+            0,
+            0,
+            0.01899,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            0.64777,
+            0.07312,
+            0.0672,
+            0.40276,
+            0.17492,
+            0,
+            0.12963,
+            0.28057,
+            0,
+            0,
+            0.30082,
+            0.22231,
+            0,
+            0.26224,
+            0.49366,
+            0.17271,
+            0.15551,
+            0.75434,
+            0.48777,
+            0.08455,
+            0.40201,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.28444,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55273,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.64418,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0.24852,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.07518,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          0,
+          -40,
+          420,
+          1060,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "normal",
+      "clipPath": "inset(0px 0px 0px 0px)",
+      "cssHeight": "860px",
+      "cssWidth": "420px",
+      "display": "block",
+      "filter": "",
+      "height": 860,
+      "transform": "translate(0px, 0px)",
+      "width": 420,
+      "zIndex": "25",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          420,
+          860,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          210,
+          700,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          290,
+          700,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          44,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          107.7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.18467,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0.03065,
+            0.01969,
+            10,
+            1,
+            0.13027,
+            -0.06519,
+            13,
+            1,
+            0.07663,
+            0.05201,
+            17,
+            1,
+            0.1456,
+            -0.10001,
+            23,
+            1,
+            0.04598,
+            0.04936,
+            31,
+            1,
+            0.09196,
+            -0.08925,
+            41,
+            1,
+            0.01533,
+            0.03673,
+            54,
+            1,
+            0,
+            -0.02666,
+            71,
+            1,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0.0597,
+            -0.02342,
+            0,
+            0,
+            0.25373,
+            0.07667,
+            0,
+            0,
+            0.14925,
+            -0.05803,
+            0,
+            0,
+            0.28358,
+            0.11012,
+            0,
+            0,
+            0.08955,
+            -0.05147,
+            0,
+            0,
+            0.17911,
+            0.09341,
+            0,
+            0,
+            0.02985,
+            -0.03563,
+            0,
+            0,
+            0,
+            0.02424,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            0.64777,
+            0.07312,
+            0.0672,
+            0.40276,
+            0.17492,
+            0,
+            0.12963,
+            0.28057,
+            0,
+            0,
+            0.30082,
+            0.22231,
+            0,
+            0.26224,
+            0.49366,
+            0.17271,
+            0.15551,
+            0.75434,
+            0.48777,
+            0.08455,
+            0.40201,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.37333,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          43,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          12,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55185,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.73261,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0.34856,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.07518,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          0,
+          -40,
+          420,
+          1060,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "normal",
+      "clipPath": "inset(0px 0px 0px 0px)",
+      "cssHeight": "860px",
+      "cssWidth": "420px",
+      "display": "block",
+      "filter": "",
+      "height": 860,
+      "transform": "translate(0px, 0px)",
+      "width": 420,
+      "zIndex": "25",
+    },
+  },
+]
+`;
+
+exports[`createAura frames > outlines the page when there is no anchor 1`] = `
+[
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          315,
+          645,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          315,
+          645,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          210,
+          430,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          210,
+          430,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          24,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          177.13,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.01667,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0,
+            0.00088,
+            3,
+            1,
+            0,
+            -0.00109,
+            4,
+            1,
+            0,
+            0.00131,
+            6,
+            1,
+            0,
+            -0.00153,
+            8,
+            1,
+            0,
+            0.00175,
+            10,
+            1,
+            0,
+            -0.00197,
+            14,
+            1,
+            0,
+            0.00219,
+            18,
+            1,
+            0,
+            -0.00241,
+            24,
+            1,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0,
+            -0.00096,
+            0,
+            0,
+            0,
+            0.00114,
+            0,
+            0,
+            0,
+            -0.00131,
+            0,
+            0,
+            0,
+            0.00149,
+            0,
+            0,
+            0,
+            -0.00166,
+            0,
+            0,
+            0,
+            0.00184,
+            0,
+            0,
+            0,
+            -0.00201,
+            0,
+            0,
+            0,
+            0.00219,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            1,
+            0.30215,
+            0.26804,
+            0.84737,
+            0.39454,
+            0.02838,
+            0.33095,
+            0.58425,
+            0.09933,
+            0,
+            0.66085,
+            0.48842,
+            0.05006,
+            0.56781,
+            1,
+            0.41143,
+            0.42374,
+            1,
+            0.87156,
+            0.2827,
+            0.74078,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          73.1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          1.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          19.2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.07856,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.08857,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1.33333,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          -1000000,
+          -1000000,
+          1000000,
+          1000000,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "plus-lighter",
+      "clipPath": "none",
+      "cssHeight": "860px",
+      "cssWidth": "420px",
+      "display": "block",
+      "filter": "",
+      "height": 645,
+      "transform": "translate(0px, 0px)",
+      "width": 315,
+      "zIndex": "2147483000",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          315,
+          645,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          315,
+          645,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          210,
+          430,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          210,
+          430,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          24,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          177.13,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.03267,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0,
+            0.00172,
+            3,
+            1,
+            0,
+            -0.00214,
+            4,
+            1,
+            0,
+            0.00257,
+            6,
+            1,
+            0,
+            -0.003,
+            8,
+            1,
+            0,
+            0.00343,
+            10,
+            1,
+            0,
+            -0.00386,
+            14,
+            1,
+            0,
+            0.00429,
+            18,
+            1,
+            0,
+            -0.00472,
+            24,
+            1,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0,
+            -0.00189,
+            0,
+            0,
+            0,
+            0.00223,
+            0,
+            0,
+            0,
+            -0.00257,
+            0,
+            0,
+            0,
+            0.00292,
+            0,
+            0,
+            0,
+            -0.00326,
+            0,
+            0,
+            0,
+            0.0036,
+            0,
+            0,
+            0,
+            -0.00394,
+            0,
+            0,
+            0,
+            0.00429,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            1,
+            0.30215,
+            0.26804,
+            0.84737,
+            0.39454,
+            0.02838,
+            0.33095,
+            0.58425,
+            0.09933,
+            0,
+            0.66085,
+            0.48842,
+            0.05006,
+            0.56781,
+            1,
+            0.41143,
+            0.42374,
+            1,
+            0.87156,
+            0.2827,
+            0.74078,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.03556,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          73.1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          1.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          19.2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.14568,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.08857,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1.33333,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          -1000000,
+          -1000000,
+          1000000,
+          1000000,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "plus-lighter",
+      "clipPath": "none",
+      "cssHeight": "860px",
+      "cssWidth": "420px",
+      "display": "block",
+      "filter": "",
+      "height": 645,
+      "transform": "translate(0px, 0px)",
+      "width": 315,
+      "zIndex": "2147483000",
+    },
+  },
+  {
+    "calls": [
+      {
+        "args": [
+          0,
+          0,
+          315,
+          645,
+        ],
+        "name": "viewport",
+      },
+      {
+        "args": [
+          "u_px",
+          315,
+          645,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_size",
+          420,
+          860,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_center",
+          210,
+          430,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_half",
+          210,
+          430,
+        ],
+        "name": "uniform2f",
+      },
+      {
+        "args": [
+          "u_radius",
+          24,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pradius",
+          177.13,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_inner",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_time",
+          50.04867,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_count",
+          7,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_band",
+          [
+            0,
+            0.00256,
+            3,
+            1,
+            0,
+            -0.00319,
+            4,
+            1,
+            0,
+            0.00383,
+            6,
+            1,
+            0,
+            -0.00447,
+            8,
+            1,
+            0,
+            0.00511,
+            10,
+            1,
+            0,
+            -0.00575,
+            14,
+            1,
+            0,
+            0.00639,
+            18,
+            1,
+            0,
+            -0.00703,
+            24,
+            1,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_band2",
+          [
+            0,
+            -0.00281,
+            0,
+            0,
+            0,
+            0.00332,
+            0,
+            0,
+            0,
+            -0.00383,
+            0,
+            0,
+            0,
+            0.00434,
+            0,
+            0,
+            0,
+            -0.00485,
+            0,
+            0,
+            0,
+            0.00537,
+            0,
+            0,
+            0,
+            -0.00588,
+            0,
+            0,
+            0,
+            0.00639,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform4fv",
+      },
+      {
+        "args": [
+          "u_colors",
+          [
+            1,
+            0.30215,
+            0.26804,
+            0.84737,
+            0.39454,
+            0.02838,
+            0.33095,
+            0.58425,
+            0.09933,
+            0,
+            0.66085,
+            0.48842,
+            0.05006,
+            0.56781,
+            1,
+            0.41143,
+            0.42374,
+            1,
+            0.87156,
+            0.2827,
+            0.74078,
+            0,
+            0,
+            0,
+          ],
+        ],
+        "name": "uniform3fv",
+      },
+      {
+        "args": [
+          "u_mix",
+          0.07111,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_height",
+          73.1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_line",
+          1.8,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gap",
+          1.5,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_glow",
+          19.2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_gain",
+          0.55,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_emph",
+          1,
+          0.3,
+          0.05,
+        ],
+        "name": "uniform3f",
+      },
+      {
+        "args": [
+          "u_vis",
+          0.20554,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_orbit",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_lightMode",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_layout",
+          2,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_specCenter",
+          0,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_span",
+          0.08857,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_dir",
+          1,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_pxSize",
+          1.33333,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_aura",
+          0.75,
+        ],
+        "name": "uniform1f",
+      },
+      {
+        "args": [
+          "u_clip",
+          -1000000,
+          -1000000,
+          1000000,
+          1000000,
+        ],
+        "name": "uniform4f",
+      },
+      {
+        "args": [
+          0,
+          0,
+          0,
+          0,
+        ],
+        "name": "clearColor",
+      },
+      {
+        "args": [
+          16384,
+        ],
+        "name": "clear",
+      },
+      {
+        "args": [
+          4,
+          0,
+          3,
+        ],
+        "name": "drawArrays",
+      },
+    ],
+    "canvas": {
+      "blend": "plus-lighter",
+      "clipPath": "none",
+      "cssHeight": "860px",
+      "cssWidth": "420px",
+      "display": "block",
+      "filter": "",
+      "height": 645,
+      "transform": "translate(0px, 0px)",
+      "width": 315,
+      "zIndex": "2147483000",
+    },
+  },
+]
+`;

@@ -1,0 +1,140 @@
+import type { ITtsAdapter, ITtsCapabilities, ITtsEngineConfig, ITtsSynthesizeResult, ITtsSynthesizeInput, TtsErrorCode } from "@saystack/core";
+
+interface IResponseLike {
+  ok: boolean;
+  status: number;
+  arrayBuffer: () => Promise<ArrayBuffer>;
+  text: () => Promise<string>;
+}
+
+export interface ITtsAdapterDeps {
+  readonly fetch?: (input: string, init?: RequestInit) => Promise<Response>;
+}
+
+const MAX_AUDIO_TOKENS = 2048;
+const BASE_AUDIO_TOKENS = 50;
+const AUDIO_TOKENS_PER_CHAR = 5;
+
+export const maxAudioTokens = (text: string): number =>
+  Math.min(MAX_AUDIO_TOKENS, BASE_AUDIO_TOKENS + AUDIO_TOKENS_PER_CHAR * text.length);
+
+const normalizeBaseUrl = (url: string): string => {
+  const trimmed = url.replace(/\/+$/, "");
+  return trimmed.endsWith("/v1") ? trimmed : `${trimmed}/v1`;
+};
+
+const statusToErrorCode = (status: number): TtsErrorCode => {
+  if (status === 401 || status === 403) return "BAD_TOKEN";
+  if (status === 404) return "MODEL_NOT_FOUND";
+  if (status === 429 || status === 503) return "TTS_RETRYABLE";
+  if (status === 400 || status === 415 || status === 422) return "TTS_REJECTED_INPUT";
+  return "TTS_FAILED";
+};
+
+const isAbortName = (error: unknown): boolean => {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  return error.name === "AbortError" || error.name === "TimeoutError";
+};
+
+export const createOmlxTtsAdapter = (
+  engine: ITtsEngineConfig,
+  deps: ITtsAdapterDeps = {},
+): ITtsAdapter => {
+  const doFetch = deps.fetch ?? ((input: string, init?: RequestInit) => fetch(input, init));
+
+  const url = normalizeBaseUrl(engine.url);
+  const token = engine.token;
+  const model = engine.model ?? "higgs_audio_v3-tts-4b";
+  const timeoutMs = (engine.timeoutSeconds ?? 60) * 1000;
+
+  const capabilities: ITtsCapabilities = {
+    streaming: false,
+    voiceCloning: true,
+  };
+
+  return {
+    capabilities,
+
+    async synthesize(input: ITtsSynthesizeInput): Promise<ITtsSynthesizeResult> {
+      if (input.text.trim().length === 0) {
+        return { ok: false, errorCode: "EMPTY_TEXT", message: "text is empty" };
+      }
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), timeoutMs);
+      const onCallerAbort = (): void => {
+        if (input.signal?.aborted) {
+          controller.abort();
+        }
+      };
+      input.signal?.addEventListener("abort", onCallerAbort, { once: true });
+
+      const reference =
+        input.refAudio !== undefined && input.refText !== undefined
+          ? { ref_audio: input.refAudio, ref_text: input.refText }
+          : {};
+
+      let response: IResponseLike;
+
+      try {
+        response = (await doFetch(`${url}/audio/speech`, {
+          method: "POST",
+          headers: {
+            ...(token !== undefined && token !== "" ? { Authorization: `Bearer ${token}` } : {}),
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model,
+            input: input.text,
+            response_format: "wav",
+            max_tokens: maxAudioTokens(input.text),
+            ...reference,
+          }),
+          signal: controller.signal,
+        })) as unknown as IResponseLike;
+      } catch (error) {
+        clearTimeout(timeout);
+        input.signal?.removeEventListener("abort", onCallerAbort);
+        if (isAbortName(error)) {
+          if (input.signal?.aborted) {
+            return { ok: false, errorCode: "TTS_FAILED", message: "cancelled by caller" };
+          }
+          return { ok: false, errorCode: "TTS_TIMEOUT", message: "engine timed out" };
+        }
+        return { ok: false, errorCode: "TTS_UNAVAILABLE", message: "engine unreachable" };
+      }
+
+      if (!response.ok) {
+        clearTimeout(timeout);
+        input.signal?.removeEventListener("abort", onCallerAbort);
+        const detail = await response.text().catch(() => "");
+        return {
+          ok: false,
+          errorCode: statusToErrorCode(response.status),
+          message: detail.slice(0, 300) || `engine said ${response.status}`,
+        };
+      }
+
+      let audio: ArrayBuffer;
+
+      try {
+        audio = await response.arrayBuffer();
+      } catch {
+        clearTimeout(timeout);
+        input.signal?.removeEventListener("abort", onCallerAbort);
+        return { ok: false, errorCode: "TTS_FAILED", message: "engine interrupted the transfer" };
+      }
+
+      clearTimeout(timeout);
+      input.signal?.removeEventListener("abort", onCallerAbort);
+
+      if (audio.byteLength === 0) {
+        return { ok: false, errorCode: "TTS_FAILED", message: "engine returned no audio" };
+      }
+
+      return { ok: true, audio, mimeType: "audio/wav" };
+    },
+  };
+};

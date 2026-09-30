@@ -1,0 +1,134 @@
+import type { ISpeechClipResult, ISpeechState, ITtsDriver, ITtsSynthesizeResult } from "@saystack/core";
+import { act, renderHook } from "@testing-library/react";
+import { deferred } from "./deferred.js";
+import { describe, expect, it, vi } from "vitest";
+import { useSpeech } from "../src/useSpeech.js";
+
+const WAV = new ArrayBuffer(8);
+
+interface IDriverFakes {
+  synthesize: ReturnType<typeof vi.fn>;
+  createClip: ReturnType<typeof vi.fn>;
+}
+
+function makeDriver(fakes?: Partial<IDriverFakes>): ITtsDriver {
+  const synthesize =
+    fakes?.synthesize ??
+    vi.fn(async (): Promise<ITtsSynthesizeResult> => ({ ok: true, audio: WAV, mimeType: "audio/wav" }));
+
+  const createClip =
+    fakes?.createClip ??
+    vi.fn(async (): Promise<ISpeechClipResult> => ({
+      ok: true,
+      clip: { play: async () => undefined, stop: () => undefined, release: () => undefined },
+    }));
+
+  return { synthesize, createClip };
+}
+
+describe("useSpeech", () => {
+  it("starts idle and keeps state identity stable across unrelated re-renders", () => {
+    const { result, rerender } = renderHook(() => useSpeech(makeDriver()));
+
+    expect(result.current[0].phase).toBe("idle");
+
+    const before = result.current[0];
+    rerender();
+
+    expect(result.current[0]).toBe(before);
+  });
+
+  it("speak plays the chunk and ends in done", async () => {
+    const play = deferred<void>();
+    const driver = makeDriver({
+      createClip: vi.fn(async (): Promise<ISpeechClipResult> => ({
+        ok: true,
+        clip: { play: () => play.promise, stop: () => undefined, release: () => undefined },
+      })),
+    });
+    const { result } = renderHook(() => useSpeech(driver));
+
+    let speakPromise: Promise<void> | null = null;
+    await act(async () => {
+      speakPromise = result.current[1].speak("One chunk only.");
+      await Promise.resolve();
+    });
+
+    expect(result.current[0].phase).toBe("playing");
+
+    await act(async () => {
+      play.resolve();
+      await speakPromise;
+    });
+
+    expect(result.current[0].phase).toBe("done");
+  });
+
+  it("stop resets to idle", async () => {
+    const play = deferred<void>();
+    const driver = makeDriver({
+      createClip: vi.fn(async (): Promise<ISpeechClipResult> => ({
+        ok: true,
+        clip: { play: () => play.promise, stop: () => undefined, release: () => undefined },
+      })),
+    });
+    const { result } = renderHook(() => useSpeech(driver));
+
+    await act(async () => {
+      const speakPromise = result.current[1].speak("Speak until stopped.");
+      result.current[1].stop();
+
+      await speakPromise;
+    });
+
+    expect(result.current[0].phase).toBe("idle");
+  });
+
+  it("unmount stops the clip", async () => {
+    const stop = vi.fn();
+    const driver = makeDriver({
+      createClip: vi.fn(async (): Promise<ISpeechClipResult> => ({
+        ok: true,
+        clip: { play: () => new Promise<void>(() => undefined), stop, release: () => undefined },
+      })),
+    });
+    const { result, unmount } = renderHook(() => useSpeech(driver));
+
+    await act(async () => {
+      void result.current[1].speak("Speak until unmounted.");
+      await Promise.resolve();
+    });
+    unmount();
+
+    expect(stop).toHaveBeenCalled();
+  });
+
+  it("surfaces a failed synthesize as coded error state", async () => {
+    const driver = makeDriver({
+      synthesize: vi.fn(async (): Promise<ITtsSynthesizeResult> => ({
+        ok: false,
+        errorCode: "TTS_RETRYABLE",
+        message: "engine said 503",
+      })),
+    });
+    const { result } = renderHook(() => useSpeech(driver));
+
+    await act(async () => {
+      await result.current[1].speak("Fails at the engine.");
+    });
+
+    expect(result.current[0]).toMatchObject({ phase: "error", errorCode: "TTS_RETRYABLE" });
+  });
+
+  it("speak passes the reference pair through when both parts are given", async () => {
+    const synthesize = vi.fn(async (): Promise<ITtsSynthesizeResult> => ({ ok: true, audio: WAV, mimeType: "audio/wav" }));
+    const { result } = renderHook(() => useSpeech(makeDriver({ synthesize })));
+
+    await act(async () => {
+      await result.current[1].speak("Cloned voice please.", "refwave", "reference text");
+    });
+
+    expect(synthesize).toHaveBeenCalledWith(expect.objectContaining({ refAudio: "refwave", refText: "reference text" }));
+  });
+});
+
