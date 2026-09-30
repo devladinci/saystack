@@ -48,7 +48,11 @@ export function createResampler(fromRate: number, toRate: number): (input: Float
   };
 }
 
-export function createPcm16Chunker({ onChunk, sampleRate = 16000, chunkMs = 100 }: IPcm16ChunkerOptions): IPcm16Chunker {
+export function createPcm16Chunker({
+  onChunk,
+  sampleRate = 16000,
+  chunkMs = 100,
+}: IPcm16ChunkerOptions): IPcm16Chunker {
   const chunk = new DataView(new ArrayBuffer(Math.max(2, Math.round((sampleRate * chunkMs) / 1000)) * 2));
   let filled = 0;
 
@@ -120,7 +124,12 @@ export function pcm16ToWav(chunks: readonly Uint8Array[], sampleRate = 16000): U
 }
 
 const tagAt = (view: DataView, offset: number): string =>
-  String.fromCharCode(view.getUint8(offset), view.getUint8(offset + 1), view.getUint8(offset + 2), view.getUint8(offset + 3));
+  String.fromCharCode(
+    view.getUint8(offset),
+    view.getUint8(offset + 1),
+    view.getUint8(offset + 2),
+    view.getUint8(offset + 3),
+  );
 
 const sampleAt = (view: DataView, offset: number, format: number, bits: number): number => {
   if (format === 3 && bits === 32) {

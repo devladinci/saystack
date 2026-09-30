@@ -87,7 +87,9 @@ export function LiftedReply({
     return () => animation.stop();
   }, [isLifted, layout, progress]);
 
-  const activeBlock = text.blocks.findIndex((block) => activeWord >= (block[0]?.index ?? 0) && activeWord <= (block.at(-1)?.index ?? -1));
+  const activeBlock = text.blocks.findIndex(
+    (block) => activeWord >= (block[0]?.index ?? 0) && activeWord <= (block.at(-1)?.index ?? -1),
+  );
 
   useEffect(() => {
     const box = blocksRef.current[activeBlock];
@@ -126,7 +128,10 @@ export function LiftedReply({
     [progress, dy],
   );
   const surface = useMemo(() => ({ opacity: progress }), [progress]);
-  const words = useMemo(() => ({ opacity: progress.interpolate({ inputRange: [0, 0.6, 1], outputRange: [0, 1, 1] }) }), [progress]);
+  const words = useMemo(
+    () => ({ opacity: progress.interpolate({ inputRange: [0, 0.6, 1], outputRange: [0, 1, 1] }) }),
+    [progress],
+  );
   const body = useMemo((): ViewStyle | null => (bodyHeight === null ? null : { maxHeight: bodyHeight }), [bodyHeight]);
 
   return (

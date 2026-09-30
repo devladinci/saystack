@@ -289,7 +289,7 @@ function transcribe() {
 micBtn.addEventListener('pointerdown', (e) => {
   if (e.button !== 0) return;
   e.preventDefault();
-  try { micBtn.setPointerCapture(e.pointerId); } catch { }
+  try { micBtn.setPointerCapture(e.pointerId); } catch { /* not available on every pointer type */ }
   const r = micBtn.getBoundingClientRect();
   Object.assign(dict, { pointerId: e.pointerId, cx: r.left + r.width / 2, cy: r.top + r.height / 2 });
   startDictation();

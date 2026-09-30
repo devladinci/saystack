@@ -135,8 +135,7 @@ describe("createBandMeter", () => {
 
   it("learns steady room noise and ignores it", () => {
     const meter = createBandMeter({ bands: 6, sampleRate: SAMPLE_RATE, binCount: BINS });
-    const noise = (): Float32Array =>
-      Float32Array.from({ length: BINS }, () => -60 + (Math.random() - 0.5) * 4);
+    const noise = (): Float32Array => Float32Array.from({ length: BINS }, () => -60 + (Math.random() - 0.5) * 4);
 
     for (let frame = 0; frame < 6; frame += 1) {
       meter.update(new Float32Array(BINS).fill(-Infinity), 1 / 60);

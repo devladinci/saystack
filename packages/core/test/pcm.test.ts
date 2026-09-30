@@ -64,7 +64,8 @@ describe("WAV", () => {
     const frames = 4;
     const buffer = new ArrayBuffer(12 + 8 + 16 + 8 + 4 + 8 + frames * 8);
     const view = new DataView(buffer);
-    const ascii = (offset: number, text: string) => [...text].forEach((char, index) => view.setUint8(offset + index, char.charCodeAt(0)));
+    const ascii = (offset: number, text: string) =>
+      [...text].forEach((char, index) => view.setUint8(offset + index, char.charCodeAt(0)));
     ascii(0, "RIFF");
     ascii(8, "WAVE");
     ascii(12, "fmt ");

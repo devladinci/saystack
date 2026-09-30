@@ -103,7 +103,9 @@ export function useDictation(options: IUseDictationOptions = {}): IUseDictationR
       const recording = await session.recorder.stopRecording();
       const streamed = session.live === null ? null : await session.live.finish();
       const result: ISttTranscribeResult =
-        streamed === null ? await transcribeWith(optionsRef.current)(recording, abort.signal) : { ok: true, text: streamed };
+        streamed === null
+          ? await transcribeWith(optionsRef.current)(recording, abort.signal)
+          : { ok: true, text: streamed };
 
       if (!abort.signal.aborted) {
         deliver(result, session);

@@ -14,7 +14,10 @@ interface IProps {
 export function PlayerTrack({ progress, theme, label, onSeek }: IProps) {
   const [width, setWidth] = useState(0);
   const themed = useMemo(() => themedStyles(theme), [theme]);
-  const filled = useMemo((): ViewStyle => ({ width: `${Math.round(Math.min(1, Math.max(0, progress)) * 1000) / 10}%` }), [progress]);
+  const filled = useMemo(
+    (): ViewStyle => ({ width: `${Math.round(Math.min(1, Math.max(0, progress)) * 1000) / 10}%` }),
+    [progress],
+  );
 
   const handleLayout = (event: LayoutChangeEvent): void => {
     setWidth(event.nativeEvent.layout.width);
@@ -27,7 +30,13 @@ export function PlayerTrack({ progress, theme, label, onSeek }: IProps) {
   };
 
   return (
-    <Pressable style={styles.hit} onLayout={handleLayout} onPress={handlePress} accessibilityRole="adjustable" accessibilityLabel={label}>
+    <Pressable
+      style={styles.hit}
+      onLayout={handleLayout}
+      onPress={handlePress}
+      accessibilityRole="adjustable"
+      accessibilityLabel={label}
+    >
       <View style={[styles.rail, themed.rail]}>
         <View style={[styles.fill, themed.fill, filled]} />
       </View>

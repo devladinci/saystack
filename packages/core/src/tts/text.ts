@@ -36,8 +36,7 @@ const cleanLine = (line: string): string =>
     .replace(SPACES, " ")
     .trim();
 
-const asSentence = (line: string): string =>
-  SENTENCE_END.test(line) ? line : `${line}.`;
+const asSentence = (line: string): string => (SENTENCE_END.test(line) ? line : `${line}.`);
 
 export function toSpeechText(markdown: string): string {
   return markdown
@@ -90,16 +89,14 @@ export function toReadingBlocks(markdown: string): string[] {
   return blocks;
 }
 
-export const hasSpeechText = (markdown: string): boolean =>
-  toSpeechText(markdown) !== "";
+export const hasSpeechText = (markdown: string): boolean => toSpeechText(markdown) !== "";
 
 export const needsSummary = (markdown: string): boolean =>
   markdown.includes("```") ||
   markdown.split("\n").some((line) => TABLE_ROW.test(line)) ||
   toSpeechText(markdown).length > SUMMARY_MIN_CHARS;
 
-const sentences = (text: string): string[] =>
-  (text.match(SENTENCE) ?? []).map((s) => s.trim()).filter(Boolean);
+const sentences = (text: string): string[] => (text.match(SENTENCE) ?? []).map((s) => s.trim()).filter(Boolean);
 
 export function speechChunks(text: string): string[] {
   const chunks: string[] = [];

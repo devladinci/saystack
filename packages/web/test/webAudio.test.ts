@@ -122,7 +122,9 @@ describe("createWebClip", () => {
 
 describe("createWebTtsDriver", () => {
   it("posts the text and returns the audio", async () => {
-    const fetch = vi.fn(async () => new Response(new Uint8Array([1, 2, 3]), { headers: { "content-type": "audio/wav" } }));
+    const fetch = vi.fn(
+      async () => new Response(new Uint8Array([1, 2, 3]), { headers: { "content-type": "audio/wav" } }),
+    );
     const driver = createWebTtsDriver({ endpoint: "/voice/speech", fetch });
 
     const result = await driver.synthesize({ text: "Hello.", refAudio: "clip", refText: "words" });
@@ -130,7 +132,10 @@ describe("createWebTtsDriver", () => {
     expect(result).toMatchObject({ ok: true, mimeType: "audio/wav" });
     expect(fetch).toHaveBeenCalledWith(
       "/voice/speech",
-      expect.objectContaining({ method: "POST", body: JSON.stringify({ text: "Hello.", refAudio: "clip", refText: "words" }) }),
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ text: "Hello.", refAudio: "clip", refText: "words" }),
+      }),
     );
   });
 
@@ -138,7 +143,11 @@ describe("createWebTtsDriver", () => {
     const fetch = vi.fn(async () => Response.json({ errorCode: "TTS_RETRYABLE", message: "busy" }, { status: 503 }));
     const driver = createWebTtsDriver({ endpoint: "/voice/speech", fetch });
 
-    expect(await driver.synthesize({ text: "Hello." })).toEqual({ ok: false, errorCode: "TTS_RETRYABLE", message: "busy" });
+    expect(await driver.synthesize({ text: "Hello." })).toEqual({
+      ok: false,
+      errorCode: "TTS_RETRYABLE",
+      message: "busy",
+    });
   });
 
   it("unlocks quietly where there is no Web Audio", () => {
@@ -151,7 +160,11 @@ describe("createWebTtsDriver", () => {
   it("reads the headers for every request, so a changed token is picked up", async () => {
     let token = "first";
     const fetch = vi.fn(async (_input: string, _init: RequestInit) => new Response(new Uint8Array([1])));
-    const driver = createWebTtsDriver({ endpoint: "/voice/speech", headers: () => ({ Authorization: `Bearer ${token}` }), fetch });
+    const driver = createWebTtsDriver({
+      endpoint: "/voice/speech",
+      headers: () => ({ Authorization: `Bearer ${token}` }),
+      fetch,
+    });
 
     await driver.synthesize({ text: "One." });
     token = "second";

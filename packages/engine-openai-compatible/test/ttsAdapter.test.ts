@@ -19,7 +19,10 @@ function makeFetchResponse(status: number, body: ArrayBuffer | string): Response
   } as unknown as Response;
 }
 
-function captureFetch(responder: (init: RequestInit) => Response): { fetch: (input: string, init?: RequestInit) => Promise<Response>; requests: ICapturedRequest[] } {
+function captureFetch(responder: (init: RequestInit) => Response): {
+  fetch: (input: string, init?: RequestInit) => Promise<Response>;
+  requests: ICapturedRequest[];
+} {
   const requests: ICapturedRequest[] = [];
   return {
     requests,
@@ -172,12 +175,15 @@ describe("createOmlxTtsAdapter — coded failures", () => {
   it("hung engine aborts at the configured timeout with TTS_TIMEOUT", async () => {
     vi.useFakeTimers();
     try {
-      const adapter = createOmlxTtsAdapter({ ...ENGINE, timeoutSeconds: 0.05 }, {
-        fetch: (_input, init) =>
-          new Promise<Response>((_resolve, reject) => {
-            init?.signal?.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError")));
-          }),
-      });
+      const adapter = createOmlxTtsAdapter(
+        { ...ENGINE, timeoutSeconds: 0.05 },
+        {
+          fetch: (_input, init) =>
+            new Promise<Response>((_resolve, reject) => {
+              init?.signal?.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError")));
+            }),
+        },
+      );
 
       const pending = adapter.synthesize({ text: "hi" });
       const assertion = expect(pending).resolves.toEqual({

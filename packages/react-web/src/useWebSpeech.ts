@@ -26,13 +26,12 @@ export function useWebSpeech({ endpoint, headers, bands, ...sessionOptions }: IU
     levelsRef.current = levels;
   }, [levels]);
 
-  const [driver] = useState(
-    (): ITtsDriver =>
-      createWebTtsDriver({
-        endpoint,
-        ...(headers === undefined ? {} : { headers }),
-        output: () => levelsRef.current?.input ?? null,
-      }),
+  const [driver] = useState((): ITtsDriver =>
+    createWebTtsDriver({
+      endpoint,
+      ...(headers === undefined ? {} : { headers }),
+      output: () => levelsRef.current?.input ?? null,
+    }),
   );
   const speech = useSpeech(driver, sessionOptions);
 

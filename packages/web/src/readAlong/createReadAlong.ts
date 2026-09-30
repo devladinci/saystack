@@ -175,9 +175,7 @@ export function createReadAlong(root: Element, options: IReadAlongOptions = {}):
   const place = (element: HTMLDivElement, box: DOMRect | null, padX: number, padY: number): void => {
     const bounds = clipper?.getBoundingClientRect();
     const isVisible =
-      box !== null &&
-      box.width > 0 &&
-      (bounds === undefined || (box.bottom > bounds.top && box.top < bounds.bottom));
+      box !== null && box.width > 0 && (bounds === undefined || (box.bottom > bounds.top && box.top < bounds.bottom));
 
     if (!isVisible || box === null) {
       element.style.opacity = "0";
@@ -198,7 +196,12 @@ export function createReadAlong(root: Element, options: IReadAlongOptions = {}):
     }
 
     const word = page.words[current];
-    place(pill, block === null && word !== undefined ? word.range.getBoundingClientRect() : null, PILL_PADDING_X, PILL_PADDING_Y);
+    place(
+      pill,
+      block === null && word !== undefined ? word.range.getBoundingClientRect() : null,
+      PILL_PADDING_X,
+      PILL_PADDING_Y,
+    );
     place(ring, block?.getBoundingClientRect() ?? null, 6, 6);
   };
 
@@ -265,7 +268,10 @@ export function createReadAlong(root: Element, options: IReadAlongOptions = {}):
     const caret = caretAt(event.clientX, event.clientY);
     const pageIndex =
       caret === null ? -1 : page.words.findIndex((word) => word.range.comparePoint(caret.node, caret.offset) === 0);
-    const clickedBlock = event.target instanceof Element ? page.blocks.find((item) => item.element.contains(event.target as Node)) : undefined;
+    const clickedBlock =
+      event.target instanceof Element
+        ? page.blocks.find((item) => item.element.contains(event.target as Node))
+        : undefined;
     const spokenIndex =
       pageIndex >= 0
         ? alignment.pageOf.indexOf(pageIndex)

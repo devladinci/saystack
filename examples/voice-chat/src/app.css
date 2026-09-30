@@ -42,7 +42,12 @@ body,
 body {
   background: var(--background);
   color: var(--text);
-  font: 15px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font:
+    15px/1.6 ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
 }
 
 .app {
@@ -131,7 +136,11 @@ body {
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--surface);
-  font: 13px/1.6 ui-monospace, "SF Mono", Menlo, monospace;
+  font:
+    13px/1.6 ui-monospace,
+    "SF Mono",
+    Menlo,
+    monospace;
 }
 
 .message__body table {

@@ -87,5 +87,4 @@ export interface ISttRealtimeAdapter {
 }
 
 export type ISttRealtimeResult =
-  | { ok: true; session: ISttRealtimeSession }
-  | { ok: false; errorCode: SttErrorCode; message?: string };
+  { ok: true; session: ISttRealtimeSession } | { ok: false; errorCode: SttErrorCode; message?: string };

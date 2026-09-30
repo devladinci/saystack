@@ -1,4 +1,12 @@
-import type { AuraBackground, AuraState, IAuraHost, IAuraRect, IAuraRenderer, IAuraStyleOptions, IAuraView } from "@saystack/core";
+import type {
+  AuraBackground,
+  AuraState,
+  IAuraHost,
+  IAuraRect,
+  IAuraRenderer,
+  IAuraStyleOptions,
+  IAuraView,
+} from "@saystack/core";
 import { createAuraRenderer } from "@saystack/core";
 
 export type { AuraState };
@@ -226,7 +234,15 @@ export function createAura(options: IAuraOptions = {}): IAura {
     const root = document.documentElement;
 
     if (element === null) {
-      return { x: 0, y: 0, w: root.clientWidth, h: root.clientHeight, r: settings.pageRadius, isPage: true, isInner: true };
+      return {
+        x: 0,
+        y: 0,
+        w: root.clientWidth,
+        h: root.clientHeight,
+        r: settings.pageRadius,
+        isPage: true,
+        isInner: true,
+      };
     }
 
     const box = element.getBoundingClientRect();

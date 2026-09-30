@@ -8,7 +8,10 @@ export interface IWebClipOptions {
   output?: AudioNode;
 }
 
-export async function createWebClip(audio: ArrayBuffer, { context, output }: IWebClipOptions = {}): Promise<ISpeechClip> {
+export async function createWebClip(
+  audio: ArrayBuffer,
+  { context, output }: IWebClipOptions = {},
+): Promise<ISpeechClip> {
   const audioContext = context ?? sharedAudioContext();
   const buffer = await audioContext.decodeAudioData(audio.slice(0));
   const destination = output ?? audioContext.destination;

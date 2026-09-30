@@ -13,7 +13,10 @@ export interface IRealtimeOptions {
   params?: Readonly<Record<string, unknown>>;
 }
 
-export interface IUseNativeDictationOptions extends Omit<IUseDictationOptions, "endpoint" | "recorder" | "live" | "input"> {
+export interface IUseNativeDictationOptions extends Omit<
+  IUseDictationOptions,
+  "endpoint" | "recorder" | "live" | "input"
+> {
   endpoint: string;
   realtime?: IRealtimeOptions;
   recorder?: INativeRecorder;
@@ -29,7 +32,13 @@ export interface INativeDictation extends IUseDictationResult {
 
 // Streams while the engine allows it; the words then go into the draft through onInsert.
 // Otherwise the recording is transcribed and handed to onText, or to onInsert when there is no onText.
-export function useNativeDictation({ realtime, recorder: givenRecorder, bands, onInsert, ...options }: IUseNativeDictationOptions): INativeDictation {
+export function useNativeDictation({
+  realtime,
+  recorder: givenRecorder,
+  bands,
+  onInsert,
+  ...options
+}: IUseNativeDictationOptions): INativeDictation {
   const [recorder] = useState(() => givenRecorder ?? createNativeRecorder(bands === undefined ? {} : { bands }));
   const [liveText, setLiveText] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);

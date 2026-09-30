@@ -5,7 +5,12 @@ export { createSpeechApi, useSpeech } from "./useSpeech.js";
 export { useSpeechProgress } from "./useSpeechProgress.js";
 export type { IReadAloudSnapshot, IReadAloudStore, IReadAloudView, ReadAloudId } from "./readAloud/readAloudStore.js";
 export { createReadAloudStore } from "./readAloud/readAloudStore.js";
-export type { ICreateReadAloudOptions, IReadAloudSources, RewriteFn, SummarizeFn } from "./readAloud/createReadAloud.js";
+export type {
+  ICreateReadAloudOptions,
+  IReadAloudSources,
+  RewriteFn,
+  SummarizeFn,
+} from "./readAloud/createReadAloud.js";
 export { createReadAloud } from "./readAloud/createReadAloud.js";
 export { estimateDurations } from "./player/estimateDurations.js";
 export { formatClock } from "./player/formatClock.js";

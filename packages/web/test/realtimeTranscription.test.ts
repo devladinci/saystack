@@ -80,7 +80,9 @@ class FakeSocket {
   }
 
   texts(): Record<string, unknown>[] {
-    return this.sent.filter((item): item is string => typeof item === "string").map((item) => JSON.parse(item) as Record<string, unknown>);
+    return this.sent
+      .filter((item): item is string => typeof item === "string")
+      .map((item) => JSON.parse(item) as Record<string, unknown>);
   }
 
   audio(): Uint8Array[] {

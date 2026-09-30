@@ -30,7 +30,14 @@ export interface IReadAloudStore<TAnchor> {
   connect: () => () => void;
 }
 
-const IDLE_STATE: ISpeechState = { phase: "idle", text: "", errorCode: null, errorMessage: null, chunks: [], chunkIndex: -1 };
+const IDLE_STATE: ISpeechState = {
+  phase: "idle",
+  text: "",
+  errorCode: null,
+  errorMessage: null,
+  chunks: [],
+  chunkIndex: -1,
+};
 
 // Replies that are not being read share one idle view, so they do not re-render while another one plays.
 export function createReadAloudStore<TAnchor>(

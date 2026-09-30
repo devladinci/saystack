@@ -26,7 +26,8 @@ export default function ReadAlongText({ text, activeWord, theme, textStyle, onWo
       text.blocks.map((_, block) =>
         onBlockLayout === undefined
           ? undefined
-          : (event: LayoutChangeEvent) => onBlockLayout(block, event.nativeEvent.layout.y, event.nativeEvent.layout.height),
+          : (event: LayoutChangeEvent) =>
+              onBlockLayout(block, event.nativeEvent.layout.y, event.nativeEvent.layout.height),
       ),
     [text.blocks, onBlockLayout],
   );

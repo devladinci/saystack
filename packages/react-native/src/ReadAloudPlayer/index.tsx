@@ -28,7 +28,15 @@ const RESTART_AFTER_SECONDS = 1.5;
 
 const defaultIcon: PlayerIconRenderer = (name, color, size) => <PlayerIcon name={name} color={color} size={size} />;
 
-export default function ReadAloudPlayer({ speech, theme, isSummary = false, labels, renderIcon = defaultIcon, onClose, style }: IProps) {
+export default function ReadAloudPlayer({
+  speech,
+  theme,
+  isSummary = false,
+  labels,
+  renderIcon = defaultIcon,
+  onClose,
+  style,
+}: IProps) {
   const [state, api] = speech;
   const position = useSpeechProgress(speech);
   const text = useMemo(() => readAloudLabels(labels), [labels]);
@@ -159,11 +167,26 @@ export default function ReadAloudPlayer({ speech, theme, isSummary = false, labe
             {renderIcon("next", theme.text, 20)}
           </Pressable>
         </View>
-        <Pressable style={[styles.primary, themed.primary]} onPress={handlePrimary} accessibilityRole="button" accessibilityLabel={primaryLabel}>
-          {phase === "loading" && chunkIndex < 0 ? <ActivityIndicator color={theme.accentInk} /> : renderIcon(primaryIcon, theme.accentInk, 26)}
+        <Pressable
+          style={[styles.primary, themed.primary]}
+          onPress={handlePrimary}
+          accessibilityRole="button"
+          accessibilityLabel={primaryLabel}
+        >
+          {phase === "loading" && chunkIndex < 0 ? (
+            <ActivityIndicator color={theme.accentInk} />
+          ) : (
+            renderIcon(primaryIcon, theme.accentInk, 26)
+          )}
         </Pressable>
         <View style={[styles.side, styles.end]}>
-          <Pressable style={styles.small} onPress={handleClose} accessibilityRole="button" accessibilityLabel={text.close} hitSlop={8}>
+          <Pressable
+            style={styles.small}
+            onPress={handleClose}
+            accessibilityRole="button"
+            accessibilityLabel={text.close}
+            hitSlop={8}
+          >
             {renderIcon("close", theme.text, 20)}
           </Pressable>
         </View>

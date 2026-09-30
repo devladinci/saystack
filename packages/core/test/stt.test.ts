@@ -1,11 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type {
-  ISttAdapter,
-  ISttTranscribeInput,
-  ISttTranscribeResult,
-  SttErrorCode,
-} from "../src/stt.js";
+import type { ISttAdapter, ISttTranscribeInput, ISttTranscribeResult, SttErrorCode } from "../src/stt.js";
 
 describe("SttErrorCode — the fixed list carries the reviewer's missing codes", () => {
   it("names auth, model, timeout, retry and device problems distinctly", () => {
@@ -44,16 +39,17 @@ describe("ISttTranscribeInput — cancellation is part of the contract", () => {
         }
 
         return new Promise((resolve) => {
-          const timer = setTimeout(
-            () => resolve({ ok: true, text: "late" }),
-            5000,
+          const timer = setTimeout(() => resolve({ ok: true, text: "late" }), 5000);
+
+          signal?.addEventListener(
+            "abort",
+            () => {
+              clearTimeout(timer);
+
+              resolve({ ok: false, errorCode: "TIMEOUT", message: "cancelled" });
+            },
+            { once: true },
           );
-
-          signal?.addEventListener("abort", () => {
-            clearTimeout(timer);
-
-            resolve({ ok: false, errorCode: "TIMEOUT", message: "cancelled" });
-          }, { once: true });
         });
       },
     };

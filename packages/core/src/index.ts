@@ -125,7 +125,13 @@ export type {
   ISpectrumAnalyserOptions,
   PcmWindowReader,
 } from "./aura/spectrum.js";
-export { createPcmLevels, createPcmMeter, createSampleWindow, createSpectrumAnalyser, fftSizeFor } from "./aura/spectrum.js";
+export {
+  createPcmLevels,
+  createPcmMeter,
+  createSampleWindow,
+  createSpectrumAnalyser,
+  fftSizeFor,
+} from "./aura/spectrum.js";
 
 export type { IBandPalette, LinearRgb } from "./aura/palette.js";
 export { bandPalette } from "./aura/palette.js";

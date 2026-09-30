@@ -12,7 +12,13 @@ export interface IWebTtsDriverOptions {
   fetch?: SpeechFetch;
 }
 
-export function createWebTtsDriver({ endpoint, headers = {}, context, output, fetch }: IWebTtsDriverOptions): ITtsDriver {
+export function createWebTtsDriver({
+  endpoint,
+  headers = {},
+  context,
+  output,
+  fetch,
+}: IWebTtsDriverOptions): ITtsDriver {
   const audioContext = (): AudioContext => context ?? sharedAudioContext();
 
   return {

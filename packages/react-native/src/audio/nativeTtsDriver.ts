@@ -17,7 +17,12 @@ export interface INativeTtsDriver extends ITtsDriver {
   setBands(bands: number): void;
 }
 
-export function createNativeTtsDriver({ endpoint, headers = {}, fetch, bands = 7 }: INativeTtsDriverOptions): INativeTtsDriver {
+export function createNativeTtsDriver({
+  endpoint,
+  headers = {},
+  fetch,
+  bands = 7,
+}: INativeTtsDriverOptions): INativeTtsDriver {
   let active: INativeClip | null = null;
   let meter: { clip: INativeClip; meter: IPcmMeter } | null = null;
   let sampled: IPcmLevels | null = null;
@@ -98,7 +103,10 @@ export function createNativeTtsDriver({ endpoint, headers = {}, fetch, bands = 7
         return out;
       };
 
-      return meterFor(clip, decoded.sampleRate).advance(Math.round((clip.currentTime ?? 0) * decoded.sampleRate), windowAt);
+      return meterFor(clip, decoded.sampleRate).advance(
+        Math.round((clip.currentTime ?? 0) * decoded.sampleRate),
+        windowAt,
+      );
     },
 
     setBands(count) {

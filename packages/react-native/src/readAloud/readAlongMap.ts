@@ -78,7 +78,11 @@ export function pageWordAt({ chunkStarts, pageOf }: IReadAlongMap, { chunkIndex,
   return -1;
 }
 
-export function seekFor({ pageOf, spoken }: IReadAlongMap, chunks: readonly ISpeechChunk[], pageIndex: number): IReadAlongSeek | null {
+export function seekFor(
+  { pageOf, spoken }: IReadAlongMap,
+  chunks: readonly ISpeechChunk[],
+  pageIndex: number,
+): IReadAlongSeek | null {
   const spokenIndex = pageOf.indexOf(pageIndex);
   const target = spoken[spokenIndex];
 

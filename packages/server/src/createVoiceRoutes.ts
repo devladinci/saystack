@@ -56,10 +56,7 @@ export function createVoiceRoutes(deps: IVoiceServerDeps): Hono {
     });
 
     if (!result.ok) {
-      return c.json(
-        { errorCode: result.errorCode, message: result.message },
-        statusForErrorCode(result.errorCode),
-      );
+      return c.json({ errorCode: result.errorCode, message: result.message }, statusForErrorCode(result.errorCode));
     }
 
     return c.json({
@@ -79,7 +76,9 @@ export function createVoiceRoutes(deps: IVoiceServerDeps): Hono {
         return { ok: false, errorCode: "NO_ADAPTER", message: "no stt engine configured" };
       }
 
-      return deps.createSttAdapter(settings.config.stt).transcribe({ audio: wav, mimeType: "audio/wav", filename: "audio.wav" });
+      return deps
+        .createSttAdapter(settings.config.stt)
+        .transcribe({ audio: wav, mimeType: "audio/wav", filename: "audio.wav" });
     };
 
     app.get(
@@ -139,7 +138,10 @@ export function createVoiceRoutes(deps: IVoiceServerDeps): Hono {
     });
 
     if (!result.ok) {
-      return c.json({ errorCode: result.errorCode, message: result.message }, statusForSpeechErrorCode(result.errorCode));
+      return c.json(
+        { errorCode: result.errorCode, message: result.message },
+        statusForSpeechErrorCode(result.errorCode),
+      );
     }
 
     return c.body(result.audio, 200, {

@@ -157,7 +157,9 @@ const interpolate = (anchors: readonly IAnchor[], units: number): number => {
     if (units <= anchor.units) {
       const span = anchor.units - previous.units;
 
-      return span <= 0 ? anchor.time : previous.time + ((units - previous.units) / span) * (anchor.time - previous.time);
+      return span <= 0
+        ? anchor.time
+        : previous.time + ((units - previous.units) / span) * (anchor.time - previous.time);
     }
     previous = anchor;
   }
@@ -214,7 +216,7 @@ export function estimateWordTimings(text: string, envelope: ISpeechEnvelope): IW
         continue;
       }
 
-      const expected = speechStart + (((gap.from + gap.to) / 2) / totalUnits) * span;
+      const expected = speechStart + ((gap.from + gap.to) / 2 / totalUnits) * span;
       const distance = Math.abs(expected - middle);
 
       if (distance < bestDistance) {
@@ -226,7 +228,12 @@ export function estimateWordTimings(text: string, envelope: ISpeechEnvelope): IW
     const matched = gaps[best];
     const previous = anchors[anchors.length - 1];
 
-    if (matched === undefined || previous === undefined || pause.start <= previous.time || matched.from <= previous.units) {
+    if (
+      matched === undefined ||
+      previous === undefined ||
+      pause.start <= previous.time ||
+      matched.from <= previous.units
+    ) {
       continue;
     }
 
@@ -246,7 +253,9 @@ export function estimateWordTimings(text: string, envelope: ISpeechEnvelope): IW
 export function wordTimingsFromMarks(text: string, marks: readonly ISpeechMark[], duration: number): IWordTiming[] {
   const tokens = tokenizeWords(text);
   const sorted = [...marks].sort((a, b) => a.charIndex - b.charIndex);
-  const found = tokens.map((token) => sorted.find((mark) => mark.charIndex >= token.charStart && mark.charIndex < token.charEnd)?.time);
+  const found = tokens.map(
+    (token) => sorted.find((mark) => mark.charIndex >= token.charStart && mark.charIndex < token.charEnd)?.time,
+  );
 
   const starts = found.map((time, index) => {
     if (time !== undefined) {

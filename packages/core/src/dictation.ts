@@ -13,4 +13,7 @@ export interface ILiveTranscription {
   cancel(): void;
 }
 
-export type LiveTranscriptionFactory = (recorder: IPlatformRecorder, onText: (text: string) => void) => ILiveTranscription;
+export type LiveTranscriptionFactory = (
+  recorder: IPlatformRecorder,
+  onText: (text: string) => void,
+) => ILiveTranscription;

@@ -1,5 +1,3 @@
-import type { INormalizeFn } from "./normalize.js";
-
 export type ChunkingMode = "semantic" | "growth";
 
 export type UnheardPolicy = "keep" | "hide";
@@ -44,8 +42,4 @@ export interface IConfig {
   reference?: IReferenceConfig;
   chunking?: ChunkingMode;
   interrupt?: IInterruptConfig;
-}
-
-export interface IVoiceRuntime {
-  normalize?: INormalizeFn;
 }

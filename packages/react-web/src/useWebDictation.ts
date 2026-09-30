@@ -25,7 +25,13 @@ export interface IWebDictation extends IUseDictationResult {
 }
 
 // Streams while the engine allows it; otherwise, or when the stream breaks off, the recording is transcribed.
-export function useWebDictation({ realtime, constraints, mimeType, bands, ...options }: IUseWebDictationOptions): IWebDictation {
+export function useWebDictation({
+  realtime,
+  constraints,
+  mimeType,
+  bands,
+  ...options
+}: IUseWebDictationOptions): IWebDictation {
   const [recorder] = useState(() =>
     createWebRecorder({
       ...(constraints === undefined ? {} : { constraints }),

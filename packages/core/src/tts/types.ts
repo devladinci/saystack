@@ -50,8 +50,7 @@ export interface ISpeechClip {
 }
 
 export type ISpeechClipResult =
-  | { ok: true; clip: ISpeechClip }
-  | { ok: false; errorCode: TtsErrorCode; message: string };
+  { ok: true; clip: ISpeechClip } | { ok: false; errorCode: TtsErrorCode; message: string };
 
 export interface ITtsDriver {
   unlock?: () => void;

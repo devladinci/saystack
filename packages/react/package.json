@@ -3,6 +3,16 @@
   "version": "0.0.1",
   "description": "React hooks for voice chat on any platform: dictation and read-aloud sessions with coded errors.",
   "license": "MIT",
+  "author": "DeVladinci",
+  "homepage": "https://github.com/devladinci/saystack#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devladinci/saystack.git",
+    "directory": "packages/react"
+  },
+  "bugs": {
+    "url": "https://github.com/devladinci/saystack/issues"
+  },
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.js",
@@ -52,5 +62,8 @@
     "speech",
     "tts",
     "read-aloud"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }

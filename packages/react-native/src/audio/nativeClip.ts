@@ -59,7 +59,8 @@ export async function createNativeClip(audio: ArrayBuffer, hooks: INativeClipHoo
   file.write(new Uint8Array(audio));
   const player = createAudioPlayer(file.uri, { updateInterval: 50 });
   const duration = decoded === null ? await loaded(player) : decoded.samples.length / decoded.sampleRate;
-  const envelope: ISpeechEnvelope | null = decoded === null ? null : speechEnvelope(decoded.samples, decoded.sampleRate);
+  const envelope: ISpeechEnvelope | null =
+    decoded === null ? null : speechEnvelope(decoded.samples, decoded.sampleRate);
   const heard = decoded === null ? new Float32Array(4096) : null;
   let finish: (() => void) | null = null;
   let isPlaying = false;

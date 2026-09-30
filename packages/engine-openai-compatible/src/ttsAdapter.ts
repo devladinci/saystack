@@ -1,4 +1,11 @@
-import type { ITtsAdapter, ITtsCapabilities, ITtsEngineConfig, ITtsSynthesizeResult, ITtsSynthesizeInput, TtsErrorCode } from "@saystack/core";
+import type {
+  ITtsAdapter,
+  ITtsCapabilities,
+  ITtsEngineConfig,
+  ITtsSynthesizeResult,
+  ITtsSynthesizeInput,
+  TtsErrorCode,
+} from "@saystack/core";
 
 interface IResponseLike {
   ok: boolean;
@@ -38,10 +45,7 @@ const isAbortName = (error: unknown): boolean => {
   return error.name === "AbortError" || error.name === "TimeoutError";
 };
 
-export const createOmlxTtsAdapter = (
-  engine: ITtsEngineConfig,
-  deps: ITtsAdapterDeps = {},
-): ITtsAdapter => {
+export const createOmlxTtsAdapter = (engine: ITtsEngineConfig, deps: ITtsAdapterDeps = {}): ITtsAdapter => {
   const doFetch = deps.fetch ?? ((input: string, init?: RequestInit) => fetch(input, init));
 
   const url = normalizeBaseUrl(engine.url);

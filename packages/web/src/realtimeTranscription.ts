@@ -43,6 +43,10 @@ const streamSource = (stream: () => MediaStream | null, context?: AudioContext):
   },
 });
 
-export function startRealtimeTranscription({ stream, context, ...options }: IRealtimeTranscriptionOptions): ILiveTranscription {
+export function startRealtimeTranscription({
+  stream,
+  context,
+  ...options
+}: IRealtimeTranscriptionOptions): ILiveTranscription {
   return startLiveTranscription({ ...options, source: streamSource(stream, context) });
 }

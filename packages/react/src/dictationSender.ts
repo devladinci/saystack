@@ -1,8 +1,4 @@
-import type {
-  INativeRecording,
-  ISttTranscribeResult,
-  IVoiceRecording,
-} from "@saystack/core";
+import type { INativeRecording, ISttTranscribeResult, IVoiceRecording } from "@saystack/core";
 import { isSttErrorCode, resolveHeaders } from "@saystack/core";
 import type { IDictationSendOptions } from "./types.js";
 
@@ -64,14 +60,16 @@ export async function sendDictation(
 }
 
 async function readResponse(response: Response): Promise<ISttTranscribeResult> {
-  const parsed = (await response.json().catch(() => undefined)) as {
-    text?: string;
-    language?: string;
-    durationSeconds?: number;
-    errorCode?: string;
-    message?: string;
-    error?: unknown;
-  } | undefined;
+  const parsed = (await response.json().catch(() => undefined)) as
+    | {
+        text?: string;
+        language?: string;
+        durationSeconds?: number;
+        errorCode?: string;
+        message?: string;
+        error?: unknown;
+      }
+    | undefined;
 
   if (response.ok && parsed?.text !== undefined) {
     const okResult: ISttTranscribeResult = { ok: true, text: parsed.text };

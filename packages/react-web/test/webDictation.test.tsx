@@ -18,7 +18,11 @@ vi.mock("@saystack/web", async (importOriginal) => ({
     startRecording: async () => undefined,
     stopRecording: async () => ({ blob: new Blob(["x"], { type: "audio/webm" }) }),
   }),
-  startRealtimeTranscription: (options: { url: string; stream: () => MediaStream | null; onText: (text: string) => void }) => {
+  startRealtimeTranscription: (options: {
+    url: string;
+    stream: () => MediaStream | null;
+    onText: (text: string) => void;
+  }) => {
     web.started.push(options);
     options.onText("Hello");
 

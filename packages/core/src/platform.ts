@@ -17,9 +17,7 @@ export interface IPlatformRecorder {
   stopRecording(): Promise<IVoiceRecording>;
 }
 
-export type IVoiceRecorderResult =
-  | { ok: true; recorder: IPlatformRecorder }
-  | { ok: false; errorCode: SttErrorCode };
+export type IVoiceRecorderResult = { ok: true; recorder: IPlatformRecorder } | { ok: false; errorCode: SttErrorCode };
 
 let recorder: IPlatformRecorder | undefined;
 
@@ -28,7 +26,5 @@ export function setVoiceRecorder(next: IPlatformRecorder): void {
 }
 
 export function getVoiceRecorder(): IVoiceRecorderResult {
-  return recorder
-    ? { ok: true, recorder }
-    : { ok: false, errorCode: "NO_PLATFORM" };
+  return recorder ? { ok: true, recorder } : { ok: false, errorCode: "NO_PLATFORM" };
 }

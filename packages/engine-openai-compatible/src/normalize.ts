@@ -63,12 +63,7 @@ async function normalizeWithChat(
   };
 }
 
-function runChat(
-  spec: IChatCompletionsSpec,
-  system: string,
-  user: string,
-  timeoutMs: number,
-) {
+function runChat(spec: IChatCompletionsSpec, system: string, user: string, timeoutMs: number) {
   if (spec.chatClient !== undefined) {
     return spec.chatClient.complete({
       model: spec.model,
@@ -81,7 +76,14 @@ function runChat(
   }
 
   return httpChatComplete(
-    { model: spec.model, system, user, timeoutMs, ...(spec.disableThinking !== undefined ? { disableThinking: spec.disableThinking } : {}), ...(spec.token !== undefined ? { token: spec.token } : {}) },
+    {
+      model: spec.model,
+      system,
+      user,
+      timeoutMs,
+      ...(spec.disableThinking !== undefined ? { disableThinking: spec.disableThinking } : {}),
+      ...(spec.token !== undefined ? { token: spec.token } : {}),
+    },
     joinUrl(spec.url),
   );
 }

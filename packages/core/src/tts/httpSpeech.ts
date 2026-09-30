@@ -28,7 +28,11 @@ const isTtsErrorCode = (value: unknown): value is TtsErrorCode =>
   typeof value === "string" && TTS_ERROR_CODES.includes(value);
 
 async function failure(response: Response): Promise<ITtsSynthesizeResult> {
-  const body = (await response.json().catch(() => null)) as { errorCode?: unknown; message?: unknown; error?: unknown } | null;
+  const body = (await response.json().catch(() => null)) as {
+    errorCode?: unknown;
+    message?: unknown;
+    error?: unknown;
+  } | null;
   const errorCode = isTtsErrorCode(body?.errorCode) ? body.errorCode : "TTS_FAILED";
   const reason = typeof body?.message === "string" ? body.message : body?.error;
   const message = typeof reason === "string" && reason !== "" ? reason : `speech endpoint said ${response.status}`;
@@ -47,7 +51,9 @@ export function createHttpSynthesize({
   return async (input) => {
     const body = {
       text: input.text,
-      ...(input.refAudio !== undefined && input.refText !== undefined ? { refAudio: input.refAudio, refText: input.refText } : {}),
+      ...(input.refAudio !== undefined && input.refText !== undefined
+        ? { refAudio: input.refAudio, refText: input.refText }
+        : {}),
     };
     let response: Response;
 

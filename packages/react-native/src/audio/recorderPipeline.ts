@@ -27,7 +27,10 @@ const HISTORY_SAMPLES = PIPELINE_RATE;
 
 let recordings = 0;
 
-export function createRecorderPipeline({ bands = 7, sensitivity = 1 }: IRecorderPipelineOptions = {}): IRecorderPipeline {
+export function createRecorderPipeline({
+  bands = 7,
+  sensitivity = 1,
+}: IRecorderPipelineOptions = {}): IRecorderPipeline {
   const listeners = new Set<PcmListener>();
   const meter = createPcmMeter({ sampleRate: PIPELINE_RATE, bands, sensitivity });
   const history = new Float32Array(HISTORY_SAMPLES);

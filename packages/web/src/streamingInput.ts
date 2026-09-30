@@ -183,10 +183,16 @@ export function createStreamingInput(field: HTMLTextAreaElement | HTMLInputEleme
         scheduleFollow();
       }
 
-      return joinText(base, words.map((word) => word.text));
+      return joinText(
+        base,
+        words.map((word) => word.text),
+      );
     },
     end() {
-      const text = joinText(base, shown.map((word) => word.text));
+      const text = joinText(
+        base,
+        shown.map((word) => word.text),
+      );
       stopStreaming();
 
       return text;

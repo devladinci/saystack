@@ -26,9 +26,7 @@ export interface IConfigError {
   message: string;
 }
 
-export type IValidationResult =
-  | { ok: true; config: IConfig }
-  | { ok: false; errors: IConfigError[] };
+export type IValidationResult = { ok: true; config: IConfig } | { ok: false; errors: IConfigError[] };
 
 const CONFIG_KEYS = ["tts", "stt", "llm", "languages", "reference", "chunking", "interrupt"] as const;
 

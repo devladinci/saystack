@@ -27,7 +27,11 @@ interface ILatest extends IReadAloudSources {
 
 type Driver = ITtsDriver & Partial<Pick<INativeTtsDriver, "readLevels" | "setBands">>;
 
-const driverFor = (endpoint: string | undefined, driver: Driver | undefined, headers: () => Readonly<Record<string, string>>): Driver => {
+const driverFor = (
+  endpoint: string | undefined,
+  driver: Driver | undefined,
+  headers: () => Readonly<Record<string, string>>,
+): Driver => {
   if (driver !== undefined) {
     return driver;
   }
@@ -39,7 +43,16 @@ const driverFor = (endpoint: string | undefined, driver: Driver | undefined, hea
   return createNativeTtsDriver({ endpoint, headers });
 };
 
-export function ReadAloudProvider({ endpoint, headers, driver, bands, rewrite, shouldRewrite, summarize, children }: IProps) {
+export function ReadAloudProvider({
+  endpoint,
+  headers,
+  driver,
+  bands,
+  rewrite,
+  shouldRewrite,
+  summarize,
+  children,
+}: IProps) {
   const latestRef = useRef<ILatest>({});
 
   useEffect(() => {
@@ -53,13 +66,12 @@ export function ReadAloudProvider({ endpoint, headers, driver, bands, rewrite, s
 
   const [ttsDriver] = useState(() => driverFor(endpoint, driver, () => resolveHeaders(latestRef.current.headers)));
 
-  const [store] = useState(
-    (): IReadAloudStore<IMeasurable> =>
-      createReadAloud<IMeasurable>({
-        driver: ttsDriver,
-        readLevels: () => ttsDriver.readLevels?.(),
-        sources: () => latestRef.current,
-      }),
+  const [store] = useState((): IReadAloudStore<IMeasurable> =>
+    createReadAloud<IMeasurable>({
+      driver: ttsDriver,
+      readLevels: () => ttsDriver.readLevels?.(),
+      sources: () => latestRef.current,
+    }),
   );
 
   useEffect(() => {

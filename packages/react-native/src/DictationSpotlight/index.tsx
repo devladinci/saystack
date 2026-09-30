@@ -22,7 +22,10 @@ import { useDictationPhase } from "./useDictationPhase.js";
 import { useDropMotion } from "./useDropMotion.js";
 import { useElapsed } from "./useElapsed.js";
 
-type Dictation = Pick<INativeDictation, "state" | "liveText" | "isStreaming" | "readLevels" | "errorCode" | "errorMessage">;
+type Dictation = Pick<
+  INativeDictation,
+  "state" | "liveText" | "isStreaming" | "readLevels" | "errorCode" | "errorMessage"
+>;
 
 interface IProps {
   dictation: Dictation;
@@ -38,7 +41,13 @@ interface IProps {
 
 const UNMOUNT_MS = 360;
 
-const AURA_STATE = { hidden: "hidden", listening: "active", working: "working", dropping: "hidden", notice: "hidden" } as const;
+const AURA_STATE = {
+  hidden: "hidden",
+  listening: "active",
+  working: "working",
+  dropping: "hidden",
+  notice: "hidden",
+} as const;
 
 const clock = (seconds: number): string => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 
@@ -48,11 +57,22 @@ interface ICopy {
   hint: string;
 }
 
-const copyFor = (phase: DictationPhase, dictation: Dictation, labels: IDictationLabels, isCancelling: boolean, isTooShort: boolean, seconds: number): ICopy => {
+const copyFor = (
+  phase: DictationPhase,
+  dictation: Dictation,
+  labels: IDictationLabels,
+  isCancelling: boolean,
+  isTooShort: boolean,
+  seconds: number,
+): ICopy => {
   if (phase === "notice") {
     const failure = dictation.errorCode === undefined ? undefined : labels.errors[dictation.errorCode];
 
-    return { text: "", placeholder: isTooShort ? labels.holdToTalk : (failure ?? dictation.errorMessage ?? labels.failed), hint: "" };
+    return {
+      text: "",
+      placeholder: isTooShort ? labels.holdToTalk : (failure ?? dictation.errorMessage ?? labels.failed),
+      hint: "",
+    };
   }
 
   if (phase !== "listening") {
@@ -138,7 +158,13 @@ export default function DictationSpotlight({
   return (
     <Container>
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
-        <SpotlightBackdrop isVisible={isOpen && phase !== "dropping"} theme={theme} bottom={bottom} {...(blur === undefined ? {} : { blur })} {...(dim === undefined ? {} : { dim })} />
+        <SpotlightBackdrop
+          isVisible={isOpen && phase !== "dropping"}
+          theme={theme}
+          bottom={bottom}
+          {...(blur === undefined ? {} : { blur })}
+          {...(dim === undefined ? {} : { dim })}
+        />
         <TopWave state={AURA_STATE[phase]} mode={theme.mode} levels={dictation.readLevels} auraStyle={auraStyle} />
         <Animated.View style={[styles.area, area, drop]}>
           <LiveCaptions

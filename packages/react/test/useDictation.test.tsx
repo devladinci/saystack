@@ -20,11 +20,14 @@ function blobRecorder(): IPlatformRecorder {
 }
 
 function mockFetchJson(body: unknown, status = 200): void {
-  vi.stubGlobal("fetch", async () =>
-    new Response(JSON.stringify(body), {
-      status,
-      headers: { "Content-Type": "application/json" },
-    }));
+  vi.stubGlobal(
+    "fetch",
+    async () =>
+      new Response(JSON.stringify(body), {
+        status,
+        headers: { "Content-Type": "application/json" },
+      }),
+  );
 }
 
 afterEach(() => {
@@ -102,8 +105,10 @@ describe("useDictation state machine (offline, mocked endpoints)", () => {
   it("a second press during transcribing is ignored — no double send", async () => {
     setVoiceRecorder(blobRecorder());
     mockFetchJson({ text: "one" });
-    const fetchSpy = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) =>
-      new Response(JSON.stringify({ text: "one" }), { status: 200 }));
+    const fetchSpy = vi.fn(
+      async (_input: RequestInfo | URL, _init?: RequestInit) =>
+        new Response(JSON.stringify({ text: "one" }), { status: 200 }),
+    );
     vi.stubGlobal("fetch", fetchSpy);
     const { result } = renderHook(() => useDictation({ endpoint: ENDPOINT }));
 
@@ -143,15 +148,13 @@ describe("useDictation state machine (offline, mocked endpoints)", () => {
 
 describe("sendDictation (sender, direct)", () => {
   it("sends multipart with the recording blob", async () => {
-    const fetchSpy = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) =>
-      new Response(JSON.stringify({ text: "ok" }), { status: 200 }));
+    const fetchSpy = vi.fn(
+      async (_input: RequestInfo | URL, _init?: RequestInit) =>
+        new Response(JSON.stringify({ text: "ok" }), { status: 200 }),
+    );
     vi.stubGlobal("fetch", fetchSpy);
 
-    const result = await sendDictation(
-      ENDPOINT,
-      { blob: new Blob(["x"], { type: "audio/webm" }) },
-      {},
-    );
+    const result = await sendDictation(ENDPOINT, { blob: new Blob(["x"], { type: "audio/webm" }) }, {});
 
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.text).toBe("ok");
@@ -160,14 +163,9 @@ describe("sendDictation (sender, direct)", () => {
   });
 
   it("non-json garbage response parses as TRANSCRIPTION_FAILED, not a crash", async () => {
-    vi.stubGlobal("fetch", async () =>
-      new Response("<html>oops</html>", { status: 500 }));
+    vi.stubGlobal("fetch", async () => new Response("<html>oops</html>", { status: 500 }));
 
-    const result = await sendDictation(
-      ENDPOINT,
-      { blob: new Blob(["x"]) },
-      {},
-    );
+    const result = await sendDictation(ENDPOINT, { blob: new Blob(["x"]) }, {});
 
     if (result.ok) throw new Error("expected failure");
     expect(result.errorCode).toBe("TRANSCRIPTION_FAILED");
@@ -234,7 +232,12 @@ describe("useDictation live", () => {
     mockFetchJson({ text: "From the recording." });
     const field = fakeInput();
     const { result } = renderHook(() =>
-      useDictation({ endpoint: ENDPOINT, recorder: blobRecorder(), live: fakeLive(true, null).factory, input: field.input }),
+      useDictation({
+        endpoint: ENDPOINT,
+        recorder: blobRecorder(),
+        live: fakeLive(true, null).factory,
+        input: field.input,
+      }),
     );
 
     await press(result);
@@ -247,7 +250,13 @@ describe("useDictation live", () => {
     const field = fakeInput();
     const onText = vi.fn();
     const { result } = renderHook(() =>
-      useDictation({ endpoint: ENDPOINT, recorder: blobRecorder(), live: fakeLive(false, null).factory, input: field.input, onText }),
+      useDictation({
+        endpoint: ENDPOINT,
+        recorder: blobRecorder(),
+        live: fakeLive(false, null).factory,
+        input: field.input,
+        onText,
+      }),
     );
 
     await press(result);
@@ -311,14 +320,20 @@ describe("useDictation live", () => {
 
 describe("sendDictation headers and bodies", () => {
   it("names the file after its type and reads the headers per request", async () => {
-    const fetchSpy = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) =>
-      new Response(JSON.stringify({ text: "ok" }), { status: 200 }));
+    const fetchSpy = vi.fn(
+      async (_input: RequestInfo | URL, _init?: RequestInit) =>
+        new Response(JSON.stringify({ text: "ok" }), { status: 200 }),
+    );
     vi.stubGlobal("fetch", fetchSpy);
     const append = vi.spyOn(FormData.prototype, "append");
 
-    await sendDictation(ENDPOINT, { blob: new Blob(["x"], { type: "audio/webm;codecs=opus" }) }, {
-      headers: () => ({ Authorization: "Bearer t" }),
-    });
+    await sendDictation(
+      ENDPOINT,
+      { blob: new Blob(["x"], { type: "audio/webm;codecs=opus" }) },
+      {
+        headers: () => ({ Authorization: "Bearer t" }),
+      },
+    );
 
     const init = fetchSpy.mock.calls[0]?.[1];
     expect((init?.headers as Record<string, string>).Authorization).toBe("Bearer t");
@@ -331,7 +346,11 @@ describe("sendDictation headers and bodies", () => {
 
     const result = await sendDictation(ENDPOINT, { uri: "file:///cache/dictation.wav", mimeType: "audio/wav" }, {});
 
-    expect(append).toHaveBeenCalledWith("file", { uri: "file:///cache/dictation.wav", name: "audio.wav", type: "audio/wav" });
+    expect(append).toHaveBeenCalledWith("file", {
+      uri: "file:///cache/dictation.wav",
+      name: "audio.wav",
+      type: "audio/wav",
+    });
     expect(result).toEqual({ ok: true, text: "From the phone." });
   });
 

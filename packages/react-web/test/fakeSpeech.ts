@@ -22,7 +22,15 @@ export function fakeSpeech(
     seek: vi.fn(),
     position: vi.fn(() => position),
   };
-  const fullState: ISpeechState = { phase: "idle", text: "", errorCode: null, errorMessage: null, chunks: [], chunkIndex: -1, ...state };
+  const fullState: ISpeechState = {
+    phase: "idle",
+    text: "",
+    errorCode: null,
+    errorMessage: null,
+    chunks: [],
+    chunkIndex: -1,
+    ...state,
+  };
 
   return { result: [fullState, api as unknown as ISpeechApi], api };
 }

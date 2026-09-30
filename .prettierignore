@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+pnpm-lock.yaml
+*.log
+
+# The playground is a hand-written lab with its own deliberate style
+# (single quotes, no semicolons) and no build step. It is not published.
+playground
+
+# Editor/tooling state, not project source.
+.claude

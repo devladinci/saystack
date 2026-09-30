@@ -4,9 +4,16 @@ import { createHttpSynthesize } from "../src/tts/httpSpeech.js";
 
 describe("createHttpSynthesize", () => {
   it("posts the text with fresh headers and returns the audio", async () => {
-    const fetch = vi.fn(async (_input: string, _init: RequestInit) => new Response(new Uint8Array([1, 2, 3]), { headers: { "content-type": "audio/wav" } }));
+    const fetch = vi.fn(
+      async (_input: string, _init: RequestInit) =>
+        new Response(new Uint8Array([1, 2, 3]), { headers: { "content-type": "audio/wav" } }),
+    );
     let token = "a";
-    const synthesize = createHttpSynthesize({ endpoint: "http://daemon/tts/speech", headers: () => ({ Authorization: `Bearer ${token}` }), fetch });
+    const synthesize = createHttpSynthesize({
+      endpoint: "http://daemon/tts/speech",
+      headers: () => ({ Authorization: `Bearer ${token}` }),
+      fetch,
+    });
 
     token = "b";
     const result = await synthesize({ text: "Hi." });
@@ -19,8 +26,10 @@ describe("createHttpSynthesize", () => {
   });
 
   it("keeps the engine's error code and words", async () => {
-    const fetch = async () => new Response(JSON.stringify({ errorCode: "MODEL_NOT_FOUND", message: "No voice model" }), { status: 404 });
-    const plain = async () => new Response(JSON.stringify({ error: "No text-to-speech model selected" }), { status: 400 });
+    const fetch = async () =>
+      new Response(JSON.stringify({ errorCode: "MODEL_NOT_FOUND", message: "No voice model" }), { status: 404 });
+    const plain = async () =>
+      new Response(JSON.stringify({ error: "No text-to-speech model selected" }), { status: 400 });
 
     await expect(createHttpSynthesize({ endpoint: "x", fetch })({ text: "Hi." })).resolves.toEqual({
       ok: false,
@@ -41,8 +50,12 @@ describe("createHttpSynthesize", () => {
     const controller = new AbortController();
     controller.abort();
 
-    await expect(createHttpSynthesize({ endpoint: "x", fetch })({ text: "Hi." })).resolves.toMatchObject({ errorCode: "TTS_UNAVAILABLE" });
-    await expect(createHttpSynthesize({ endpoint: "x", fetch })({ text: "Hi.", signal: controller.signal })).resolves.toMatchObject({
+    await expect(createHttpSynthesize({ endpoint: "x", fetch })({ text: "Hi." })).resolves.toMatchObject({
+      errorCode: "TTS_UNAVAILABLE",
+    });
+    await expect(
+      createHttpSynthesize({ endpoint: "x", fetch })({ text: "Hi.", signal: controller.signal }),
+    ).resolves.toMatchObject({
       errorCode: "TTS_FAILED",
       message: "cancelled by caller",
     });

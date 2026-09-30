@@ -13,8 +13,18 @@ export function useShimmer(isActive: boolean): Animated.Value {
 
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, { toValue: 0.45, duration: 550, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 1, duration: 550, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        Animated.timing(opacity, {
+          toValue: 0.45,
+          duration: 550,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 550,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
       ]),
     );
 

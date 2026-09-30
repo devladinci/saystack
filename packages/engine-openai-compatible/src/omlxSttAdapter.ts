@@ -23,8 +23,31 @@ const DEFAULT_TIMEOUT_MS = 60_000;
 const MIN_AUDIO_BYTES = 1_024;
 
 const PARAKEET_V3_LANGUAGES = [
-  "bg", "hr", "cs", "da", "nl", "en", "et", "fi", "fr", "de", "el", "hu", "it",
-  "lv", "lt", "mt", "pl", "pt", "ro", "sk", "sl", "es", "sv", "ru", "uk",
+  "bg",
+  "hr",
+  "cs",
+  "da",
+  "nl",
+  "en",
+  "et",
+  "fi",
+  "fr",
+  "de",
+  "el",
+  "hu",
+  "it",
+  "lv",
+  "lt",
+  "mt",
+  "pl",
+  "pt",
+  "ro",
+  "sk",
+  "sl",
+  "es",
+  "sv",
+  "ru",
+  "uk",
 ] as const;
 
 const MODEL_LANGUAGES: Record<string, readonly string[]> = {
@@ -71,7 +94,7 @@ export function guessFilename(mimeType?: string, filename?: string): string {
   return `${base}${extForMime(mimeType)}`;
 }
 
-export function statusToErrorCode(status: number): SttErrorCode {
+function statusToErrorCode(status: number): SttErrorCode {
   if (status === 401 || status === 403) {
     return "BAD_TOKEN";
   }
@@ -100,11 +123,12 @@ export function createOmlxSttAdapter(engineConfig: ISttEngineConfig, options: IO
   const token = engineConfig.token;
   const model = options.model ?? engineConfig.model ?? "parakeet-tdt-0.6b-v3";
   const maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES;
-  const configuredTimeoutMs = options.timeoutMs ?? (engineConfig.timeoutSeconds ?? 60) * 1000;
+  const defaultTimeoutMs =
+    engineConfig.timeoutSeconds !== undefined ? engineConfig.timeoutSeconds * 1000 : DEFAULT_TIMEOUT_MS;
+  const configuredTimeoutMs = options.timeoutMs ?? defaultTimeoutMs;
   const minAudioBytes = options.minAudioBytes ?? MIN_AUDIO_BYTES;
 
-  const headers = (): Record<string, string> =>
-    token ? { Authorization: `Bearer ${token}` } : {};
+  const headers = (): Record<string, string> => (token ? { Authorization: `Bearer ${token}` } : {});
 
   const capabilities: ISttCapabilities = {
     streaming: false,
@@ -140,8 +164,7 @@ export function createOmlxSttAdapter(engineConfig: ISttEngineConfig, options: IO
       }
 
       const timeoutSignal = AbortSignal.timeout(configuredTimeoutMs);
-      const fetchSignal =
-        input.signal !== undefined ? AbortSignal.any([input.signal, timeoutSignal]) : timeoutSignal;
+      const fetchSignal = input.signal !== undefined ? AbortSignal.any([input.signal, timeoutSignal]) : timeoutSignal;
 
       const form = new FormData();
 
@@ -173,7 +196,8 @@ export function createOmlxSttAdapter(engineConfig: ISttEngineConfig, options: IO
           return {
             ok: false,
             errorCode: "TIMEOUT",
-            message: input.signal?.aborted === true ? "cancelled by caller" : `timed out after ${configuredTimeoutMs} ms`,
+            message:
+              input.signal?.aborted === true ? "cancelled by caller" : `timed out after ${configuredTimeoutMs} ms`,
           };
         }
 
@@ -194,9 +218,11 @@ export function createOmlxSttAdapter(engineConfig: ISttEngineConfig, options: IO
         };
       }
 
-      const body = (await res.json().catch(() => null)) as
-        | { text?: string; language?: string | null; duration?: number | null }
-        | null;
+      const body = (await res.json().catch(() => null)) as {
+        text?: string;
+        language?: string | null;
+        duration?: number | null;
+      } | null;
 
       if (body === null || typeof body.text !== "string") {
         return {

@@ -41,7 +41,8 @@ const setup = (options: Partial<IAuraRendererOptions> = {}) => {
   return { renderer, calls };
 };
 
-const framebuffers = (calls: IGlCall[]): unknown[] => calls.filter((call) => call.name === "bindFramebuffer").map((call) => call.args[1]);
+const framebuffers = (calls: IGlCall[]): unknown[] =>
+  calls.filter((call) => call.name === "bindFramebuffer").map((call) => call.args[1]);
 
 const uniform = (calls: IGlCall[], name: string): unknown[][] =>
   calls.filter((call) => call.name.startsWith("uniform") && call.args[0] === name).map((call) => call.args.slice(1));
@@ -62,7 +63,10 @@ describe("createAuraRenderer", () => {
     const { renderer, calls } = setup();
     renderer.setState("active");
 
-    renderer.frame(1000, hostFor({ hides: 0 }, "dark", () => RECT, DENSE_VIEW));
+    renderer.frame(
+      1000,
+      hostFor({ hides: 0 }, "dark", () => RECT, DENSE_VIEW),
+    );
 
     expect(uniform(calls, "u_px")).toEqual([[780, 280]]);
     expect(uniform(calls, "u_sigma")).toEqual([[0]]);
@@ -109,7 +113,10 @@ describe("createAuraRenderer", () => {
   });
 
   it("leaves blur and scaling to the host by default", () => {
-    const { renderer, calls } = setup({ effects: "host", settings: { levels: null, style: { blur: 6, resolution: 0.5 }, gap: 0, glideMs: 480 } });
+    const { renderer, calls } = setup({
+      effects: "host",
+      settings: { levels: null, style: { blur: 6, resolution: 0.5 }, gap: 0, glideMs: 480 },
+    });
     renderer.setState("active");
 
     renderer.frame(1000, hostFor({ hides: 0 }));

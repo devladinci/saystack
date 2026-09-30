@@ -1,9 +1,9 @@
-export interface IPageWord {
+interface IPageWord {
   text: string;
   range: Range;
 }
 
-export interface IPageBlock {
+interface IPageBlock {
   element: Element;
   after: number;
 }

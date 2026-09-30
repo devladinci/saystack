@@ -2,7 +2,13 @@ import type { IAudioLevels, IAudioLevelsOptions } from "@saystack/web";
 import { createAudioLevels } from "@saystack/web";
 import { useEffect, useState } from "react";
 
-export function useAudioLevels({ bands, sensitivity, isAudible, fftSize, context }: IAudioLevelsOptions = {}): IAudioLevels | null {
+export function useAudioLevels({
+  bands,
+  sensitivity,
+  isAudible,
+  fftSize,
+  context,
+}: IAudioLevelsOptions = {}): IAudioLevels | null {
   const [levels, setLevels] = useState<IAudioLevels | null>(null);
 
   useEffect(() => {

@@ -23,9 +23,7 @@ export interface ISpeechSessionOptions {
   readonly shouldRewrite?: ((markdown: string) => boolean) | undefined;
 }
 
-export type ISpeechOutcome =
-  | { ok: true }
-  | { ok: false; errorCode: TtsErrorCode; message: string };
+export type ISpeechOutcome = { ok: true } | { ok: false; errorCode: TtsErrorCode; message: string };
 
 type Listener = () => void;
 
@@ -160,7 +158,11 @@ export function createSpeechSession(driver: ITtsDriver, sessionOptions: ISpeechS
           ? { ok: true, audio: result.audio }
           : { ok: true, audio: result.audio, marks: result.marks };
       },
-      (error: unknown): IChunkAudio => ({ ok: false, errorCode: "TTS_FAILED", message: messageOf(error, "synthesis failed") }),
+      (error: unknown): IChunkAudio => ({
+        ok: false,
+        errorCode: "TTS_FAILED",
+        message: messageOf(error, "synthesis failed"),
+      }),
     );
 
     const entry: ICachedAudio = { promise: pending, isSettled: false };
@@ -178,13 +180,11 @@ export function createSpeechSession(driver: ITtsDriver, sessionOptions: ISpeechS
   };
 
   const createClip = (audio: ArrayBuffer): Promise<ISpeechClipResult> =>
-    driver.createClip(audio).catch(
-      (error: unknown): ISpeechClipResult => ({
-        ok: false,
-        errorCode: "TTS_UNSUPPORTED_MEDIA",
-        message: messageOf(error, "the audio could not be decoded"),
-      }),
-    );
+    driver.createClip(audio).catch((error: unknown): ISpeechClipResult => ({
+      ok: false,
+      errorCode: "TTS_UNSUPPORTED_MEDIA",
+      message: messageOf(error, "the audio could not be decoded"),
+    }));
 
   const playChunk = async (current: IRun, playback: number, index: number, offset: number): Promise<boolean> => {
     const audio = await synthesize(current, index);
@@ -222,11 +222,10 @@ export function createSpeechSession(driver: ITtsDriver, sessionOptions: ISpeechS
       built.clip.seek?.(offset);
     }
 
-    const chunks = state.chunks.map(
-      (chunk, chunkIndex): ISpeechChunk =>
-        chunkIndex === index
-          ? { text: chunk.text, words: wordsFor(chunk.text, built.clip, audio.marks), duration: built.clip.duration ?? 0 }
-          : chunk,
+    const chunks = state.chunks.map((chunk, chunkIndex): ISpeechChunk =>
+      chunkIndex === index
+        ? { text: chunk.text, words: wordsFor(chunk.text, built.clip, audio.marks), duration: built.clip.duration ?? 0 }
+        : chunk,
     );
 
     const playing = built.clip.play();

@@ -73,11 +73,9 @@ function fitToGamut(lightness: number, chroma: number, hue: number): LinearRgb {
   return [clampUnit(fitted[0]), clampUnit(fitted[1]), clampUnit(fitted[2])];
 }
 
-const encodeSrgb = (value: number): number =>
-  value <= 0.0031308 ? 12.92 * value : 1.055 * value ** (1 / 2.4) - 0.055;
+const encodeSrgb = (value: number): number => (value <= 0.0031308 ? 12.92 * value : 1.055 * value ** (1 / 2.4) - 0.055);
 
-const toCss = (rgb: LinearRgb): string =>
-  `rgb(${rgb.map((value) => Math.round(encodeSrgb(value) * 255)).join(" ")})`;
+const toCss = (rgb: LinearRgb): string => `rgb(${rgb.map((value) => Math.round(encodeSrgb(value) * 255)).join(" ")})`;
 
 export function bandPalette(name: AuraPaletteName, count: number): IBandPalette {
   const spec = SPECS[name];
@@ -86,7 +84,9 @@ export function bandPalette(name: AuraPaletteName, count: number): IBandPalette 
     spec.wrap ? spec.from + (spec.span * index) / bands : spec.from + (spec.span * index) / Math.max(1, bands - 1),
   );
   const onDark = hues.map((hue) => fitToGamut(DARK_LIGHTNESS, spec.chroma, hue));
-  const onLight = hues.map((hue) => fitToGamut(LIGHT_LIGHTNESS, spec.chroma + LIGHT_EXTRA_CHROMA * Math.sign(spec.chroma), hue));
+  const onLight = hues.map((hue) =>
+    fitToGamut(LIGHT_LIGHTNESS, spec.chroma + LIGHT_EXTRA_CHROMA * Math.sign(spec.chroma), hue),
+  );
 
   return { onDark, onLight, css: onDark.map(toCss), cssLight: onLight.map(toCss) };
 }

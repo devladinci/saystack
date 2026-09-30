@@ -180,11 +180,23 @@ export default function SpeechPlayer({
             {formatClock(elapsed)} / {formatClock(total, true)}
           </span>
           {onLocate !== undefined && (
-            <button type="button" className="saystack-player__button" aria-label={text.locate} title={text.locate} onClick={onLocate}>
+            <button
+              type="button"
+              className="saystack-player__button"
+              aria-label={text.locate}
+              title={text.locate}
+              onClick={onLocate}
+            >
               <PlayerIcon name="locate" />
             </button>
           )}
-          <button type="button" className="saystack-player__button" aria-label={text.close} title={text.close} onClick={handleClose}>
+          <button
+            type="button"
+            className="saystack-player__button"
+            aria-label={text.close}
+            title={text.close}
+            onClick={handleClose}
+          >
             <PlayerIcon name="close" />
           </button>
         </div>

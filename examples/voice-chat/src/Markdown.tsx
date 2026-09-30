@@ -46,13 +46,23 @@ function toBlocks(text: string): IBlock[] {
       continue;
     }
 
-    const kind = TABLE_ROW.test(line) ? "table" : LIST_ITEM.test(line) ? "list" : HEADING.test(line) ? "heading" : "paragraph";
+    const kind = TABLE_ROW.test(line)
+      ? "table"
+      : LIST_ITEM.test(line)
+        ? "list"
+        : HEADING.test(line)
+          ? "heading"
+          : "paragraph";
     const body: string[] = [];
 
     while (index < lines.length && (lines[index] ?? "").trim() !== "") {
       const next = lines[index] ?? "";
       const isSameKind =
-        kind === "table" ? TABLE_ROW.test(next) : kind === "list" ? LIST_ITEM.test(next) : !TABLE_ROW.test(next) && !next.trim().startsWith("```");
+        kind === "table"
+          ? TABLE_ROW.test(next)
+          : kind === "list"
+            ? LIST_ITEM.test(next)
+            : !TABLE_ROW.test(next) && !next.trim().startsWith("```");
 
       if (!isSameKind || (kind === "heading" && body.length > 0)) {
         break;

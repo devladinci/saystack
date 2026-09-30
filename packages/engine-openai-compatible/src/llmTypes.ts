@@ -9,9 +9,7 @@ export interface ILlmChatRequest {
   token?: string;
 }
 
-export type ILlmChatResponse =
-  | { ok: true; content: string }
-  | { ok: false; errorCode: LlmErrorCode; message: string };
+export type ILlmChatResponse = { ok: true; content: string } | { ok: false; errorCode: LlmErrorCode; message: string };
 
 export interface ILlmChatClient {
   complete(request: ILlmChatRequest): Promise<ILlmChatResponse>;

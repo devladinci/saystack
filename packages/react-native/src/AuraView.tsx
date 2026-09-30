@@ -1,4 +1,12 @@
-import type { AuraBackground, AuraClip, AuraState, IAuraHost, IAuraRect, IAuraRenderer, IAuraStyleOptions } from "@saystack/core";
+import type {
+  AuraBackground,
+  AuraClip,
+  AuraState,
+  IAuraHost,
+  IAuraRect,
+  IAuraRenderer,
+  IAuraStyleOptions,
+} from "@saystack/core";
 import { createAuraRenderer } from "@saystack/core";
 import type { ExpoWebGLRenderingContext } from "expo-gl";
 import { useEffect, useRef, useState } from "react";
@@ -52,13 +60,31 @@ const rectOf = (outline: AuraOutline, size: ISize): IAuraRect => {
 
   const radius = Math.max(0, Math.min(outline.radius ?? 0, outline.width / 2, outline.height / 2));
 
-  return { x: outline.x, y: outline.y, w: outline.width, h: outline.height, r: radius, isPage: false, isInner: outline.isInside === true };
+  return {
+    x: outline.x,
+    y: outline.y,
+    w: outline.width,
+    h: outline.height,
+    r: radius,
+    isPage: false,
+    isInner: outline.isInside === true,
+  };
 };
 
-const clipOf = (outline: AuraOutline, size: ISize): AuraClip | null => (outline === "top-edge" ? topEdgeClip(size.width, size.height) : null);
+const clipOf = (outline: AuraOutline, size: ISize): AuraClip | null =>
+  outline === "top-edge" ? topEdgeClip(size.width, size.height) : null;
 
 // saystack's aura shader on the GPU, drawn over what is behind it: light adds up on dark, and covers on light.
-export function AuraView({ state, mode, outline, levels, auraStyle = NO_STYLE, gap = 1.5, glideMs = 480, style }: IProps) {
+export function AuraView({
+  state,
+  mode,
+  outline,
+  levels,
+  auraStyle = NO_STYLE,
+  gap = 1.5,
+  glideMs = 480,
+  style,
+}: IProps) {
   const [size, setSize] = useState<ISize>({ width: 0, height: 0 });
   const rendererRef = useRef<IAuraRenderer | null>(null);
   const wakeRef = useRef<(() => void) | null>(null);
@@ -197,7 +223,15 @@ export function AuraView({ state, mode, outline, levels, auraStyle = NO_STYLE, g
 
   const { GLView } = expoGl;
 
-  return <GLView style={[styles.fill, style]} msaaSamples={0} pointerEvents="none" onLayout={handleLayout} onContextCreate={handleContextCreate} />;
+  return (
+    <GLView
+      style={[styles.fill, style]}
+      msaaSamples={0}
+      pointerEvents="none"
+      onLayout={handleLayout}
+      onContextCreate={handleContextCreate}
+    />
+  );
 }
 
 const styles = StyleSheet.create({

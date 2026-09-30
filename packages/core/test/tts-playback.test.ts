@@ -2,7 +2,13 @@ import { describe, expect, it, vi } from "vitest";
 
 import { createSpeechSession } from "../src/tts/session.js";
 import type { ISpeechEnvelope, ISpeechMark } from "../src/tts/timing.js";
-import type { ISpeechClip, ISpeechClipResult, ITtsDriver, ITtsSynthesizeInput, ITtsSynthesizeResult } from "../src/tts/types.js";
+import type {
+  ISpeechClip,
+  ISpeechClipResult,
+  ITtsDriver,
+  ITtsSynthesizeInput,
+  ITtsSynthesizeResult,
+} from "../src/tts/types.js";
 
 interface IControlledClip {
   clip: ISpeechClip;
@@ -281,7 +287,11 @@ describe("createSpeechSession — playback", () => {
 
     await session.speak("Say this.");
 
-    expect(session.state).toMatchObject({ phase: "error", errorCode: "TTS_UNAVAILABLE", errorMessage: "the voice server is offline" });
+    expect(session.state).toMatchObject({
+      phase: "error",
+      errorCode: "TTS_UNAVAILABLE",
+      errorMessage: "the voice server is offline",
+    });
 
     session.replay();
     await settle();

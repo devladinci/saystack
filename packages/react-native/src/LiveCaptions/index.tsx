@@ -30,14 +30,25 @@ const keyedLines = (texts: readonly string[]): ICaptionLine[] => {
 };
 
 // Live words in the middle of the screen. Mount it again for each dictation to start from the largest size.
-export default function LiveCaptions({ text, placeholder, hint, theme, isCancelling = false, isWorking = false, style }: IProps) {
+export default function LiveCaptions({
+  text,
+  placeholder,
+  hint,
+  theme,
+  isCancelling = false,
+  isWorking = false,
+  style,
+}: IProps) {
   const [step, setStep] = useState(0);
   const [lines, setLines] = useState<readonly ICaptionLine[]>([]);
   const [isScrolling, setIsScrolling] = useState(false);
   const shimmer = useShimmer(isWorking);
   const fontSize = CAPTION_STEPS[step]?.fontSize ?? 18;
   const themed = useMemo(() => themedStyles(theme), [theme]);
-  const sized = useMemo(() => ({ fontSize, lineHeight: Math.round(fontSize * CAPTION_LINE_HEIGHT), letterSpacing: fontSize * -0.015 }), [fontSize]);
+  const sized = useMemo(
+    () => ({ fontSize, lineHeight: Math.round(fontSize * CAPTION_LINE_HEIGHT), letterSpacing: fontSize * -0.015 }),
+    [fontSize],
+  );
   const breathing = useMemo(() => (isWorking ? { opacity: shimmer } : null), [isWorking, shimmer]);
   const isIdle = text === "";
 
@@ -65,9 +76,14 @@ export default function LiveCaptions({ text, placeholder, hint, theme, isCancell
         {isIdle ? (
           <Animated.Text style={[styles.caption, styles.idle, themed.muted, breathing]}>{placeholder}</Animated.Text>
         ) : isScrolling ? (
-          <CaptionLines lines={visibleCaptionLines(lines, step)} textStyle={[styles.caption, sized, themed.text, isCancelling ? styles.faded : null]} />
+          <CaptionLines
+            lines={visibleCaptionLines(lines, step)}
+            textStyle={[styles.caption, sized, themed.text, isCancelling ? styles.faded : null]}
+          />
         ) : (
-          <Animated.Text style={[styles.caption, sized, themed.text, isCancelling ? styles.faded : null, breathing]}>{text}</Animated.Text>
+          <Animated.Text style={[styles.caption, sized, themed.text, isCancelling ? styles.faded : null, breathing]}>
+            {text}
+          </Animated.Text>
         )}
       </View>
       <Text style={[styles.hint, isCancelling ? themed.danger : themed.muted]}>{hint}</Text>

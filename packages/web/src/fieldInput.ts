@@ -6,7 +6,10 @@ export interface IFieldInputOptions {
   onValue: (value: string) => void;
 }
 
-export function createFieldInput(field: HTMLTextAreaElement | HTMLInputElement, { onValue }: IFieldInputOptions): IDictationInput {
+export function createFieldInput(
+  field: HTMLTextAreaElement | HTMLInputElement,
+  { onValue }: IFieldInputOptions,
+): IDictationInput {
   const streaming = createStreamingInput(field);
   let isShowing = false;
 

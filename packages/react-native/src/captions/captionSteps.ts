@@ -18,7 +18,11 @@ export const CAPTION_STEPS: readonly ICaptionStep[] = [
 export const CAPTION_LINE_HEIGHT = 1.3;
 
 // Steps only grow within one dictation, so the text never jumps back up while it streams.
-export function fitCaption(step: number, lineCount: number, steps: readonly ICaptionStep[] = CAPTION_STEPS): ICaptionLayout {
+export function fitCaption(
+  step: number,
+  lineCount: number,
+  steps: readonly ICaptionStep[] = CAPTION_STEPS,
+): ICaptionLayout {
   const last = steps.length - 1;
   const current = Math.min(Math.max(0, step), last);
   const limit = steps[current]?.lines ?? Infinity;
@@ -34,7 +38,11 @@ export function fitCaption(step: number, lineCount: number, steps: readonly ICap
   return { step: current, isScrolling: true };
 }
 
-export function visibleCaptionLines<T>(lines: readonly T[], step: number, steps: readonly ICaptionStep[] = CAPTION_STEPS): readonly T[] {
+export function visibleCaptionLines<T>(
+  lines: readonly T[],
+  step: number,
+  steps: readonly ICaptionStep[] = CAPTION_STEPS,
+): readonly T[] {
   const limit = steps[Math.min(Math.max(0, step), steps.length - 1)]?.lines ?? lines.length;
 
   return lines.length > limit ? lines.slice(lines.length - limit) : lines;

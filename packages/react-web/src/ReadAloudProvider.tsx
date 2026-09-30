@@ -44,7 +44,16 @@ const driverFor = (
   return createWebTtsDriver({ endpoint, headers, output });
 };
 
-export function ReadAloudProvider({ endpoint, headers, driver, bands, rewrite, shouldRewrite, summarize, children }: IProps) {
+export function ReadAloudProvider({
+  endpoint,
+  headers,
+  driver,
+  bands,
+  rewrite,
+  shouldRewrite,
+  summarize,
+  children,
+}: IProps) {
   const levels = useAudioLevels(bands === undefined ? { isAudible: true } : { isAudible: true, bands });
   const levelsRef = useRef<IAudioLevels | null>(null);
   const latestRef = useRef<ILatest>({});
@@ -62,17 +71,16 @@ export function ReadAloudProvider({ endpoint, headers, driver, bands, rewrite, s
     };
   });
 
-  const [store] = useState(
-    (): IReadAloudStore<Element> =>
-      createReadAloud<Element>({
-        driver: driverFor(
-          { ...(endpoint === undefined ? {} : { endpoint }), ...(driver === undefined ? {} : { driver }) },
-          () => resolveHeaders(latestRef.current.headers),
-          () => levelsRef.current?.input ?? null,
-        ),
-        readLevels: () => levelsRef.current?.read(),
-        sources: () => latestRef.current,
-      }),
+  const [store] = useState((): IReadAloudStore<Element> =>
+    createReadAloud<Element>({
+      driver: driverFor(
+        { ...(endpoint === undefined ? {} : { endpoint }), ...(driver === undefined ? {} : { driver }) },
+        () => resolveHeaders(latestRef.current.headers),
+        () => levelsRef.current?.input ?? null,
+      ),
+      readLevels: () => levelsRef.current?.read(),
+      sources: () => latestRef.current,
+    }),
   );
 
   useEffect(() => store.connect(), [store]);

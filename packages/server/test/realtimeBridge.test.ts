@@ -120,7 +120,11 @@ describe("createRealtimeBridge", () => {
     await settle();
     midStream.fail("ENGINE_UNAVAILABLE", "the engine went away");
 
-    expect(first.sent.at(-1)).toEqual({ type: "error", errorCode: "ENGINE_UNAVAILABLE", detail: "the engine went away" });
+    expect(first.sent.at(-1)).toEqual({
+      type: "error",
+      errorCode: "ENGINE_UNAVAILABLE",
+      detail: "the engine went away",
+    });
     expect(first.closed).toEqual([1011]);
 
     const onStop = fakeSession();

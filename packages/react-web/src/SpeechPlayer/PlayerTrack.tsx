@@ -68,7 +68,9 @@ export function PlayerTrack({ chunks, chunkIndex, time, isDone, labels, onSeek }
         <button
           key={offsets[index]}
           type="button"
-          className={index === chunkIndex ? "saystack-player__segment saystack-player__segment--now" : "saystack-player__segment"}
+          className={
+            index === chunkIndex ? "saystack-player__segment saystack-player__segment--now" : "saystack-player__segment"
+          }
           aria-label={labels.part(index + 1, chunks.length)}
           title={chunk.text}
           onClick={() => onSeek(index)}

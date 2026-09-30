@@ -64,7 +64,10 @@ export function fftSizeFor(sampleRate: number): number {
 
 // The same numbers AnalyserNode.getFloatFrequencyData gives: Blackman window, magnitude over N,
 // smoothed over time, in decibels.
-export function createSpectrumAnalyser({ fftSize = 2048, smoothing = 0.3 }: ISpectrumAnalyserOptions = {}): ISpectrumAnalyser {
+export function createSpectrumAnalyser({
+  fftSize = 2048,
+  smoothing = 0.3,
+}: ISpectrumAnalyserOptions = {}): ISpectrumAnalyser {
   if (!isPowerOfTwo(fftSize)) {
     throw new Error(`spectrum: fftSize must be a power of two, got ${fftSize}`);
   }
@@ -166,7 +169,13 @@ export function createPcmLevels({
   const spectrum = new Float32Array(analyser.binCount);
   let currentSensitivity = sensitivity;
   const createMeter = (count: number): IBandMeter =>
-    createBandMeter({ bands: count, sampleRate, binCount: analyser.binCount, sensitivity: currentSensitivity, isNoiseTracked });
+    createBandMeter({
+      bands: count,
+      sampleRate,
+      binCount: analyser.binCount,
+      sensitivity: currentSensitivity,
+      isNoiseTracked,
+    });
   let meter = createMeter(bands);
 
   return {

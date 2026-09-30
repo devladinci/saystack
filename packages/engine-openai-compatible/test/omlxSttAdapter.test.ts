@@ -86,7 +86,11 @@ describe("createOmlxSttAdapter — offline contract", () => {
 
   it("oversized audio is rejected locally as AUDIO_TOO_LARGE", async () => {
     const adapter = createOmlxSttAdapter({ url: "http://x/v1" }, { maxBytes: 4, minAudioBytes: 1 });
-    const result = await adapter.transcribe({ audio: new Uint8Array([1, 2, 3, 4, 5]), mimeType: "audio/wav", filename: "x.wav" });
+    const result = await adapter.transcribe({
+      audio: new Uint8Array([1, 2, 3, 4, 5]),
+      mimeType: "audio/wav",
+      filename: "x.wav",
+    });
 
     if (result.ok) throw new Error("expected failure");
     expect(result.errorCode).toBe("AUDIO_TOO_LARGE");

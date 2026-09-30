@@ -14,4 +14,5 @@ export function holdOutcome({ heldMs, isCancelling, minHoldMs }: IHoldOutcomeInp
   return heldMs < minHoldMs ? "tooShort" : "end";
 }
 
-export const isPastCancel = (dx: number, dy: number, cancelDistance: number): boolean => Math.hypot(dx, dy) > cancelDistance;
+export const isPastCancel = (dx: number, dy: number, cancelDistance: number): boolean =>
+  Math.hypot(dx, dy) > cancelDistance;

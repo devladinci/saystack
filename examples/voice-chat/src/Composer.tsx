@@ -72,7 +72,8 @@ export function Composer({ isWaiting, onSend }: IProps) {
 
   const error =
     dictation.state === "error"
-      ? ((dictation.errorCode === undefined ? undefined : DICTATION_ERRORS[dictation.errorCode]) ?? dictation.errorMessage)
+      ? ((dictation.errorCode === undefined ? undefined : DICTATION_ERRORS[dictation.errorCode]) ??
+        dictation.errorMessage)
       : undefined;
 
   return (

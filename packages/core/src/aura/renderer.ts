@@ -204,8 +204,15 @@ function program(gl: WebGLRenderingContext, fragment: string): WebGLProgram {
   return created;
 }
 
-const locate = <T extends string>(gl: WebGLRenderingContext, target: WebGLProgram, names: readonly T[]): Record<T, WebGLUniformLocation | null> =>
-  Object.fromEntries(names.map((name) => [name, gl.getUniformLocation(target, name)])) as Record<T, WebGLUniformLocation | null>;
+const locate = <T extends string>(
+  gl: WebGLRenderingContext,
+  target: WebGLProgram,
+  names: readonly T[],
+): Record<T, WebGLUniformLocation | null> =>
+  Object.fromEntries(names.map((name) => [name, gl.getUniformLocation(target, name)])) as Record<
+    T,
+    WebGLUniformLocation | null
+  >;
 
 const pointAt = (gl: WebGLRenderingContext, target: WebGLProgram): void => {
   const position = gl.getAttribLocation(target, "a_pos");
@@ -234,7 +241,13 @@ const emptyTarget = (): ITarget => ({ texture: null, buffer: null, width: 0, hei
 
 export function createAuraRenderer(
   gl: WebGLRenderingContext,
-  { settings: initial, background: initialBackground, effects = "host", isAdditive = false, isReducedMotion = () => false }: IAuraRendererOptions,
+  {
+    settings: initial,
+    background: initialBackground,
+    effects = "host",
+    isAdditive = false,
+    isReducedMotion = () => false,
+  }: IAuraRendererOptions,
 ): IAuraRenderer {
   const isShaded = effects === "shader";
   let programs = link(gl, isShaded);
@@ -249,7 +262,10 @@ export function createAuraRenderer(
   const current = new Float32Array(MAX_BANDS);
   const cycles = new Float32Array(MAX_BANDS).fill(1);
   const previousCycles = new Float32Array(MAX_BANDS).fill(1);
-  const history = Array.from({ length: HISTORY_FRAMES }, () => ({ at: -Infinity, levels: new Float32Array(MAX_BANDS) }));
+  const history = Array.from({ length: HISTORY_FRAMES }, () => ({
+    at: -Infinity,
+    levels: new Float32Array(MAX_BANDS),
+  }));
   const scene = emptyTarget();
   const pass = emptyTarget();
   let historyIndex = 0;
@@ -325,7 +341,8 @@ export function createAuraRenderer(
 
   const glowOf = (rect: IAuraRect): number => look.auraSize * (rect.isPage ? PAGE_GLOW : 1);
 
-  const reachOf = (rect: IAuraRect): number => settings.gap + look.lineWidth + liftOf(rect) * 1.3 + glowOf(rect) * 4 + 2;
+  const reachOf = (rect: IAuraRect): number =>
+    settings.gap + look.lineWidth + liftOf(rect) * 1.3 + glowOf(rect) * 4 + 2;
 
   const perimeterOf = (rect: IAuraRect, radius: number): number =>
     2 * Math.max(0, rect.w - 2 * radius) + 2 * Math.max(0, rect.h - 2 * radius) + 2 * Math.PI * radius;
@@ -369,7 +386,8 @@ export function createAuraRenderer(
 
     for (let index = 0; index < MAX_BANDS; index += 1) {
       const level = source !== undefined && index < look.bands ? (source[index] ?? 0) * activity : 0;
-      phases[index] = (phases[index] ?? 0) + dt * speed * (0.15 + 3.2 * level) * (index % 2 === 1 ? -1 : 1) * (1 + index * 0.25);
+      phases[index] =
+        (phases[index] ?? 0) + dt * speed * (0.15 + 3.2 * level) * (index % 2 === 1 ? -1 : 1) * (1 + index * 0.25);
       bands[index * 4] = level;
       bands[index * 4 + 1] = phases[index] ?? 0;
       current[index] = level;
@@ -396,7 +414,8 @@ export function createAuraRenderer(
 
     for (let index = 0; index < MAX_BANDS; index += 1) {
       const level = echo[index] ?? 0;
-      echoPhases[index] = (echoPhases[index] ?? 0) + dt * speed * (0.15 + 3.2 * level) * (index % 2 === 1 ? 1 : -1) * (1.1 + index * 0.2);
+      echoPhases[index] =
+        (echoPhases[index] ?? 0) + dt * speed * (0.15 + 3.2 * level) * (index % 2 === 1 ? 1 : -1) * (1.1 + index * 0.2);
       echoBands[index * 4] = level;
       echoBands[index * 4 + 1] = echoPhases[index] ?? 0;
     }
@@ -457,7 +476,10 @@ export function createAuraRenderer(
     const isLight = background === "light";
     const emphasis = look.outline === "full" ? EMPHASIS.around : EMPHASIS[look.placement];
     const spectrum = spectrumOf(rect, radius, perimeter);
-    const clip = view.clip === null ? NO_CLIP : [view.clip[0] - view.x, view.clip[1] - view.y, view.clip[2] - view.x, view.clip[3] - view.y];
+    const clip =
+      view.clip === null
+        ? NO_CLIP
+        : [view.clip[0] - view.x, view.clip[1] - view.y, view.clip[2] - view.x, view.clip[3] - view.y];
 
     gl.viewport(0, 0, pixelWidth, pixelHeight);
     gl.uniform2f(uniforms.u_px, pixelWidth, pixelHeight);
@@ -499,7 +521,13 @@ export function createAuraRenderer(
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   };
 
-  const blurInto = (source: ITarget, target: ITarget | null, step: readonly [number, number], sigma: number, view: IAuraView): void => {
+  const blurInto = (
+    source: ITarget,
+    target: ITarget | null,
+    step: readonly [number, number],
+    sigma: number,
+    view: IAuraView,
+  ): void => {
     const { blur, blurUniforms } = programs;
 
     if (blur === null || blurUniforms === null) {
@@ -526,8 +554,13 @@ export function createAuraRenderer(
   const draw = (view: IAuraView, rect: IAuraRect, radius: number, perimeter: number, breathe: number): void => {
     const density = view.pixelWidth / Math.max(1, view.width);
     const sigma = isShaded ? look.blur * density : 0;
-    const resolution = isShaded ? look.resolution * (rect.isPage ? 0.75 : 1) * Math.min(1, MAX_DENSITY / density) * quality : 1;
-    const scale = Math.max(MIN_OFFSCREEN_SCALE, sigma > 0 ? Math.min(resolution, BLUR_TEXEL_SIGMA / sigma) : resolution);
+    const resolution = isShaded
+      ? look.resolution * (rect.isPage ? 0.75 : 1) * Math.min(1, MAX_DENSITY / density) * quality
+      : 1;
+    const scale = Math.max(
+      MIN_OFFSCREEN_SCALE,
+      sigma > 0 ? Math.min(resolution, BLUR_TEXEL_SIGMA / sigma) : resolution,
+    );
 
     if (!isShaded || (sigma === 0 && resolution === 1)) {
       drawAura(view, rect, radius, perimeter, breathe, view.pixelWidth, view.pixelHeight);
@@ -625,7 +658,11 @@ export function createAuraRenderer(
         bands[index * 4 + 3] = previousCycles[index] ?? 1;
       }
 
-      const view = host.place(rect, { reach: reachOf(rect), resolution: look.resolution * (rect.isPage ? 0.75 : 1), look });
+      const view = host.place(rect, {
+        reach: reachOf(rect),
+        resolution: look.resolution * (rect.isPage ? 0.75 : 1),
+        look,
+      });
 
       if (view === null) {
         host.hide();

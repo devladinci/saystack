@@ -18,7 +18,17 @@ export function TopWave({ state, mode, levels, auraStyle }: IProps) {
   const height = useMemo(() => auraReach(auraStyle, mode, 0), [auraStyle, mode]);
   const size = useMemo((): ViewStyle => ({ height }), [height]);
 
-  return <AuraView style={[styles.wave, size]} state={state} mode={mode} outline="top-edge" levels={levels} auraStyle={auraStyle} gap={0} />;
+  return (
+    <AuraView
+      style={[styles.wave, size]}
+      state={state}
+      mode={mode}
+      outline="top-edge"
+      levels={levels}
+      auraStyle={auraStyle}
+      gap={0}
+    />
+  );
 }
 
 const styles = StyleSheet.create({

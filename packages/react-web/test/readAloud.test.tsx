@@ -19,7 +19,9 @@ interface IFakeDriver {
 
 function fakeDriver(result?: ITtsSynthesizeResult): IFakeDriver {
   const endings: (() => void)[] = [];
-  const synthesize = vi.fn(async (): Promise<ITtsSynthesizeResult> => result ?? { ok: true, audio: new ArrayBuffer(8), mimeType: "audio/wav" });
+  const synthesize = vi.fn(
+    async (): Promise<ITtsSynthesizeResult> => result ?? { ok: true, audio: new ArrayBuffer(8), mimeType: "audio/wav" },
+  );
   const createClip = async (): Promise<ISpeechClipResult> => ({
     ok: true,
     clip: {

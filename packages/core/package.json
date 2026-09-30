@@ -3,6 +3,16 @@
   "version": "0.0.1",
   "description": "Engine-agnostic core: turn LLM output into speakable text, chunked for streaming.",
   "license": "MIT",
+  "author": "DeVladinci",
+  "homepage": "https://github.com/devladinci/saystack#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devladinci/saystack.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/devladinci/saystack/issues"
+  },
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.js",
@@ -39,5 +49,8 @@
     "llm",
     "chat",
     "accessibility"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }

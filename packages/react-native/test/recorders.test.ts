@@ -4,17 +4,29 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const files = vi.hoisted(() => new Map<string, Uint8Array>());
 
 const audio = vi.hoisted(() => {
-  const streams: { started: boolean; stopped: boolean; emit: (samples: Float32Array) => void; resolveStart: () => void }[] = [];
+  const streams: {
+    started: boolean;
+    stopped: boolean;
+    emit: (samples: Float32Array) => void;
+    resolveStart: () => void;
+  }[] = [];
 
   class FakeStream {
-    private listener: ((buffer: { data: ArrayBuffer; sampleRate: number; channels: number; timestamp: number }) => void) | null = null;
-    private handle: { started: boolean; stopped: boolean; emit: (samples: Float32Array) => void; resolveStart: () => void };
+    private listener:
+      ((buffer: { data: ArrayBuffer; sampleRate: number; channels: number; timestamp: number }) => void) | null = null;
+    private handle: {
+      started: boolean;
+      stopped: boolean;
+      emit: (samples: Float32Array) => void;
+      resolveStart: () => void;
+    };
 
     constructor() {
       this.handle = {
         started: false,
         stopped: false,
-        emit: (samples) => this.listener?.({ data: samples.slice().buffer, sampleRate: 16000, channels: 1, timestamp: 0 }),
+        emit: (samples) =>
+          this.listener?.({ data: samples.slice().buffer, sampleRate: 16000, channels: 1, timestamp: 0 }),
         resolveStart: () => undefined,
       };
       streams.push(this.handle);

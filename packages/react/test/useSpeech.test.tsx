@@ -7,11 +7,6 @@ import { describe, expect, it, vi } from "vitest";
 
 const WAV = new ArrayBuffer(8);
 
-const okClip: IClipFn = async () => ({
-  ok: true,
-  clip: { play: async () => undefined, stop: () => undefined, release: () => undefined },
-});
-
 describe("useSpeech", () => {
   it("keeps one api for its session even when the driver is recreated on every render", () => {
     const { result, rerender } = renderHook(() => useSpeech(makeDriver()));
@@ -26,9 +21,12 @@ describe("useSpeech", () => {
   it("reads the latest rewrite when speech starts", async () => {
     const early = vi.fn(async () => "early");
     const late = vi.fn(async () => "Late rewrite wins.");
-    const { result, rerender } = renderHook(({ rewrite }) => useSpeech(makeDriver(), { rewrite, shouldRewrite: () => true }), {
-      initialProps: { rewrite: early },
-    });
+    const { result, rerender } = renderHook(
+      ({ rewrite }) => useSpeech(makeDriver(), { rewrite, shouldRewrite: () => true }),
+      {
+        initialProps: { rewrite: early },
+      },
+    );
 
     rerender({ rewrite: late });
 

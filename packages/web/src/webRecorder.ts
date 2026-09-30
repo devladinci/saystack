@@ -11,7 +11,10 @@ const VOICE_CONSTRAINTS: MediaTrackConstraints = {
   autoGainControl: true,
 };
 
-export function createWebRecorder({ mimeType, constraints = VOICE_CONSTRAINTS }: IWebRecorderOptions = {}): IPlatformRecorder {
+export function createWebRecorder({
+  mimeType,
+  constraints = VOICE_CONSTRAINTS,
+}: IWebRecorderOptions = {}): IPlatformRecorder {
   let stream: MediaStream | null = null;
   let recorder: MediaRecorder | null = null;
   let parts: Blob[] = [];

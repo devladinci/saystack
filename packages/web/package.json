@@ -3,6 +3,16 @@
   "version": "0.0.1",
   "description": "Browser voice UI without a framework: spectral aura, audio levels, read-along highlighting and streaming dictation.",
   "license": "MIT",
+  "author": "DeVladinci",
+  "homepage": "https://github.com/devladinci/saystack#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devladinci/saystack.git",
+    "directory": "packages/web"
+  },
+  "bugs": {
+    "url": "https://github.com/devladinci/saystack/issues"
+  },
   "type": "module",
   "sideEffects": [
     "*.css"
@@ -47,5 +57,8 @@
     "web-audio",
     "read-along",
     "visualizer"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }

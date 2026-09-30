@@ -22,7 +22,11 @@ export interface ICreateReadAloudOptions {
 }
 
 // Sources are read when speech starts, so a provider may hand in fresh functions on every render.
-export function createReadAloud<TAnchor>({ driver, readLevels, sources }: ICreateReadAloudOptions): IReadAloudStore<TAnchor> {
+export function createReadAloud<TAnchor>({
+  driver,
+  readLevels,
+  sources,
+}: ICreateReadAloudOptions): IReadAloudStore<TAnchor> {
   const spoken: RewriteFn = async (markdown, signal) => {
     const current = sources();
     const id = store.speakingId();

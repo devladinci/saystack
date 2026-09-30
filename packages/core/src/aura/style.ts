@@ -35,7 +35,8 @@ export interface IAuraRange {
   step: number;
 }
 
-export type AuraNumericKey = "bands" | "lift" | "lineWidth" | "blur" | "aura" | "auraSize" | "brightness" | "rippleSpeed" | "resolution";
+export type AuraNumericKey =
+  "bands" | "lift" | "lineWidth" | "blur" | "aura" | "auraSize" | "brightness" | "rippleSpeed" | "resolution";
 
 export const AURA_RANGES: Readonly<Record<AuraNumericKey, IAuraRange>> = {
   bands: { min: 1, max: 8, step: 1 },
@@ -82,7 +83,10 @@ export const MESSAGE_AURA_STYLE: Readonly<IAuraStyleOptions> = {
   light: { lineWidth: 1.8, blur: 2, aura: 0.75, auraSize: 8, brightness: 0.55 },
 };
 
-export function auraStyleFor({ dark, light, ...shared }: IAuraStyleOptions, background: AuraBackground): Partial<IAuraStyle> {
+export function auraStyleFor(
+  { dark, light, ...shared }: IAuraStyleOptions,
+  background: AuraBackground,
+): Partial<IAuraStyle> {
   return { ...shared, ...(background === "dark" ? dark : light) };
 }
 

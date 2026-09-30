@@ -15,7 +15,7 @@ function makeDeps(overrides: Partial<IVoiceServerDeps> = {}): IVoiceServerDeps {
       ok: true,
       config: { languages: [], stt: STT_CONFIG, tts: { url: "http://127.0.0.1:7777/v1" } },
     }),
-    createSttAdapter: (engineConfig) => ({
+    createSttAdapter: (_engineConfig) => ({
       capabilities: { streaming: false, interimResults: false, wordTimings: false, languages: ["en"] },
       transcribe: async (input) => {
         if (input.audio.byteLength === 0) {
@@ -25,7 +25,7 @@ function makeDeps(overrides: Partial<IVoiceServerDeps> = {}): IVoiceServerDeps {
         return { ok: true, text: "stub transcription" };
       },
     }),
-    createTtsAdapter: (engineConfig) => ({
+    createTtsAdapter: (_engineConfig) => ({
       capabilities: { streaming: false, voiceCloning: false },
       synthesize: async (input) => {
         if (input.text.trim().length === 0) {
@@ -465,7 +465,10 @@ describe("createVoiceRoutes realtime", () => {
         }),
         realtime: {
           upgradeWebSocket,
-          createAdapter: () => ({ capabilities: session.capabilities, openRealtime: async () => ({ ok: true, session }) }),
+          createAdapter: () => ({
+            capabilities: session.capabilities,
+            openRealtime: async () => ({ ok: true, session }),
+          }),
         },
       }),
     );

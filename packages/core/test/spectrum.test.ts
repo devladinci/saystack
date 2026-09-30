@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { createPcmLevels, createPcmMeter, createSampleWindow, createSpectrumAnalyser, fftSizeFor } from "../src/aura/spectrum.js";
+import {
+  createPcmLevels,
+  createPcmMeter,
+  createSampleWindow,
+  createSpectrumAnalyser,
+  fftSizeFor,
+} from "../src/aura/spectrum.js";
 
 const tone = (hz: number, sampleRate: number, length: number, amplitude = 0.5): Float32Array =>
   Float32Array.from({ length }, (_, index) => amplitude * Math.sin((2 * Math.PI * hz * index) / sampleRate));
@@ -106,7 +112,9 @@ describe("createPcmLevels", () => {
 describe("createPcmMeter", () => {
   const rate = 16000;
   const speech = Float32Array.from({ length: rate * 2 }, (_, index) =>
-    index < rate / 2 ? 0.001 * Math.sin(index * 1.7) : 0.4 * Math.sin((2 * Math.PI * 300 * index) / rate) * (0.6 + 0.4 * Math.sin(index / 900)),
+    index < rate / 2
+      ? 0.001 * Math.sin(index * 1.7)
+      : 0.4 * Math.sin((2 * Math.PI * 300 * index) / rate) * (0.6 + 0.4 * Math.sin(index / 900)),
   );
   const windowAt = (end: number, out: Float32Array): Float32Array => {
     out.fill(0);

@@ -12,7 +12,7 @@ interface IChatResponseShape {
   choices?: unknown;
 }
 
-export function statusToLlmErrorCode(status: number): LlmErrorCode {
+function statusToLlmErrorCode(status: number): LlmErrorCode {
   if (status === 401 || status === 403) {
     return "LLM_UNAVAILABLE";
   }

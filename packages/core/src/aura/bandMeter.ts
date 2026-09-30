@@ -139,7 +139,8 @@ export function createBandMeter({
 
       const noise = isNoiseTracked ? noiseOf(index) : 0;
       const clean = power - noise * NOISE_FACTOR;
-      const level = clean > 1e-13 && clean > noise * NOISE_GATE ? 10 * Math.log10(clean) + (tilt[index] ?? 0) : SILENT_DB;
+      const level =
+        clean > 1e-13 && clean > noise * NOISE_GATE ? 10 * Math.log10(clean) + (tilt[index] ?? 0) : SILENT_DB;
 
       decibels[index] = level;
       top = Math.max(top, level);

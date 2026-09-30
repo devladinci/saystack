@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { hasSpeechText, needsSummary, speechChunks, toReadingBlocks, toSpeechText } from "../src/tts/text.js";
+import { needsSummary, speechChunks, toReadingBlocks, toSpeechText } from "../src/tts/text.js";
 
 describe("toSpeechText", () => {
   it("strips code blocks, tables, rules, markdown noise", () => {
@@ -39,7 +39,8 @@ describe("toSpeechText", () => {
   });
 
   it("keeps text with content when chunks are made", () => {
-    const text = "First sentence is here for the test suite. Second sentence continues the flow of this text. Third sentence wraps up the demo nicely.";
+    const text =
+      "First sentence is here for the test suite. Second sentence continues the flow of this text. Third sentence wraps up the demo nicely.";
     const chunks = speechChunks(text);
 
     expect(chunks.length).toBeGreaterThan(0);

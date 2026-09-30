@@ -208,7 +208,10 @@ describe("createOmlxRealtimeSttAdapter (fake ws server)", () => {
 
   it("gives up on the last words after the stop timeout", async () => {
     harness = await readyServer(() => {});
-    const open = await createOmlxRealtimeSttAdapter({ url: harness.url, token: TOKEN }, { stopTimeoutMs: 30 }).openRealtime({});
+    const open = await createOmlxRealtimeSttAdapter(
+      { url: harness.url, token: TOKEN },
+      { stopTimeoutMs: 30 },
+    ).openRealtime({});
     if (!open.ok) throw new Error("expected the stream to open");
 
     await expect(open.session.stop()).resolves.toMatchObject({ ok: false, errorCode: "TIMEOUT" });
@@ -229,4 +232,3 @@ describe("createOmlxRealtimeSttAdapter (fake ws server)", () => {
     expect(isClosed).toBe(true);
   });
 });
-

@@ -104,7 +104,12 @@ export function useHoldToTalk({
           clearTimeout(timerRef.current);
         }
 
-        pressRef.current = { x: event.nativeEvent.pageX, y: event.nativeEvent.pageY, at: Date.now(), isCancelling: false };
+        pressRef.current = {
+          x: event.nativeEvent.pageX,
+          y: event.nativeEvent.pageY,
+          at: Date.now(),
+          isCancelling: false,
+        };
         setIsHolding(true);
         setIsCancelling(false);
         setIsTooShort(false);
@@ -117,7 +122,11 @@ export function useHoldToTalk({
           return;
         }
 
-        const next = isPastCancel(event.nativeEvent.pageX - press.x, event.nativeEvent.pageY - press.y, latestRef.current.cancelDistance);
+        const next = isPastCancel(
+          event.nativeEvent.pageX - press.x,
+          event.nativeEvent.pageY - press.y,
+          latestRef.current.cancelDistance,
+        );
 
         if (next !== press.isCancelling) {
           press.isCancelling = next;

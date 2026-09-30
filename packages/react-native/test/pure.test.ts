@@ -10,7 +10,13 @@ import { mapReadAlong, pageWordAt, readingText, seekFor } from "../src/readAloud
 const chunk = (text: string, starts: number[] = []): ISpeechChunk => ({
   text,
   duration: starts.length > 0 ? (starts.at(-1) ?? 0) + 0.3 : 0,
-  words: starts.map((start, index) => ({ text: text.split(" ")[index] ?? "", charStart: 0, charEnd: 0, start, end: start + 0.3 })),
+  words: starts.map((start, index) => ({
+    text: text.split(" ")[index] ?? "",
+    charStart: 0,
+    charEnd: 0,
+    start,
+    end: start + 0.3,
+  })),
 });
 
 describe("fitCaption", () => {
@@ -58,7 +64,10 @@ describe("read-along map", () => {
   const map = mapReadAlong(chunks, text.words);
 
   it("splits the reply into blocks of words, without the code", () => {
-    expect(text.blocks.map((block) => block.map((word) => word.text))).toEqual([["Leave", "at", "nine."], ["Pack", "a", "jacket"]]);
+    expect(text.blocks.map((block) => block.map((word) => word.text))).toEqual([
+      ["Leave", "at", "nine."],
+      ["Pack", "a", "jacket"],
+    ]);
     expect(text.words.map((word) => word.index)).toEqual([0, 1, 2, 3, 4, 5]);
   });
 

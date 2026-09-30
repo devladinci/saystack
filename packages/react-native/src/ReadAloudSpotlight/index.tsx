@@ -48,7 +48,12 @@ const PLAYER_ESTIMATE = 126;
 
 const UNMOUNT_MS = 420;
 
-const fallbackRect = (width: number, height: number): IWindowRect => ({ x: 16, y: height * 0.35, width: width - 32, height: 80 });
+const fallbackRect = (width: number, height: number): IWindowRect => ({
+  x: 16,
+  y: height * 0.35,
+  width: width - 32,
+  height: 80,
+});
 
 // Reading a reply: the chat blurs, the aura's bands hang from the top edge as it speaks, the reply lifts
 // with its words marked as they are read, and the player waits at the bottom. The blur stays until the
@@ -142,7 +147,9 @@ export default function ReadAloudSpotlight({
   const player = useMemo(
     () => ({
       bottom: playerBottom,
-      transform: [{ translateY: slide.interpolate({ inputRange: [0, 1], outputRange: [playerHeight + playerBottom + 40, 0] }) }],
+      transform: [
+        { translateY: slide.interpolate({ inputRange: [0, 1], outputRange: [playerHeight + playerBottom + 40, 0] }) },
+      ],
     }),
     [slide, playerHeight, playerBottom],
   );
@@ -166,7 +173,12 @@ export default function ReadAloudSpotlight({
           {...(blur === undefined ? {} : { blur })}
           {...(dim === undefined ? {} : { dim })}
         />
-        <TopWave state={isOpen ? PHASE_AURA[phase] : "hidden"} mode={theme.mode} levels={readLevels} auraStyle={auraStyle} />
+        <TopWave
+          state={isOpen ? PHASE_AURA[phase] : "hidden"}
+          mode={theme.mode}
+          levels={readLevels}
+          auraStyle={auraStyle}
+        />
         {from === null ? null : (
           <LiftedReply
             key={String(messageId)}

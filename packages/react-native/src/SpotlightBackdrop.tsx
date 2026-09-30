@@ -21,7 +21,15 @@ const FADE_MS = 220;
 const VEIL_WITHOUT_BLUR = 0.86;
 
 // Blurs and dims the screen above `bottom`; what sits below it stays sharp, as if lifted over the blur.
-export function SpotlightBackdrop({ isVisible, theme, blur = 32, dim = 0.35, bottom = 0, isBlocking = false, onPress }: IProps) {
+export function SpotlightBackdrop({
+  isVisible,
+  theme,
+  blur = 32,
+  dim = 0.35,
+  bottom = 0,
+  isBlocking = false,
+  onPress,
+}: IProps) {
   const progress = useRef(new Animated.Value(0)).current;
   const [isShown, setIsShown] = useState(isVisible);
 
@@ -49,10 +57,16 @@ export function SpotlightBackdrop({ isVisible, theme, blur = 32, dim = 0.35, bot
   const area = useMemo((): ViewStyle => ({ bottom }), [bottom]);
   const veilOpacity = expoBlur === null ? Math.max(dim, VEIL_WITHOUT_BLUR) : dim;
   const veil = useMemo(
-    () => ({ backgroundColor: theme.background, opacity: progress.interpolate({ inputRange: [0, 1], outputRange: [0, veilOpacity] }) }),
+    () => ({
+      backgroundColor: theme.background,
+      opacity: progress.interpolate({ inputRange: [0, 1], outputRange: [0, veilOpacity] }),
+    }),
     [theme.background, progress, veilOpacity],
   );
-  const intensity = useMemo(() => progress.interpolate({ inputRange: [0, 1], outputRange: [0, blur] }), [progress, blur]);
+  const intensity = useMemo(
+    () => progress.interpolate({ inputRange: [0, 1], outputRange: [0, blur] }),
+    [progress, blur],
+  );
 
   if (!isShown) {
     return null;
@@ -61,7 +75,11 @@ export function SpotlightBackdrop({ isVisible, theme, blur = 32, dim = 0.35, bot
   return (
     <View style={[styles.area, area]} pointerEvents={isBlocking ? "auto" : "none"}>
       {expoBlur === null ? null : (
-        <expoBlur.AnimatedBlurView style={StyleSheet.absoluteFill} intensity={intensity} tint={theme.mode === "dark" ? "dark" : "light"} />
+        <expoBlur.AnimatedBlurView
+          style={StyleSheet.absoluteFill}
+          intensity={intensity}
+          tint={theme.mode === "dark" ? "dark" : "light"}
+        />
       )}
       <Animated.View style={[StyleSheet.absoluteFill, veil]} />
       {isBlocking ? <Pressable style={StyleSheet.absoluteFill} accessible={false} onPress={onPress} /> : null}

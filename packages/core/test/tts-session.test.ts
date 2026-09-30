@@ -68,7 +68,6 @@ function makeDriver(): IFakeDriver {
   };
 }
 
-
 const settle = async (): Promise<void> => {
   await new Promise((resolve) => setTimeout(resolve, 0));
 };
@@ -89,12 +88,16 @@ describe("createSpeechSession — happy path", () => {
   it("prefetches chunk 2 while chunk 1 is queued", async () => {
     const fake = makeDriver();
     const gate = { release: (): void => undefined };
-    fake.setPlayGate(new Promise<void>((resolve) => {
-      gate.release = resolve;
-    }));
+    fake.setPlayGate(
+      new Promise<void>((resolve) => {
+        gate.release = resolve;
+      }),
+    );
 
     const session = createSpeechSession(fake.driver);
-    const speaking = session.speak("Sentence one. Sentence two goes on a bit. Sentence three is here. A fourth sentence follows now. And a fifth closes it.");
+    const speaking = session.speak(
+      "Sentence one. Sentence two goes on a bit. Sentence three is here. A fourth sentence follows now. And a fifth closes it.",
+    );
 
     await settle();
 
@@ -148,9 +151,11 @@ describe("createSpeechSession — stop and replay", () => {
   it("stop() mid-speech aborts the driver fetch and resets to idle", async () => {
     const fake = makeDriver();
     const gate = { release: (): void => undefined };
-    fake.setPlayGate(new Promise<void>((resolve) => {
-      gate.release = resolve;
-    }));
+    fake.setPlayGate(
+      new Promise<void>((resolve) => {
+        gate.release = resolve;
+      }),
+    );
 
     const session = createSpeechSession(fake.driver);
     const speaking = session.speak("Long answer sentence one. Sentence two follows.");
@@ -171,9 +176,11 @@ describe("createSpeechSession — stop and replay", () => {
   it("second speak() cancels the first run", async () => {
     const fake = makeDriver();
     const gate = { release: (): void => undefined };
-    fake.setPlayGate(new Promise<void>((resolve) => {
-      gate.release = resolve;
-    }));
+    fake.setPlayGate(
+      new Promise<void>((resolve) => {
+        gate.release = resolve;
+      }),
+    );
 
     const session = createSpeechSession(fake.driver);
     const first = session.speak("First long speech. ".repeat(8));

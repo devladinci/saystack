@@ -156,9 +156,12 @@ describe("useRecorderLevels", () => {
     const stream = {} as MediaStream;
     let live: MediaStream | null = null;
 
-    const { rerender } = renderHook(({ isRecording }: IRecordingProps) => useRecorderLevels(levels, isRecording, () => live), {
-      initialProps: { isRecording: true },
-    });
+    const { rerender } = renderHook(
+      ({ isRecording }: IRecordingProps) => useRecorderLevels(levels, isRecording, () => live),
+      {
+        initialProps: { isRecording: true },
+      },
+    );
 
     expect(listen).not.toHaveBeenCalled();
 
@@ -222,4 +225,3 @@ describe("useFieldInput", () => {
     expect(values).toEqual([]);
   });
 });
-
