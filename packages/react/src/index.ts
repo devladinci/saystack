@@ -1,5 +1,7 @@
 export { dictationEndpoint, sendDictation } from "./dictationSender.js";
 export { useDictation } from "./useDictation.js";
+export type { HoldOutcome, IHoldOutcomeInput } from "./holdOutcome.js";
+export { holdOutcome, isPastCancel } from "./holdOutcome.js";
 export type { ISpeechApi, ISpeechHookResult } from "./useSpeech.js";
 export { createSpeechApi, useSpeech } from "./useSpeech.js";
 export { useSpeechProgress } from "./useSpeechProgress.js";

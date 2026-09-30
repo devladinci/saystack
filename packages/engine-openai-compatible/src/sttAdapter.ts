@@ -150,6 +150,10 @@ export function createOpenAiSttAdapter(engineConfig: ISttEngineConfig, options: 
         form.append("prompt", input.prompt);
       }
 
+      if (input.language !== undefined) {
+        form.append("language", input.language);
+      }
+
       let res: Response;
 
       try {

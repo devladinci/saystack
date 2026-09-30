@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { auraReach, topEdgeClip, topEdgeOutline } from "../src/aura/auraGeometry.js";
 import { CAPTION_STEPS, fitCaption, visibleCaptionLines } from "../src/captions/captionSteps.js";
-import { holdOutcome, isPastCancel } from "../src/dictation/holdOutcome.js";
+import { holdOutcome, isPastCancel } from "@saystack/react";
 import { liftCard } from "../src/readAloud/cardLayout.js";
 import { mapReadAlong, pageWordAt, readingText, seekFor } from "../src/readAloud/readAlongMap.js";
 

@@ -29,6 +29,7 @@ export interface ISttTranscribeInput {
   mimeType?: string;
   filename?: string;
   prompt?: string;
+  language?: string;
   maxBytes?: number;
   signal?: AbortSignal;
   minDurationMs?: number;

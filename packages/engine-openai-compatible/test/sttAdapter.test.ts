@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createOpenAiSttAdapter, extForMime, guessFilename } from "../src/sttAdapter.js";
 
@@ -29,6 +29,26 @@ describe("filename/mime mapping", () => {
 
   it("an empty filename is treated as no filename", () => {
     expect(guessFilename("audio/wav", "")).toBe("audio.wav");
+  });
+});
+
+describe("language hint", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("sends the hint as the standard `language` form field", async () => {
+    const forms: FormData[] = [];
+    vi.stubGlobal("fetch", async (_url: string, init: RequestInit) => {
+      forms.push(init.body as FormData);
+      return new Response(JSON.stringify({ text: "zdravei" }), { status: 200 });
+    });
+    const adapter = createOpenAiSttAdapter({ url: "http://x/v1", model: "m" }, { minAudioBytes: 1 });
+
+    await adapter.transcribe({ audio: new Uint8Array(8), mimeType: "audio/wav", language: "bg" });
+    await adapter.transcribe({ audio: new Uint8Array(8), mimeType: "audio/wav" });
+
+    expect(forms.map((form) => form.get("language"))).toEqual(["bg", null]);
   });
 });
 

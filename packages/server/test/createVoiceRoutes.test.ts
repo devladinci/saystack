@@ -245,6 +245,31 @@ describe("createVoiceRoutes — transcription routing", () => {
     expect(body.message).toBe("engine said 401");
   });
 
+  it("passes a language hint from the upload to the engine", async () => {
+    const languages: (string | undefined)[] = [];
+    const deps = makeDeps({
+      createSttAdapter: () => ({
+        capabilities: { streaming: false, interimResults: false, wordTimings: false, languages: [] },
+        transcribe: async (input) => {
+          languages.push(input.language);
+          return { ok: true, text: "zdravei" };
+        },
+      }),
+    });
+    const form = new FormData();
+    form.append("file", new Blob([AUDIO_BYTES], { type: "audio/webm" }), "a.webm");
+    form.append("language", "bg");
+
+    await createVoiceRoutes(deps).request("/audio/transcriptions", { method: "POST", body: form });
+    await createVoiceRoutes(deps).request("/audio/transcriptions", {
+      method: "POST",
+      body: AUDIO_BYTES,
+      headers: { "content-type": "audio/wav", "x-audio-language": "en" },
+    });
+
+    expect(languages).toEqual(["bg", "en"]);
+  });
+
   it("hands back the transcription fields the engine returned", async () => {
     const deps = makeDeps({
       createSttAdapter: () => ({
@@ -264,6 +289,22 @@ describe("createVoiceRoutes — transcription routing", () => {
     expect(body).toEqual({ text: "hey", language: "en", durationSeconds: 1.5 });
   });
 });
+describe("createVoiceRoutes — cors", () => {
+  it("answers any origin by default", async () => {
+    const res = await createVoiceRoutes(makeDeps()).request("/capabilities", { headers: { Origin: "http://a.test" } });
+
+    expect(res.headers.get("access-control-allow-origin")).toBe("*");
+  });
+
+  it("cors: false leaves CORS to the host app", async () => {
+    const res = await createVoiceRoutes(makeDeps({ cors: false })).request("/capabilities", {
+      headers: { Origin: "http://a.test" },
+    });
+
+    expect(res.headers.get("access-control-allow-origin")).toBeNull();
+  });
+});
+
 describe("createVoiceRoutes — speech routing", () => {
   it("text in, audio out with the engine's mime", async () => {
     const seen: Array<{ text: string; refAudio?: string }> = [];
@@ -396,9 +437,46 @@ describe("createVoiceRoutes — speech routing", () => {
     expect(seen).toEqual([{ refAudio: "AAA=", refText: "hi mate" }, {}]);
   });
 
+  it("maxTextChars refuses long text with 413 TEXT_TOO_LONG before the engine is asked", async () => {
+    let asked = 0;
+    const res = await createVoiceRoutes(
+      makeDeps({
+        maxTextChars: 5,
+        createTtsAdapter: () => ({
+          capabilities: { streaming: false, voiceCloning: false },
+          synthesize: async () => {
+            asked += 1;
+            return { ok: false, errorCode: "TTS_FAILED", message: "unreachable" };
+          },
+        }),
+      }),
+    ).request("/speech", { method: "POST", body: JSON.stringify({ text: "too long" }) });
+
+    expect(res.status).toBe(413);
+    expect(await res.json()).toMatchObject({ errorCode: "TEXT_TOO_LONG" });
+    expect(asked).toBe(0);
+  });
+
+  it("hands the request's abort signal to the engine, so a closed tab stops synthesis", async () => {
+    const signals: (AbortSignal | undefined)[] = [];
+    await createVoiceRoutes(
+      makeDeps({
+        createTtsAdapter: () => ({
+          capabilities: { streaming: false, voiceCloning: false },
+          synthesize: async (input) => {
+            signals.push(input.signal);
+            return { ok: true, audio: new ArrayBuffer(4), mimeType: "audio/wav" };
+          },
+        }),
+      }),
+    ).request("/speech", { method: "POST", body: JSON.stringify({ text: "hello" }) });
+
+    expect(signals[0]).toBeInstanceOf(AbortSignal);
+  });
+
   it("statusForSpeechErrorCode maps the family the same way as stt", async () => {
     expect(statusForSpeechErrorCode("EMPTY_TEXT")).toBe(400);
-    expect(statusForSpeechErrorCode("TEXT_TOO_LONG")).toBe(400);
+    expect(statusForSpeechErrorCode("TEXT_TOO_LONG")).toBe(413);
     expect(statusForSpeechErrorCode("TTS_RETRYABLE")).toBe(503);
     expect(statusForSpeechErrorCode("TTS_TIMEOUT")).toBe(502);
     expect(statusForSpeechErrorCode("MODEL_NOT_FOUND")).toBe(502);
@@ -408,8 +486,8 @@ describe("createVoiceRoutes — speech routing", () => {
 describe("createVoiceRoutes realtime", () => {
   it("mounts the realtime route on the configured engine when asked to", async () => {
     const opened: unknown[] = [];
-    const upgrade: { createEvents?: (c: unknown) => WSEvents } = {};
-    const upgradeWebSocket = ((factory: (c: unknown) => WSEvents) => {
+    const upgrade: { createEvents?: (c: unknown) => WSEvents | Promise<WSEvents> } = {};
+    const upgradeWebSocket = ((factory: (c: unknown) => WSEvents | Promise<WSEvents>) => {
       upgrade.createEvents = factory;
       return async () => new Response("upgraded");
     }) as unknown as UpgradeWebSocket;
@@ -431,7 +509,7 @@ describe("createVoiceRoutes realtime", () => {
     const ws = new WSContext({ send: (data) => sent.push(String(data)), close: () => undefined, readyState: 1 });
 
     expect(await (await routes.request("/audio/transcriptions/realtime")).text()).toBe("upgraded");
-    const events = upgrade.createEvents?.({}) ?? null;
+    const events = (await upgrade.createEvents?.({})) ?? null;
     events?.onMessage?.(createWSMessageEvent(JSON.stringify({ type: "start", language: "de" })), ws);
     await new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -441,8 +519,8 @@ describe("createVoiceRoutes realtime", () => {
 
   it("finishes a realtime stream with one pass of the batch engine unless told not to", async () => {
     const transcribed: string[] = [];
-    const upgrade: { createEvents?: (c: unknown) => WSEvents } = {};
-    const upgradeWebSocket = ((factory: (c: unknown) => WSEvents) => {
+    const upgrade: { createEvents?: (c: unknown) => WSEvents | Promise<WSEvents> } = {};
+    const upgradeWebSocket = ((factory: (c: unknown) => WSEvents | Promise<WSEvents>) => {
       upgrade.createEvents = factory;
       return async () => new Response("upgraded");
     }) as unknown as UpgradeWebSocket;
@@ -476,7 +554,7 @@ describe("createVoiceRoutes realtime", () => {
     const ws = new WSContext({ send: (data) => sent.push(String(data)), close: () => undefined, readyState: 1 });
 
     await routes.request("/audio/transcriptions/realtime");
-    const events = upgrade.createEvents?.({}) ?? null;
+    const events = (await upgrade.createEvents?.({})) ?? null;
     events?.onMessage?.(createWSMessageEvent(JSON.stringify({ type: "start" })), ws);
     await new Promise((resolve) => setTimeout(resolve, 0));
     events?.onMessage?.(createWSMessageEvent(JSON.stringify({ type: "stop" })), ws);
@@ -484,6 +562,53 @@ describe("createVoiceRoutes realtime", () => {
 
     expect(transcribed).toEqual(["audio/wav"]);
     expect(JSON.parse(sent.at(-1) ?? "{}")).toEqual({ type: "transcript.done", text: "One clean pass." });
+  });
+
+  it("refuses a socket the app does not authorize: BAD_TOKEN, close 4001, no engine opened", async () => {
+    const upgrade: { createEvents?: (c: unknown) => WSEvents | Promise<WSEvents> } = {};
+    const upgradeWebSocket = ((factory: (c: unknown) => WSEvents | Promise<WSEvents>) => {
+      upgrade.createEvents = factory;
+      return async () => new Response("upgraded");
+    }) as unknown as UpgradeWebSocket;
+    let opened = 0;
+    const seen: unknown[] = [];
+    const routes = createVoiceRoutes(
+      makeDeps({
+        realtime: {
+          upgradeWebSocket,
+          authorize: (c) => {
+            seen.push(c);
+            return false;
+          },
+          createAdapter: () => ({
+            capabilities: { streaming: true, interimResults: true, wordTimings: false, languages: [] },
+            openRealtime: async () => {
+              opened += 1;
+              return { ok: false, errorCode: "MODEL_NOT_FOUND" };
+            },
+          }),
+        },
+      }),
+    );
+    const sent: string[] = [];
+    const closed: unknown[] = [];
+    const ws = new WSContext({
+      send: (data) => sent.push(String(data)),
+      close: (code) => closed.push(code),
+      readyState: 1,
+    });
+
+    await routes.request("/audio/transcriptions/realtime");
+    const context = { req: "upgrade" };
+    const events = (await upgrade.createEvents?.(context)) ?? null;
+    events?.onOpen?.(new Event("open"), ws);
+    events?.onMessage?.(createWSMessageEvent(JSON.stringify({ type: "start" })), ws);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(seen).toEqual([context]);
+    expect(JSON.parse(sent[0] ?? "{}")).toMatchObject({ type: "error", errorCode: "BAD_TOKEN" });
+    expect(closed).toEqual([4001]);
+    expect(opened).toBe(0);
   });
 
   it("has no realtime route unless one is configured", async () => {

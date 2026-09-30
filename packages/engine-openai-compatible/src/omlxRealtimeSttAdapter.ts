@@ -9,10 +9,15 @@ import type {
 } from "@saystack/core";
 import { WebSocket } from "ws";
 
+import { listSpeechModels } from "./models.js";
+import { normalizeBaseUrl } from "./sttAdapter.js";
+
 export interface IOmlxRealtimeOptions {
   model?: string;
   handshakeTimeoutMs?: number;
   stopTimeoutMs?: number;
+  // Refuse at once when /models/status says the model cannot stream, instead of after it loads.
+  checkModel?: boolean;
 }
 
 interface IRealtimeMessage {
@@ -27,7 +32,7 @@ type Phase = "opening" | "open" | "stopping" | "over";
 const DEFAULT_MODEL = "whisper-large-v3-turbo";
 
 const wsUrlFor = (baseUrl: string): string => {
-  const http = new URL(baseUrl);
+  const http = new URL(normalizeBaseUrl(baseUrl));
   const wsProtocol = http.protocol === "https:" ? "wss:" : "ws:";
   const path = `${http.pathname.replace(/\/+$/, "")}/audio/transcriptions/realtime`;
   return `${wsProtocol}//${http.host}${path}`;
@@ -163,11 +168,35 @@ const CAPABILITIES: ISttCapabilities = {
 // oMLX's push protocol: {"type":"start"} (the key rides in it; a handshake carries no headers), binary 16 kHz mono PCM16, then {"type":"stop"}.
 export function createOmlxRealtimeSttAdapter(
   engine: { url: string; token?: string; model?: string },
-  { model: defaultModel, handshakeTimeoutMs = 10_000, stopTimeoutMs = 5_000 }: IOmlxRealtimeOptions = {},
+  {
+    model: defaultModel,
+    handshakeTimeoutMs = 10_000,
+    stopTimeoutMs = 5_000,
+    checkModel = true,
+  }: IOmlxRealtimeOptions = {},
 ): ISttRealtimeAdapter {
-  const openRealtime = (input: ISttRealtimeInput): Promise<ISttRealtimeResult> =>
+  const cannotStream = async (model: string): Promise<boolean> => {
+    if (!checkModel) {
+      return false;
+    }
+
+    const listed = await listSpeechModels(engine);
+
+    return listed.ok && listed.models.some((known) => known.id === model && known.realtime === false);
+  };
+
+  const openRealtime = async (input: ISttRealtimeInput): Promise<ISttRealtimeResult> => {
+    const model = input.model ?? defaultModel ?? engine.model ?? DEFAULT_MODEL;
+
+    if (await cannotStream(model)) {
+      return { ok: false, errorCode: "MODEL_NOT_FOUND", message: `${model} does not transcribe in realtime` };
+    }
+
+    return connect(input, model);
+  };
+
+  const connect = (input: ISttRealtimeInput, model: string): Promise<ISttRealtimeResult> =>
     new Promise((resolveOpen) => {
-      const model = input.model ?? defaultModel ?? engine.model ?? DEFAULT_MODEL;
       const socket = new WebSocket(wsUrlFor(engine.url));
       let phase: Phase = "opening";
       let text = "";

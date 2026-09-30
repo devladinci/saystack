@@ -40,6 +40,7 @@ export async function sendDictation(
   }
 
   if (options.prompt !== undefined) form.append("prompt", options.prompt);
+  if (options.language !== undefined) form.append("language", options.language);
 
   const init: RequestInit = { method: "POST", body: form, headers: resolveHeaders(options.headers) };
   if (options.signal !== undefined) init.signal = options.signal;

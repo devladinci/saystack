@@ -8,12 +8,13 @@ export interface IUseReadAlongOptions {
   isActive: boolean;
   isDimmed?: boolean;
   blocks?: string;
+  zIndex?: number;
 }
 
 export function useReadAlong(
   root: RefObject<Element | null>,
   [state, api]: ISpeechHookResult,
-  { isActive, isDimmed = true, blocks }: IUseReadAlongOptions,
+  { isActive, isDimmed = true, blocks, zIndex }: IUseReadAlongOptions,
 ): void {
   const [readAlong, setReadAlong] = useState<IReadAlong | null>(null);
   const isDimmedRef = useRef(isDimmed);
@@ -33,6 +34,7 @@ export function useReadAlong(
     const next = createReadAlong(element, {
       isDimmed: isDimmedRef.current,
       ...(blocks === undefined ? {} : { blocks }),
+      ...(zIndex === undefined ? {} : { zIndex }),
       onSeek: ({ chunkIndex, seconds }) => {
         api.seek(chunkIndex, seconds);
       },
@@ -43,7 +45,7 @@ export function useReadAlong(
       next.destroy();
       setReadAlong(null);
     };
-  }, [root, isActive, blocks, api]);
+  }, [root, isActive, blocks, zIndex, api]);
 
   useEffect(() => {
     readAlong?.setChunks(state.chunks);

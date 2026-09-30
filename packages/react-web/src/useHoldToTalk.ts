@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { GestureResponderEvent, GestureResponderHandlers } from "react-native";
-
 import { holdOutcome, isPastCancel } from "@saystack/react";
+import type { PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export interface IUseHoldToTalkOptions {
   onStart: () => void;
@@ -12,24 +11,22 @@ export interface IUseHoldToTalkOptions {
   isDisabled?: boolean;
 }
 
-export type HoldToTalkHandlers = Pick<
-  GestureResponderHandlers,
-  | "onStartShouldSetResponder"
-  | "onResponderGrant"
-  | "onResponderMove"
-  | "onResponderRelease"
-  | "onResponderTerminate"
-  | "onResponderTerminationRequest"
->;
+export interface IHoldToTalkHandlers {
+  onPointerDown: (event: ReactPointerEvent<Element>) => void;
+  onPointerMove: (event: ReactPointerEvent<Element>) => void;
+  onPointerUp: (event: ReactPointerEvent<Element>) => void;
+  onPointerCancel: (event: ReactPointerEvent<Element>) => void;
+}
 
 export interface IHoldToTalk {
   isHolding: boolean;
   isCancelling: boolean;
   isTooShort: boolean;
-  handlers: HoldToTalkHandlers;
+  handlers: IHoldToTalkHandlers;
 }
 
 interface IPress {
+  pointerId: number;
   x: number;
   y: number;
   at: number;
@@ -38,7 +35,9 @@ interface IPress {
 
 const TOO_SHORT_MS = 650;
 
-// Hold to talk, let go to finish, slide away first to cancel. A tap is too short and says so.
+// The web twin of react-native's useHoldToTalk: hold to talk, let go to finish, drag away first to
+// cancel, and a tap is too short and says so. The pointer is captured, so a press that drifts off
+// the button still ends on it.
 export function useHoldToTalk({
   onStart,
   onEnd,
@@ -67,15 +66,15 @@ export function useHoldToTalk({
     [],
   );
 
-  const handlers = useMemo((): HoldToTalkHandlers => {
-    const finish = (isTerminated: boolean): void => {
+  const handlers = useMemo((): IHoldToTalkHandlers => {
+    const finish = (event: ReactPointerEvent<Element>, isTerminated: boolean): void => {
       const press = pressRef.current;
-      pressRef.current = null;
 
-      if (press === null) {
+      if (press === null || press.pointerId !== event.pointerId) {
         return;
       }
 
+      pressRef.current = null;
       setIsHolding(false);
       setIsCancelling(false);
       const latest = latestRef.current;
@@ -97,16 +96,22 @@ export function useHoldToTalk({
     };
 
     return {
-      onStartShouldSetResponder: () => !latestRef.current.isDisabled,
-      onResponderTerminationRequest: () => false,
-      onResponderGrant: (event: GestureResponderEvent) => {
+      onPointerDown: (event) => {
+        if (latestRef.current.isDisabled || pressRef.current !== null || event.button !== 0) {
+          return;
+        }
+
+        event.preventDefault();
+        event.currentTarget.setPointerCapture(event.pointerId);
+
         if (timerRef.current !== null) {
           clearTimeout(timerRef.current);
         }
 
         pressRef.current = {
-          x: event.nativeEvent.pageX,
-          y: event.nativeEvent.pageY,
+          pointerId: event.pointerId,
+          x: event.clientX,
+          y: event.clientY,
           at: Date.now(),
           isCancelling: false,
         };
@@ -115,26 +120,22 @@ export function useHoldToTalk({
         setIsTooShort(false);
         latestRef.current.onStart();
       },
-      onResponderMove: (event: GestureResponderEvent) => {
+      onPointerMove: (event) => {
         const press = pressRef.current;
 
-        if (press === null) {
+        if (press === null || press.pointerId !== event.pointerId) {
           return;
         }
 
-        const next = isPastCancel(
-          event.nativeEvent.pageX - press.x,
-          event.nativeEvent.pageY - press.y,
-          latestRef.current.cancelDistance,
-        );
+        const next = isPastCancel(event.clientX - press.x, event.clientY - press.y, latestRef.current.cancelDistance);
 
         if (next !== press.isCancelling) {
           press.isCancelling = next;
           setIsCancelling(next);
         }
       },
-      onResponderRelease: () => finish(false),
-      onResponderTerminate: () => finish(true),
+      onPointerUp: (event) => finish(event, false),
+      onPointerCancel: (event) => finish(event, true),
     };
   }, []);
 

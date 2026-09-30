@@ -16,10 +16,19 @@ export interface IReadAloudMessage {
   resume: () => void;
 }
 
+export interface IReadAloudMessageOptions {
+  // Stacking of the word and block marks; see IReadAlongOptions.zIndex.
+  zIndex?: number;
+}
+
 const NO_ROOT: RefObject<Element | null> = { current: null };
 
 // With a root, the words are marked while they are read and the glow gathers around it.
-export function useReadAloudMessage(id: ReadAloudId, root?: RefObject<Element | null>): IReadAloudMessage {
+export function useReadAloudMessage(
+  id: ReadAloudId,
+  root?: RefObject<Element | null>,
+  { zIndex }: IReadAloudMessageOptions = {},
+): IReadAloudMessage {
   const store = useReadAloudStore();
   const view = useSyncExternalStore(
     store.subscribe,
@@ -38,7 +47,10 @@ export function useReadAloudMessage(id: ReadAloudId, root?: RefObject<Element | 
     return store.register(id, element);
   }, [store, id, root]);
 
-  useReadAlong(root ?? NO_ROOT, speech, { isActive: root !== undefined && phase !== "idle" && !isSummary });
+  useReadAlong(root ?? NO_ROOT, speech, {
+    isActive: root !== undefined && phase !== "idle" && !isSummary,
+    ...(zIndex === undefined ? {} : { zIndex }),
+  });
 
   const speak = useCallback((markdown: string) => store.speak(id, markdown), [store, id]);
 

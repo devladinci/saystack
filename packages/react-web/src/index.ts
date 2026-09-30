@@ -24,7 +24,9 @@ export type { IReadAloudView, ReadAloudId, RewriteFn, SummarizeFn } from "@sayst
 export { ReadAloudProvider } from "./ReadAloudProvider.js";
 export type { IReadAloud } from "./useReadAloud.js";
 export { useReadAloud } from "./useReadAloud.js";
-export type { IReadAloudMessage } from "./useReadAloudMessage.js";
+export type { IReadAloudMessage, IReadAloudMessageOptions } from "./useReadAloudMessage.js";
+export type { IHoldToTalk, IHoldToTalkHandlers, IUseHoldToTalkOptions } from "./useHoldToTalk.js";
+export { useHoldToTalk } from "./useHoldToTalk.js";
 export { useReadAloudMessage } from "./useReadAloudMessage.js";
 export { ReadAloudAura } from "./ReadAloudAura.js";
 export { ReadAloudPlayer } from "./ReadAloudPlayer.js";

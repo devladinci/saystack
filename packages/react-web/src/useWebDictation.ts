@@ -9,7 +9,6 @@ import { useRecorderLevels } from "./useRecorderLevels.js";
 
 export interface IRealtimeOptions {
   url: string | (() => string);
-  language?: string;
   params?: Readonly<Record<string, unknown>>;
 }
 
@@ -39,9 +38,11 @@ export function useWebDictation({
     }),
   );
   const realtimeRef = useRef(realtime);
+  const languageRef = useRef(options.language);
 
   useEffect(() => {
     realtimeRef.current = realtime;
+    languageRef.current = options.language;
   });
 
   const live = useCallback<LiveTranscriptionFactory>((active, onText) => {
@@ -53,7 +54,7 @@ export function useWebDictation({
       stream: () => active.stream ?? null,
       onText,
       context: sharedAudioContext(),
-      ...(current?.language === undefined ? {} : { language: current.language }),
+      ...(languageRef.current === undefined ? {} : { language: languageRef.current }),
       ...(current?.params === undefined ? {} : { params: current.params }),
     });
   }, []);

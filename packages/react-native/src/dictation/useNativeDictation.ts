@@ -9,7 +9,6 @@ import { createNativeRecorder } from "../audio/nativeRecorder.js";
 
 export interface IRealtimeOptions {
   url: string | (() => string);
-  language?: string;
   params?: Readonly<Record<string, unknown>>;
 }
 
@@ -43,10 +42,12 @@ export function useNativeDictation({
   const [liveText, setLiveText] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const realtimeRef = useRef(realtime);
+  const languageRef = useRef(options.language);
   const onInsertRef = useRef(onInsert);
 
   useEffect(() => {
     realtimeRef.current = realtime;
+    languageRef.current = options.language;
     onInsertRef.current = onInsert;
   });
 
@@ -66,7 +67,7 @@ export function useNativeDictation({
         source: recorder.pcm,
         onText,
         onReady: () => setIsStreaming(true),
-        ...(current?.language === undefined ? {} : { language: current.language }),
+        ...(languageRef.current === undefined ? {} : { language: languageRef.current }),
         ...(current?.params === undefined ? {} : { params: current.params }),
       });
     },

@@ -51,6 +51,26 @@ server for speech and a hosted model for rewriting. Any other engine plugs in by
 Tested end to end against: oMLX (all of the above). The OpenAI Realtime adapter is tested against a
 fake server that follows OpenAI's published protocol; it has not yet been run against a live one.
 
+## React Native
+
+`@saystack/react-native` needs `expo-audio` and `expo-file-system`. `expo-gl` (the aura) and `expo-blur` (the
+spotlight backdrop) are optional: without them the aura is off and a stronger veil stands in for the blur.
+
+With pnpm, `expo-gl` can find an incomplete `react-native-reanimated` that another package pulled in, and
+fail at startup. expo-gl only probes reanimated inside a `try`, so an app that does not use reanimated can
+make that lookup fail on purpose in `metro.config.js`:
+
+```js
+const EXPO_GL = `${path.sep}expo-gl${path.sep}`;
+const resolveRequest = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (moduleName === "react-native-reanimated" && context.originModulePath.includes(EXPO_GL)) {
+    throw new Error("react-native-reanimated is not part of this app");
+  }
+  return (resolveRequest ?? context.resolveRequest)(context, moduleName, platform);
+};
+```
+
 ## Layout
 
 ```

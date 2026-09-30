@@ -25,8 +25,8 @@ export type { IReadAlong, IReadAlongOptions, IReadAlongSeek } from "./readAlong/
 export { createReadAlong, READ_HIGHLIGHT, UNREAD_HIGHLIGHT } from "./readAlong/createReadAlong.js";
 export { DEFAULT_BLOCKS } from "./readAlong/scanPage.js";
 
-export type { IStreamingInput } from "./streamingInput.js";
-export { createStreamingInput } from "./streamingInput.js";
+export type { IStreamingInput, IWordEntrance } from "./streamingInput.js";
+export { createStreamingInput, wordEntrance } from "./streamingInput.js";
 
 export type { IFieldInputOptions } from "./fieldInput.js";
 export { createFieldInput } from "./fieldInput.js";

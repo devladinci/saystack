@@ -14,6 +14,17 @@ interface IShownWord {
 
 const ENTER_MS = 520;
 
+export interface IWordEntrance {
+  className: string;
+  animationDelay: string;
+}
+
+// How a word that appeared ageMs ago animates in; null once it has settled. Editors that render
+// streamed words themselves (a rich-text decoration, say) use this to match saystack's entrance.
+export function wordEntrance(ageMs: number): IWordEntrance | null {
+  return ageMs < ENTER_MS ? { className: "saystack-streaming-new", animationDelay: `${-Math.round(ageMs)}ms` } : null;
+}
+
 const COPIED_STYLES = [
   "fontFamily",
   "fontSize",
@@ -115,11 +126,11 @@ export function createStreamingInput(field: HTMLTextAreaElement | HTMLInputEleme
       const span = document.createElement("span");
       span.className = word.isFinal ? "saystack-streaming-word" : "saystack-streaming-word saystack-streaming-interim";
       span.textContent = word.text;
-      const age = now - word.bornAt;
+      const entrance = wordEntrance(now - word.bornAt);
 
-      if (age < ENTER_MS) {
-        span.classList.add("saystack-streaming-new");
-        span.style.animationDelay = `${-age}ms`;
+      if (entrance !== null) {
+        span.classList.add(entrance.className);
+        span.style.animationDelay = entrance.animationDelay;
       }
 
       content.append(span);

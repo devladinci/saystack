@@ -12,6 +12,8 @@ export interface IReadAlongSeek {
 export interface IReadAlongOptions {
   blocks?: string;
   isDimmed?: boolean;
+  // The marks float above the page by default; set this to tuck them under the app's own layers.
+  zIndex?: number;
   onSeek?: (target: IReadAlongSeek) => void;
 }
 
@@ -47,9 +49,14 @@ const PILL_PADDING_Y = 1;
 const highlightRegistry = (): HighlightRegistry | null =>
   typeof CSS !== "undefined" && "highlights" in CSS && typeof Highlight !== "undefined" ? CSS.highlights : null;
 
-const overlay = (className: string): HTMLDivElement => {
+const overlay = (className: string, zIndex: number | undefined): HTMLDivElement => {
   const element = document.createElement("div");
   element.className = className;
+
+  if (zIndex !== undefined) {
+    element.style.zIndex = String(zIndex);
+  }
+
   element.setAttribute("aria-hidden", "true");
   element.style.position = "fixed";
   element.style.left = "0";
@@ -145,8 +152,8 @@ export function createReadAlong(root: Element, options: IReadAlongOptions = {}):
   let repositionFrame = 0;
   let painted: { read: Highlight; unread: Highlight } | null = null;
   const clipper = scrollParent(root);
-  const pill = overlay("saystack-read-along-word");
-  const ring = overlay("saystack-read-along-block");
+  const pill = overlay("saystack-read-along-word", options.zIndex);
+  const ring = overlay("saystack-read-along-block", options.zIndex);
   document.body.append(pill, ring);
 
   const paintHighlights = (readBefore: number): void => {

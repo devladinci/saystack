@@ -24,12 +24,14 @@ export async function readAudioInput(c: Context, maxBodyBytes: number): Promise<
     const audio = new Uint8Array(buffer);
     const mimeType = contentType === "" ? undefined : contentType;
     const filename = c.req.header("x-audio-filename");
+    const language = c.req.header("x-audio-language");
 
     return {
       ok: true,
       audio,
       ...(mimeType !== undefined ? { mimeType } : {}),
       ...(filename !== undefined ? { filename } : {}),
+      ...(language !== undefined && language.length > 0 ? { language } : {}),
     };
   }
 
@@ -60,6 +62,7 @@ async function readMultipart(c: Context): Promise<IAudioReadResult> {
   const rawName = (file as { name?: unknown }).name;
   const filename = typeof rawName === "string" && rawName.length > 0 ? rawName : undefined;
   const prompt = form.get("prompt");
+  const language = form.get("language");
 
   return {
     ok: true,
@@ -67,5 +70,6 @@ async function readMultipart(c: Context): Promise<IAudioReadResult> {
     ...(mimeType !== undefined ? { mimeType } : {}),
     ...(filename !== undefined ? { filename } : {}),
     ...(typeof prompt === "string" && prompt.length > 0 ? { prompt } : {}),
+    ...(typeof language === "string" && language.length > 0 ? { language } : {}),
   };
 }

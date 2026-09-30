@@ -162,6 +162,26 @@ describe("sendDictation (sender, direct)", () => {
     expect(String(fetchSpy.mock.calls[0]?.[0])).toBe(ENDPOINT);
   });
 
+  it("the hook's language hint rides along with the upload", async () => {
+    setVoiceRecorder(blobRecorder());
+    const fetchSpy = vi.fn(
+      async (_input: RequestInfo | URL, _init?: RequestInit) =>
+        new Response(JSON.stringify({ text: "zdravei" }), { status: 200 }),
+    );
+    vi.stubGlobal("fetch", fetchSpy);
+    const { result } = renderHook(() => useDictation({ endpoint: ENDPOINT, language: "bg" }));
+
+    act(() => {
+      result.current.handlePressStart();
+    });
+    await act(async () => {
+      await result.current.handlePressEnd();
+    });
+
+    const body = fetchSpy.mock.calls[0]?.[1]?.body as FormData;
+    expect(body.get("language")).toBe("bg");
+  });
+
   it("non-json garbage response parses as TRANSCRIPTION_FAILED, not a crash", async () => {
     vi.stubGlobal("fetch", async () => new Response("<html>oops</html>", { status: 500 }));
 

@@ -1,6 +1,7 @@
 import type { ISttTranscribeResult } from "@saystack/core";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import type { WSEvents } from "hono/ws";
 
 import { readAudioInput } from "./readAudioInput.js";
 import { createRealtimeBridge } from "./realtimeBridge.js";
@@ -10,11 +11,22 @@ import type { IVoiceServerDeps } from "./types.js";
 
 const DEFAULT_MAX_BODY_BYTES = 25 * 1024 * 1024;
 
+const UNAUTHORIZED_CLOSE = 4001;
+
+const refused: WSEvents = {
+  onOpen: (_event, ws) => {
+    ws.send(JSON.stringify({ type: "error", errorCode: "BAD_TOKEN", detail: "unauthorized" }));
+    ws.close(UNAUTHORIZED_CLOSE, "unauthorized");
+  },
+};
+
 export function createVoiceRoutes(deps: IVoiceServerDeps): Hono {
   const app = new Hono();
   const maxBodyBytes = deps.maxBodyBytes ?? DEFAULT_MAX_BODY_BYTES;
 
-  app.use("*", cors(deps.cors === undefined ? {} : { origin: deps.cors.origin }));
+  if (deps.cors !== false) {
+    app.use("*", cors(deps.cors === undefined ? {} : { origin: deps.cors.origin }));
+  }
 
   app.get("/capabilities", (c) => {
     const settings = deps.getSettings();
@@ -53,6 +65,7 @@ export function createVoiceRoutes(deps: IVoiceServerDeps): Hono {
       ...(read.mimeType !== undefined ? { mimeType: read.mimeType } : {}),
       ...(read.filename !== undefined ? { filename: read.filename } : {}),
       ...(read.prompt !== undefined ? { prompt: read.prompt } : {}),
+      ...(read.language !== undefined ? { language: read.language } : {}),
     });
 
     if (!result.ok) {
@@ -83,8 +96,12 @@ export function createVoiceRoutes(deps: IVoiceServerDeps): Hono {
 
     app.get(
       "/audio/transcriptions/realtime",
-      realtime.upgradeWebSocket(() =>
-        createRealtimeBridge(
+      realtime.upgradeWebSocket(async (c) => {
+        if (realtime.authorize !== undefined && !(await realtime.authorize(c))) {
+          return refused;
+        }
+
+        return createRealtimeBridge(
           async (start) => {
             const settings = deps.getSettings();
 
@@ -98,8 +115,8 @@ export function createVoiceRoutes(deps: IVoiceServerDeps): Hono {
             ...(realtime.maxBytes === undefined ? {} : { maxBytes: realtime.maxBytes }),
             ...(realtime.finalPass === false ? {} : { finalize }),
           },
-        ),
-      ),
+        );
+      }),
     );
   }
 
@@ -131,9 +148,17 @@ export function createVoiceRoutes(deps: IVoiceServerDeps): Hono {
       return c.json({ errorCode: "EMPTY_TEXT", message: "text is empty" }, 400);
     }
 
+    if (deps.maxTextChars !== undefined && markdown.length > deps.maxTextChars) {
+      return c.json(
+        { errorCode: "TEXT_TOO_LONG", message: `text is longer than ${deps.maxTextChars} characters` },
+        statusForSpeechErrorCode("TEXT_TOO_LONG"),
+      );
+    }
+
     const adapter = deps.createTtsAdapter(settings.config.tts);
     const result = await adapter.synthesize({
       text: markdown,
+      signal: c.req.raw.signal,
       ...(refAudio !== undefined && refText !== undefined ? { refAudio, refText } : {}),
     });
 

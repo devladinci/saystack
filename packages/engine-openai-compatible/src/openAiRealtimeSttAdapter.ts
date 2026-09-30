@@ -10,6 +10,8 @@ import type {
 import { REALTIME_PCM_RATE, createPcm16Chunker, createResampler, pcm16ToFloat } from "@saystack/core";
 import { WebSocket } from "ws";
 
+import { normalizeBaseUrl } from "./sttAdapter.js";
+
 export interface IOpenAiRealtimeOptions {
   model?: string;
   handshakeTimeoutMs?: number;
@@ -44,7 +46,7 @@ const takesLanguageList = (model: string): boolean =>
   model.startsWith("gpt-transcribe") || model.startsWith("gpt-live-transcribe");
 
 const wsUrlFor = (baseUrl: string): string => {
-  const http = new URL(baseUrl);
+  const http = new URL(normalizeBaseUrl(baseUrl));
   const wsProtocol = http.protocol === "https:" ? "wss:" : "ws:";
   return `${wsProtocol}//${http.host}${http.pathname.replace(/\/+$/, "")}/realtime?intent=transcription`;
 };
