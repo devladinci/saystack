@@ -1,7 +1,7 @@
 {
   "name": "@saystack/engine-openai-compatible",
   "version": "0.0.1",
-  "description": "OpenAI-compatible STT/TTS engine adapter: oMLX today, any /v1 server tomorrow.",
+  "description": "saystack engine for OpenAI-compatible servers: speech-to-text, text-to-speech, realtime transcription and speech rewriting.",
   "license": "MIT",
   "author": "DeVladinci",
   "homepage": "https://github.com/devladinci/saystack#readme",
@@ -52,6 +52,7 @@
     "speech",
     "voice",
     "openai-compatible",
+    "openai-realtime",
     "omlx"
   ],
   "publishConfig": {

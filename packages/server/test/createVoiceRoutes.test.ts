@@ -7,13 +7,13 @@ import { statusForErrorCode } from "../src/statusForErrorCode.js";
 import { statusForSpeechErrorCode } from "../src/statusForSpeechErrorCode.js";
 import type { IVoiceServerDeps } from "../src/types.js";
 
-const STT_CONFIG = { url: "http://127.0.0.1:7777/v1" } as const;
+const STT_CONFIG = { url: "http://127.0.0.1:7777/v1", model: "m" } as const;
 
 function makeDeps(overrides: Partial<IVoiceServerDeps> = {}): IVoiceServerDeps {
   return {
     getSettings: () => ({
       ok: true,
-      config: { languages: [], stt: STT_CONFIG, tts: { url: "http://127.0.0.1:7777/v1" } },
+      config: { languages: [], stt: STT_CONFIG, tts: { url: "http://127.0.0.1:7777/v1", model: "m" } },
     }),
     createSttAdapter: (_engineConfig) => ({
       capabilities: { streaming: false, interimResults: false, wordTimings: false, languages: ["en"] },
@@ -97,9 +97,9 @@ describe("createVoiceRoutes — capabilities", () => {
   });
 
   it("builds the adapter from the current settings, not a cached one", async () => {
-    const configs: Array<{ languages: string[]; stt?: { url: string } }> = [
-      { languages: [], stt: { url: "http://first" } },
-      { languages: [], stt: { url: "http://second" } },
+    const configs: Array<{ languages: string[]; stt?: { url: string; model: string } }> = [
+      { languages: [], stt: { url: "http://first", model: "m" } },
+      { languages: [], stt: { url: "http://second", model: "m" } },
     ];
     let call = 0;
     const seen: string[] = [];

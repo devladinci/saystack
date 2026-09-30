@@ -67,7 +67,7 @@ function validateStt(stt: IConfig["stt"], errors: IConfigError[]): void {
     errors.push({ code: "STT_TOKEN_INVALID", message: "stt.token must be a non-empty string" });
   }
 
-  if (stt.model !== undefined && (typeof stt.model !== "string" || stt.model.trim().length === 0)) {
+  if (typeof stt.model !== "string" || stt.model.trim().length === 0) {
     errors.push({ code: "STT_MODEL_INVALID", message: "stt.model must be a non-empty string" });
   }
 
@@ -131,7 +131,7 @@ function validateTts(tts: IConfig["tts"], errors: IConfigError[]): void {
     errors.push({ code: "TTS_TOKEN_INVALID", message: "tts.token must be a non-empty string" });
   }
 
-  if (tts.model !== undefined && (typeof tts.model !== "string" || tts.model.trim().length === 0)) {
+  if (typeof tts.model !== "string" || tts.model.trim().length === 0) {
     errors.push({ code: "TTS_MODEL_INVALID", message: "tts.model must be a non-empty string" });
   }
 

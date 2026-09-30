@@ -129,15 +129,15 @@ describe("parseNormalized", () => {
     expect(parseNormalized("no json here")).toBeNull();
   });
 });
-const hasLiveLlm = process.env.OMLX_TOKEN !== undefined && process.env.OMLX_TOKEN.length > 0;
+const hasLiveLlm = process.env.LLM_TOKEN !== undefined && process.env.LLM_TOKEN.length > 0;
 
-describe.skipIf(!hasLiveLlm)("live oMLX gemma-4 normalizer", () => {
+describe.skipIf(!hasLiveLlm)("live LLM normalizer", () => {
   it("normalizes numbers, money and code blocks end to end", { timeout: 60_000 }, async () => {
     const { createLlmNormalizer } = await import("../src/normalize.js");
     const normalize = createLlmNormalizer({
-      url: "http://127.0.0.1:7777/v1",
-      ...(process.env.OMLX_TOKEN !== undefined ? { token: process.env.OMLX_TOKEN } : {}),
-      model: "gemma-4-26B-A4B-it-QAT-MLX-4bit",
+      url: process.env.LLM_URL ?? "http://127.0.0.1:7777/v1",
+      ...(process.env.LLM_TOKEN !== undefined ? { token: process.env.LLM_TOKEN } : {}),
+      model: process.env.LLM_MODEL ?? "gemma-4-26B-A4B-it-QAT-MLX-4bit",
       timeoutSeconds: 45,
     });
 

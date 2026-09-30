@@ -9,8 +9,10 @@ import type {
 
 const KNOWN_AUDIO_EXTS = [".mp3", ".wav", ".m4a", ".mp4", ".webm", ".ogg", ".opus", ".flac", ".aac", ".aiff"] as const;
 
-export interface IOmlxSttOptions {
+export interface IOpenAiSttOptions {
   model?: string;
+  // What the model can hear, when the app knows it; the adapter cannot tell from an OpenAI-compatible server.
+  languages?: readonly string[];
   maxBytes?: number;
   timeoutMs?: number;
   minAudioBytes?: number;
@@ -21,38 +23,6 @@ const DEFAULT_MAX_BYTES = 25 * 1024 * 1024;
 const DEFAULT_TIMEOUT_MS = 60_000;
 
 const MIN_AUDIO_BYTES = 1_024;
-
-const PARAKEET_V3_LANGUAGES = [
-  "bg",
-  "hr",
-  "cs",
-  "da",
-  "nl",
-  "en",
-  "et",
-  "fi",
-  "fr",
-  "de",
-  "el",
-  "hu",
-  "it",
-  "lv",
-  "lt",
-  "mt",
-  "pl",
-  "pt",
-  "ro",
-  "sk",
-  "sl",
-  "es",
-  "sv",
-  "ru",
-  "uk",
-] as const;
-
-const MODEL_LANGUAGES: Record<string, readonly string[]> = {
-  "parakeet-tdt-0.6b-v3": PARAKEET_V3_LANGUAGES,
-};
 
 export function normalizeBaseUrl(rawUrl: string): string {
   let url = rawUrl.trim();
@@ -118,10 +88,10 @@ function statusToErrorCode(status: number): SttErrorCode {
   return "TRANSCRIPTION_FAILED";
 }
 
-export function createOmlxSttAdapter(engineConfig: ISttEngineConfig, options: IOmlxSttOptions = {}): ISttAdapter {
+export function createOpenAiSttAdapter(engineConfig: ISttEngineConfig, options: IOpenAiSttOptions = {}): ISttAdapter {
   const baseUrl = normalizeBaseUrl(engineConfig.url);
   const token = engineConfig.token;
-  const model = options.model ?? engineConfig.model ?? "parakeet-tdt-0.6b-v3";
+  const model = options.model ?? engineConfig.model;
   const maxBytes = options.maxBytes ?? DEFAULT_MAX_BYTES;
   const defaultTimeoutMs =
     engineConfig.timeoutSeconds !== undefined ? engineConfig.timeoutSeconds * 1000 : DEFAULT_TIMEOUT_MS;
@@ -134,7 +104,7 @@ export function createOmlxSttAdapter(engineConfig: ISttEngineConfig, options: IO
     streaming: false,
     interimResults: false,
     wordTimings: false,
-    languages: MODEL_LANGUAGES[model] ?? [],
+    languages: options.languages ?? [],
   };
 
   return {

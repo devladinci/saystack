@@ -44,7 +44,7 @@ export type {
   ISttTranscribeResult,
   SttErrorCode,
 } from "./stt.js";
-export { isSttErrorCode } from "./stt.js";
+export { isSttErrorCode, REALTIME_PCM_RATE } from "./stt.js";
 
 export type { ConfigErrorCode, IConfigError, IValidationResult } from "./validate.js";
 export { validateConfig } from "./validate.js";

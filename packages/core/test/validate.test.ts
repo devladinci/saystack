@@ -4,12 +4,12 @@ import type { ChunkingMode, IConfig, IInterruptConfig } from "../src/config.js";
 import { validateConfig, type IConfigError } from "../src/validate.js";
 
 const validTtsConfig: IConfig = {
-  tts: { url: "http://127.0.0.1:7777", token: "secret" },
+  tts: { url: "http://127.0.0.1:7777", token: "secret", model: "m" },
   languages: [],
 };
 
 const validSttConfig: IConfig = {
-  stt: { url: "http://127.0.0.1:7777", token: "secret" },
+  stt: { url: "http://127.0.0.1:7777", token: "secret", model: "m" },
   languages: [],
 };
 
@@ -55,7 +55,7 @@ describe("validateConfig — valid configs", () => {
 
   it("accepts a full config with every section filled", () => {
     const result = validateConfig({
-      tts: { url: "http://tts" },
+      tts: { url: "http://tts", model: "m" },
       stt: { url: "http://stt", token: "t", model: "m", timeoutSeconds: 30 },
       languages: ["bg"],
       reference: { clipPath: "/tmp/clip.wav", transcript: "aha" },
@@ -133,19 +133,19 @@ describe("validateConfig — serializable settings checks", () => {
   });
 
   it("rejects a relative stt.url (STT_URL_INVALID)", () => {
-    const errors = expectErrors({ ...validSttConfig, stt: { url: "/api/voice" } });
+    const errors = expectErrors({ ...validSttConfig, stt: { url: "/api/voice", model: "m" } });
 
     expect(errors[0]?.code).toBe("STT_URL_INVALID");
   });
 
   it("rejects an empty stt.url (STT_URL_INVALID)", () => {
-    const errors = expectErrors({ ...validSttConfig, stt: { url: "" } });
+    const errors = expectErrors({ ...validSttConfig, stt: { url: "", model: "m" } });
 
     expect(errors[0]?.code).toBe("STT_URL_INVALID");
   });
 
   it("rejects an empty stt.token (STT_TOKEN_INVALID)", () => {
-    const errors = expectErrors({ ...validSttConfig, stt: { url: "http://s", token: "" } });
+    const errors = expectErrors({ ...validSttConfig, stt: { url: "http://s", token: "", model: "m" } });
 
     expect(errors[0]?.code).toBe("STT_TOKEN_INVALID");
   });
@@ -156,14 +156,26 @@ describe("validateConfig — serializable settings checks", () => {
     expect(errors[0]?.code).toBe("STT_MODEL_INVALID");
   });
 
+  it("rejects a missing stt.model (STT_MODEL_INVALID) — no server's model is a safe default", () => {
+    const errors = expectErrors({ ...validSttConfig, stt: { url: "http://s" } as never });
+
+    expect(errors[0]?.code).toBe("STT_MODEL_INVALID");
+  });
+
+  it("rejects a missing tts.model (TTS_MODEL_INVALID)", () => {
+    const errors = expectErrors({ ...validTtsConfig, tts: { url: "http://t" } as never });
+
+    expect(errors[0]?.code).toBe("TTS_MODEL_INVALID");
+  });
+
   it("rejects a non-positive stt.timeoutSeconds (STT_TIMEOUT_INVALID)", () => {
-    const errors = expectErrors({ ...validSttConfig, stt: { url: "http://s", timeoutSeconds: 0 } });
+    const errors = expectErrors({ ...validSttConfig, stt: { url: "http://s", model: "m", timeoutSeconds: 0 } });
 
     expect(errors[0]?.code).toBe("STT_TIMEOUT_INVALID");
   });
 
   it("rejects a bad tts.url (TTS_URL_INVALID)", () => {
-    const errors = expectErrors({ ...validSttConfig, tts: { url: "ftp://tts" } });
+    const errors = expectErrors({ ...validSttConfig, tts: { url: "ftp://tts", model: "m" } });
 
     expect(errors).toContainEqual(expect.objectContaining({ code: "TTS_URL_INVALID" }));
   });
@@ -216,7 +228,7 @@ describe("validateConfig — structural checks", () => {
 describe("validateConfig — multi-error collection", () => {
   it("collects every problem in one pass", () => {
     const errors = expectErrors({
-      stt: { url: "" },
+      stt: { url: "", model: "m" },
       languages: [""],
       chunking: "x" as unknown as ChunkingMode,
     });

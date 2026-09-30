@@ -1,5 +1,5 @@
 import type { ILiveTranscription, IPcmSource } from "@saystack/core";
-import { startLiveTranscription } from "@saystack/core";
+import { REALTIME_PCM_RATE, startLiveTranscription } from "@saystack/core";
 
 import type { IPcmCapture } from "./pcmCapture.js";
 import { capturePcm } from "./pcmCapture.js";
@@ -27,7 +27,12 @@ const streamSource = (stream: () => MediaStream | null, context?: AudioContext):
 
       if (live !== null && capture === null && !isStopped) {
         clearInterval(poll);
-        capture = capturePcm(live, context === undefined ? { onChunk } : { onChunk, context });
+        capture = capturePcm(
+          live,
+          context === undefined
+            ? { onChunk, sampleRate: REALTIME_PCM_RATE }
+            : { onChunk, sampleRate: REALTIME_PCM_RATE, context },
+        );
       }
     };
 

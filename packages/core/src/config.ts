@@ -5,14 +5,14 @@ export type UnheardPolicy = "keep" | "hide";
 export interface ITtsEngineConfig {
   url: string;
   token?: string;
-  model?: string;
+  model: string;
   timeoutSeconds?: number;
 }
 
 export interface ISttEngineConfig {
   url: string;
   token?: string;
-  model?: string;
+  model: string;
   timeoutSeconds?: number;
 }
 

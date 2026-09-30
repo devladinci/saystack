@@ -1,12 +1,13 @@
 import type { WebSocketServerLike } from "@hono/node-server";
 import { serve, upgradeWebSocket } from "@hono/node-server";
-import type { IConfig } from "@saystack/core";
+import type { IConfig, ISttEngineConfig } from "@saystack/core";
 import { validateConfig } from "@saystack/core";
 import {
   createLlmNormalizer,
   createOmlxRealtimeSttAdapter,
-  createOmlxSttAdapter,
-  createOmlxTtsAdapter,
+  createOpenAiRealtimeSttAdapter,
+  createOpenAiSttAdapter,
+  createOpenAiTtsAdapter,
 } from "@saystack/engine-openai-compatible";
 import { createVoiceRoutes } from "@saystack/server";
 import { Hono } from "hono";
@@ -16,14 +17,14 @@ import { WebSocketServer } from "ws";
 const env = process.env;
 const apiPort = Number(env.API_PORT ?? 5181);
 const webPort = Number(env.PORT ?? 5180);
-const engineUrl = env.OMLX_URL ?? "http://127.0.0.1:7777/v1";
+const engineUrl = env.ENGINE_URL ?? "http://127.0.0.1:7777/v1";
 const chatUrl = (env.LLM_URL ?? "https://ollama.com/v1").replace(/\/+$/, "");
 const chatModel = env.LLM_MODEL ?? "deepseek-v4.1-flash";
 
 const withToken = (token: string | undefined): { token?: string } =>
   token === undefined || token === "" ? {} : { token };
 
-const engineToken = withToken(env.OMLX_TOKEN);
+const engineToken = withToken(env.ENGINE_TOKEN);
 const chatToken = withToken(env.LLM_TOKEN);
 
 const config: IConfig = {
@@ -32,6 +33,13 @@ const config: IConfig = {
   tts: { url: engineUrl, model: env.TTS_MODEL ?? "higgs_audio_v3-tts-4b", ...engineToken },
 };
 const settings = validateConfig(config);
+
+// Live dictation: "openai" speaks the OpenAI Realtime protocol (OpenAI, speaches, …); "omlx" speaks oMLX's own.
+const realtimeModel = env.REALTIME_MODEL === undefined ? {} : { model: env.REALTIME_MODEL };
+const createRealtimeAdapter =
+  env.REALTIME_PROTOCOL === "openai"
+    ? (engine: ISttEngineConfig) => createOpenAiRealtimeSttAdapter(engine, realtimeModel)
+    : (engine: ISttEngineConfig) => createOmlxRealtimeSttAdapter(engine, realtimeModel);
 
 const SYSTEM_PROMPT = [
   "You are the assistant in a voice chat demo.",
@@ -47,9 +55,9 @@ app.route(
   "/voice",
   createVoiceRoutes({
     getSettings: () => settings,
-    createSttAdapter: (engine) => createOmlxSttAdapter(engine),
-    createTtsAdapter: (engine) => createOmlxTtsAdapter(engine),
-    realtime: { upgradeWebSocket, createAdapter: (engine) => createOmlxRealtimeSttAdapter(engine) },
+    createSttAdapter: (engine) => createOpenAiSttAdapter(engine),
+    createTtsAdapter: (engine) => createOpenAiTtsAdapter(engine),
+    realtime: { upgradeWebSocket, createAdapter: createRealtimeAdapter },
   }),
 );
 

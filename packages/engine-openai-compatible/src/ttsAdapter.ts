@@ -45,12 +45,12 @@ const isAbortName = (error: unknown): boolean => {
   return error.name === "AbortError" || error.name === "TimeoutError";
 };
 
-export const createOmlxTtsAdapter = (engine: ITtsEngineConfig, deps: ITtsAdapterDeps = {}): ITtsAdapter => {
+export const createOpenAiTtsAdapter = (engine: ITtsEngineConfig, deps: ITtsAdapterDeps = {}): ITtsAdapter => {
   const doFetch = deps.fetch ?? ((input: string, init?: RequestInit) => fetch(input, init));
 
   const url = normalizeBaseUrl(engine.url);
   const token = engine.token;
-  const model = engine.model ?? "higgs_audio_v3-tts-4b";
+  const model = engine.model;
   const timeoutMs = (engine.timeoutSeconds ?? 60) * 1000;
 
   const capabilities: ITtsCapabilities = {

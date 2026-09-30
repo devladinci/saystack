@@ -1,5 +1,5 @@
 import type { INativeRecording, IPcmSource } from "@saystack/core";
-import { createPcm16Chunker, createPcmMeter, createResampler, pcm16ToWav } from "@saystack/core";
+import { REALTIME_PCM_RATE, createPcm16Chunker, createPcmMeter, createResampler, pcm16ToWav } from "@saystack/core";
 import { File, Paths } from "expo-file-system";
 
 export interface IRecorderPipelineOptions {
@@ -21,7 +21,7 @@ export interface IRecorderPipeline {
 
 type PcmListener = (pcm: Uint8Array<ArrayBuffer>) => void;
 
-export const PIPELINE_RATE = 16000;
+export const PIPELINE_RATE = REALTIME_PCM_RATE;
 
 const HISTORY_SAMPLES = PIPELINE_RATE;
 

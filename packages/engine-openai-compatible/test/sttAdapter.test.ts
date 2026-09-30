@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { createOmlxSttAdapter, extForMime, guessFilename } from "../src/omlxSttAdapter.js";
+import { createOpenAiSttAdapter, extForMime, guessFilename } from "../src/sttAdapter.js";
 
-const OMLX_URL = process.env.OMLX_URL ?? "http://127.0.0.1:7777/v1";
+const ENGINE_URL = process.env.ENGINE_URL ?? "http://127.0.0.1:7777/v1";
 
-const token = process.env.OMLX_TOKEN ?? "";
+const token = process.env.ENGINE_TOKEN ?? "";
 
-const config = { url: OMLX_URL, token } as const;
+const model = process.env.STT_MODEL ?? "parakeet-tdt-0.6b-v3";
+
+const config = { url: ENGINE_URL, token, model } as const;
 
 const hasLiveServer = token.length > 0;
 
@@ -30,21 +32,30 @@ describe("filename/mime mapping", () => {
   });
 });
 
-describe("status mapping — honest blame", () => {
-  it("auth problems say BAD_TOKEN, not 'engine down'", () => {
-    expect(createOmlxSttAdapter({ url: OMLX_URL, token: "x" }).capabilities.streaming).toBe(false);
+describe("declared languages", () => {
+  it("reports none unless the app declares what its model hears", () => {
+    expect(createOpenAiSttAdapter({ url: "http://x/v1", model: "m" }).capabilities.languages).toEqual([]);
+    expect(
+      createOpenAiSttAdapter({ url: "http://x/v1", model: "m" }, { languages: ["bg", "en"] }).capabilities.languages,
+    ).toEqual(["bg", "en"]);
   });
 });
 
-describe("createOmlxSttAdapter — offline contract", () => {
+describe("status mapping — honest blame", () => {
+  it("auth problems say BAD_TOKEN, not 'engine down'", () => {
+    expect(createOpenAiSttAdapter({ url: ENGINE_URL, token: "x", model: "m" }).capabilities.streaming).toBe(false);
+  });
+});
+
+describe("createOpenAiSttAdapter — offline contract", () => {
   it("normalizes baseUrl with trailing slash and /v1 duplication", () => {
-    const adapter = createOmlxSttAdapter({ url: "http://x:7777/v1/", token: "t" });
+    const adapter = createOpenAiSttAdapter({ url: "http://x:7777/v1/", token: "t", model: "m" });
 
     expect(adapter.capabilities.streaming).toBe(false);
   });
 
   it("empty audio is rejected locally as EMPTY_AUDIO without a network call", async () => {
-    const adapter = createOmlxSttAdapter({ url: "http://127.0.0.1:9/v1", token: "t" });
+    const adapter = createOpenAiSttAdapter({ url: "http://127.0.0.1:9/v1", token: "t", model: "m" });
     const result = await adapter.transcribe({ audio: new Uint8Array() });
 
     if (result.ok) throw new Error("expected failure");
@@ -52,7 +63,10 @@ describe("createOmlxSttAdapter — offline contract", () => {
   });
 
   it("aborts a hang after the timeout instead of waiting on the engine", { timeout: 20000 }, async () => {
-    const adapter = createOmlxSttAdapter({ url: "http://10.255.255.1:7777/v1" }, { timeoutMs: 500, minAudioBytes: 1 });
+    const adapter = createOpenAiSttAdapter(
+      { url: "http://10.255.255.1:7777/v1", model: "m" },
+      { timeoutMs: 500, minAudioBytes: 1 },
+    );
     const startedAt = Date.now();
     const result = await adapter.transcribe({
       audio: new Uint8Array([1, 2, 3]),
@@ -69,7 +83,10 @@ describe("createOmlxSttAdapter — offline contract", () => {
   it("honors a caller-provided signal (user released the mic mid-request)", async () => {
     const controller = new AbortController();
 
-    const pending = createOmlxSttAdapter({ url: "http://10.255.255.1:7777/v1" }, { minAudioBytes: 1 }).transcribe({
+    const pending = createOpenAiSttAdapter(
+      { url: "http://10.255.255.1:7777/v1", model: "m" },
+      { minAudioBytes: 1 },
+    ).transcribe({
       audio: new Uint8Array([1, 2, 3]),
       mimeType: "audio/wav",
       filename: "x.wav",
@@ -85,7 +102,7 @@ describe("createOmlxSttAdapter — offline contract", () => {
   });
 
   it("oversized audio is rejected locally as AUDIO_TOO_LARGE", async () => {
-    const adapter = createOmlxSttAdapter({ url: "http://x/v1" }, { maxBytes: 4, minAudioBytes: 1 });
+    const adapter = createOpenAiSttAdapter({ url: "http://x/v1", model: "m" }, { maxBytes: 4, minAudioBytes: 1 });
     const result = await adapter.transcribe({
       audio: new Uint8Array([1, 2, 3, 4, 5]),
       mimeType: "audio/wav",
@@ -97,7 +114,7 @@ describe("createOmlxSttAdapter — offline contract", () => {
   });
 
   it("audio too short is its own code (RECORDING_TOO_SHORT)", async () => {
-    const adapter = createOmlxSttAdapter({ url: "http://x/v1" }, { minAudioBytes: 200 });
+    const adapter = createOpenAiSttAdapter({ url: "http://x/v1", model: "m" }, { minAudioBytes: 200 });
     const result = await adapter.transcribe({ audio: new Uint8Array([1, 2, 3]), mimeType: "audio/wav" });
 
     if (result.ok) throw new Error("expected failure");
@@ -105,22 +122,12 @@ describe("createOmlxSttAdapter — offline contract", () => {
   });
 });
 
-describe.skipIf(!hasLiveServer)("createOmlxSttAdapter — live oMLX", () => {
-  it("declares whole-file capabilities and honest languages", () => {
-    const adapter = createOmlxSttAdapter(config);
-
-    expect(adapter.capabilities.streaming).toBe(false);
-    expect(adapter.capabilities.interimResults).toBe(false);
-    expect(adapter.capabilities.languages).toContain("ru");
-    expect(adapter.capabilities.languages).not.toContain("mk");
-    expect(adapter.capabilities.languages.length).toBe(25);
-  });
-
+describe.skipIf(!hasLiveServer)("createOpenAiSttAdapter — live server", () => {
   it("transcribes a real wav against the live engine", { timeout: 60000 }, async () => {
     const { readFileSync } = await import("node:fs");
     const audio = new Uint8Array(readFileSync("/tmp/saystack-test-1s.wav"));
 
-    const adapter = createOmlxSttAdapter(config);
+    const adapter = createOpenAiSttAdapter(config);
     const result = await adapter.transcribe({ audio, mimeType: "audio/wav", filename: "test.wav" });
 
     if (!result.ok) throw new Error(`expected ok, got ${result.errorCode}: ${result.message ?? ""}`);
@@ -128,7 +135,7 @@ describe.skipIf(!hasLiveServer)("createOmlxSttAdapter — live oMLX", () => {
   });
 
   it("surfaces a bad model as MODEL_NOT_FOUND", { timeout: 30000 }, async () => {
-    const adapter = createOmlxSttAdapter(config, { model: "no-such-model-xyz", minAudioBytes: 1 });
+    const adapter = createOpenAiSttAdapter(config, { model: "no-such-model-xyz", minAudioBytes: 1 });
     const result = await adapter.transcribe({
       audio: new Uint8Array([1, 2, 3]),
       mimeType: "audio/wav",
@@ -140,7 +147,7 @@ describe.skipIf(!hasLiveServer)("createOmlxSttAdapter — live oMLX", () => {
   });
 
   it("surfaces a wrong token as BAD_TOKEN, not 'engine down'", { timeout: 30000 }, async () => {
-    const adapter = createOmlxSttAdapter({ url: OMLX_URL, token: "sk-wrong" }, { minAudioBytes: 1 });
+    const adapter = createOpenAiSttAdapter({ url: ENGINE_URL, token: "sk-wrong", model }, { minAudioBytes: 1 });
     const result = await adapter.transcribe({
       audio: new Uint8Array([1, 2, 3]),
       mimeType: "audio/wav",

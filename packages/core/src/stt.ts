@@ -66,6 +66,9 @@ const KNOWN_CODES: readonly string[] = [
 export function isSttErrorCode(value: unknown): value is SttErrorCode {
   return typeof value === "string" && KNOWN_CODES.includes(value);
 }
+// The realtime stream is always mono little-endian PCM16 at this rate; an adapter whose server wants another rate resamples.
+export const REALTIME_PCM_RATE = 16000;
+
 export interface ISttRealtimeInput {
   model?: string;
   language?: string;

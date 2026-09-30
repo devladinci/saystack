@@ -2,7 +2,7 @@ import type { INormalizeFn, INormalizeResult } from "@saystack/core";
 import { httpChatComplete } from "./chatCompletionsClient.js";
 import { buildNormalizeSystemPrompt, buildNormalizeUserPrompt } from "./normalizePrompt.js";
 import type { IJsonSchemaFormat, ILlmChatClient } from "./llmTypes.js";
-import { normalizeBaseUrl } from "./omlxSttAdapter.js";
+import { normalizeBaseUrl } from "./sttAdapter.js";
 
 export interface IChatCompletionsSpec {
   url: string;

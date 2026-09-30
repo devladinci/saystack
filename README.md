@@ -22,15 +22,34 @@ runtime dependencies and no vendor knowledge; engines and UI plug into its contr
 
 ## Packages
 
-| Package                                                                   | What it is                                                                                               |
-| ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| [`@saystack/core`](packages/core)                                         | Engine-agnostic core: text, chunking, sessions, timings, aura and audio maths. No runtime dependencies.  |
-| [`@saystack/web`](packages/web)                                           | Browser audio: WebAudio unlock, recording, PCM capture, read-along over live DOM ranges, the WebGL aura. |
-| [`@saystack/react`](packages/react)                                       | Shared React state for speech and dictation. Not bound to any platform.                                  |
-| [`@saystack/react-web`](packages/react-web)                               | React components and hooks for the web: read-aloud, the player, dictation, the aura.                     |
-| [`@saystack/react-native`](packages/react-native)                         | The same ideas for React Native: spotlights, captions, native recording and playback.                    |
-| [`@saystack/server`](packages/server)                                     | Optional Hono routes and a realtime WebSocket bridge that keep engine tokens on the server.              |
-| [`@saystack/engine-openai-compatible`](packages/engine-openai-compatible) | An engine for any OpenAI-compatible `/v1` audio server (reference implementation: oMLX).                 |
+| Package                                                                   | What it is                                                                                                 |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| [`@saystack/core`](packages/core)                                         | Engine-agnostic core: text, chunking, sessions, timings, aura and audio maths. No runtime dependencies.    |
+| [`@saystack/web`](packages/web)                                           | Browser audio: WebAudio unlock, recording, PCM capture, read-along over live DOM ranges, the WebGL aura.   |
+| [`@saystack/react`](packages/react)                                       | Shared React state for speech and dictation. Not bound to any platform.                                    |
+| [`@saystack/react-web`](packages/react-web)                               | React components and hooks for the web: read-aloud, the player, dictation, the aura.                       |
+| [`@saystack/react-native`](packages/react-native)                         | The same ideas for React Native: spotlights, captions, native recording and playback.                      |
+| [`@saystack/server`](packages/server)                                     | Optional Hono routes and a realtime WebSocket bridge that keep engine tokens on the server.                |
+| [`@saystack/engine-openai-compatible`](packages/engine-openai-compatible) | An engine for any OpenAI-compatible `/v1` server: STT, TTS, OpenAI Realtime live dictation, normalization. |
+
+## Engines
+
+`@saystack/engine-openai-compatible` speaks the standard OpenAI endpoints, so it is not tied to one server:
+
+| Feature              | Endpoint                               | Adapter                                              |
+| -------------------- | -------------------------------------- | ---------------------------------------------------- |
+| Dictation (upload)   | `POST /v1/audio/transcriptions`        | `createOpenAiSttAdapter`                             |
+| Read aloud           | `POST /v1/audio/speech`                | `createOpenAiTtsAdapter`                             |
+| Live dictation       | `WS /v1/realtime?intent=transcription` | `createOpenAiRealtimeSttAdapter`                     |
+| Live dictation, oMLX | `WS /v1/audio/transcriptions/realtime` | `createOmlxRealtimeSttAdapter` (oMLX's own protocol) |
+| Speech rewriting     | `POST /v1/chat/completions`            | `createLlmNormalizer`                                |
+
+Each piece takes its own URL and model, so they can point at different servers — for example a local
+server for speech and a hosted model for rewriting. Any other engine plugs in by implementing
+`ISttAdapter`, `ITtsAdapter` or `ISttRealtimeAdapter` from `@saystack/core`.
+
+Tested end to end against: oMLX (all of the above). The OpenAI Realtime adapter is tested against a
+fake server that follows OpenAI's published protocol; it has not yet been run against a live one.
 
 ## Layout
 
@@ -65,7 +84,7 @@ The full example needs an OpenAI-compatible speech server for STT/TTS and a chat
 see [`examples/voice-chat`](examples/voice-chat):
 
 ```bash
-OMLX_TOKEN=… LLM_TOKEN=… pnpm --filter @saystack/example-voice-chat dev
+ENGINE_TOKEN=… LLM_TOKEN=… pnpm --filter @saystack/example-voice-chat dev
 ```
 
 ### Minimal read-aloud

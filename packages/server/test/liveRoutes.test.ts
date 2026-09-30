@@ -2,15 +2,15 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-import { createOmlxSttAdapter, createOmlxTtsAdapter } from "@saystack/engine-openai-compatible";
+import { createOpenAiSttAdapter, createOpenAiTtsAdapter } from "@saystack/engine-openai-compatible";
 import { validateConfig } from "@saystack/core";
 
 import { createVoiceRoutes } from "../src/createVoiceRoutes.js";
 import type { IVoiceServerDeps } from "../src/types.js";
 
-const OMLX_URL = process.env.OMLX_URL ?? "http://127.0.0.1:7777/v1";
+const ENGINE_URL = process.env.ENGINE_URL ?? "http://127.0.0.1:7777/v1";
 
-const token = process.env.OMLX_TOKEN ?? "";
+const token = process.env.ENGINE_TOKEN ?? "";
 
 const hasLiveServer = token.length > 0;
 
@@ -19,23 +19,22 @@ function makeLiveDeps(engineToken: string): IVoiceServerDeps {
     getSettings: () =>
       validateConfig({
         languages: [],
-        stt: { url: OMLX_URL, token: engineToken },
-        tts: { url: OMLX_URL, token: engineToken },
+        stt: { url: ENGINE_URL, token: engineToken, model: process.env.STT_MODEL ?? "parakeet-tdt-0.6b-v3" },
+        tts: { url: ENGINE_URL, token: engineToken, model: process.env.TTS_MODEL ?? "higgs_audio_v3-tts-4b" },
       }),
-    createSttAdapter: (engineConfig) => createOmlxSttAdapter(engineConfig),
-    createTtsAdapter: (engineConfig) => createOmlxTtsAdapter(engineConfig),
+    createSttAdapter: (engineConfig) => createOpenAiSttAdapter(engineConfig),
+    createTtsAdapter: (engineConfig) => createOpenAiTtsAdapter(engineConfig),
   };
 }
 
-describe.skipIf(!hasLiveServer)("createVoiceRoutes — live oMLX through the routes", () => {
-  it("capabilities are the engine's honest ones", async () => {
+describe.skipIf(!hasLiveServer)("createVoiceRoutes — live server through the routes", () => {
+  it("capabilities are the engine's honest ones: no language list it cannot know", async () => {
     const res = await createVoiceRoutes(makeLiveDeps(token)).request("/capabilities");
 
     expect(res.status).toBe(200);
     const body = (await res.json()) as { stt: { streaming: boolean; languages: string[] } };
     expect(body.stt.streaming).toBe(false);
-    expect(body.stt.languages).toContain("ru");
-    expect(body.stt.languages).not.toContain("mk");
+    expect(body.stt.languages).toEqual([]);
   });
 
   it("a wav through raw upload comes back as text", { timeout: 60000 }, async () => {

@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { createOmlxTtsAdapter, maxAudioTokens } from "../src/ttsAdapter.js";
+import { createOpenAiTtsAdapter, maxAudioTokens } from "../src/ttsAdapter.js";
 import type { ITtsEngineConfig } from "@saystack/core";
 
-const ENGINE: ITtsEngineConfig = { url: "http://127.0.0.1:7777/v1", token: "sk-live" };
+const ENGINE: ITtsEngineConfig = { url: "http://127.0.0.1:7777/v1", token: "sk-live", model: "some-tts" };
 
 interface ICapturedRequest {
   url: string;
@@ -43,17 +43,17 @@ describe("maxAudioTokens — the token-cap formula from PR #58", () => {
   });
 });
 
-describe("createOmlxTtsAdapter — wire shape", () => {
+describe("createOpenAiTtsAdapter — wire shape", () => {
   it("posts to {base}/audio/speech, wav, with the token", async () => {
     const { fetch: fakeFetch, requests } = captureFetch(() => makeFetchResponse(200, new ArrayBuffer(8)));
-    const adapter = createOmlxTtsAdapter(ENGINE, { fetch: fakeFetch });
+    const adapter = createOpenAiTtsAdapter(ENGINE, { fetch: fakeFetch });
 
     const result = await adapter.synthesize({ text: "hello there" });
 
     expect(result.ok).toBe(true);
     expect(requests[0]?.url).toBe("http://127.0.0.1:7777/v1/audio/speech");
     const body = JSON.parse(String(requests[0]?.init.body)) as Record<string, unknown>;
-    expect(body.model).toBe("higgs_audio_v3-tts-4b");
+    expect(body.model).toBe("some-tts");
     expect(body.input).toBe("hello there");
     expect(body.response_format).toBe("wav");
     const headers = requests[0]?.init.headers as Record<string, string>;
@@ -62,7 +62,7 @@ describe("createOmlxTtsAdapter — wire shape", () => {
 
   it("never sends temperature — the runaway-Higgs trap", async () => {
     const { fetch: fakeFetch, requests } = captureFetch(() => makeFetchResponse(200, new ArrayBuffer(8)));
-    const adapter = createOmlxTtsAdapter(ENGINE, { fetch: fakeFetch });
+    const adapter = createOpenAiTtsAdapter(ENGINE, { fetch: fakeFetch });
 
     await adapter.synthesize({ text: "no temp" });
 
@@ -72,7 +72,7 @@ describe("createOmlxTtsAdapter — wire shape", () => {
 
   it("sends the ref pair together, never a lone refAudio", async () => {
     const { fetch: fakeFetch, requests } = captureFetch(() => makeFetchResponse(200, new ArrayBuffer(8)));
-    const adapter = createOmlxTtsAdapter(ENGINE, { fetch: fakeFetch });
+    const adapter = createOpenAiTtsAdapter(ENGINE, { fetch: fakeFetch });
 
     await adapter.synthesize({ text: "cloned", refAudio: "AAA=", refText: "hi mate" });
     await adapter.synthesize({ text: "not cloned", refAudio: "AAA=" });
@@ -84,9 +84,9 @@ describe("createOmlxTtsAdapter — wire shape", () => {
     expect("ref_audio" in second).toBe(false);
   });
 
-  it("config model wins over the built-in default", async () => {
+  it("sends the configured model as-is", async () => {
     const { fetch: fakeFetch, requests } = captureFetch(() => makeFetchResponse(200, new ArrayBuffer(8)));
-    const adapter = createOmlxTtsAdapter({ ...ENGINE, model: "my-tts" }, { fetch: fakeFetch });
+    const adapter = createOpenAiTtsAdapter({ ...ENGINE, model: "my-tts" }, { fetch: fakeFetch });
 
     await adapter.synthesize({ text: "custom" });
 
@@ -96,7 +96,7 @@ describe("createOmlxTtsAdapter — wire shape", () => {
 
   it("caps max_tokens by the text length", async () => {
     const { fetch: fakeFetch, requests } = captureFetch(() => makeFetchResponse(200, new ArrayBuffer(8)));
-    const adapter = createOmlxTtsAdapter(ENGINE, { fetch: fakeFetch });
+    const adapter = createOpenAiTtsAdapter(ENGINE, { fetch: fakeFetch });
 
     await adapter.synthesize({ text: "abcd" });
 
@@ -105,7 +105,7 @@ describe("createOmlxTtsAdapter — wire shape", () => {
   });
 });
 
-describe("createOmlxTtsAdapter — coded failures", () => {
+describe("createOpenAiTtsAdapter — coded failures", () => {
   it.each([
     [401, "BAD_TOKEN"],
     [403, "BAD_TOKEN"],
@@ -116,7 +116,7 @@ describe("createOmlxTtsAdapter — coded failures", () => {
     [500, "TTS_FAILED"],
   ])("%i maps to %s", async (status, expected) => {
     const { fetch: fakeFetch } = captureFetch(() => makeFetchResponse(status, "engine detail"));
-    const adapter = createOmlxTtsAdapter(ENGINE, { fetch: fakeFetch });
+    const adapter = createOpenAiTtsAdapter(ENGINE, { fetch: fakeFetch });
 
     const result = await adapter.synthesize({ text: "hi" });
 
@@ -128,7 +128,7 @@ describe("createOmlxTtsAdapter — coded failures", () => {
   });
 
   it("network failure is TTS_UNAVAILABLE, not a throw", async () => {
-    const adapter = createOmlxTtsAdapter(ENGINE, {
+    const adapter = createOpenAiTtsAdapter(ENGINE, {
       fetch: async () => {
         throw new Error("ECONNREFUSED");
       },
@@ -141,7 +141,7 @@ describe("createOmlxTtsAdapter — coded failures", () => {
 
   it("empty text fails fast without a network call", async () => {
     const { fetch: fakeFetch, requests } = captureFetch(() => makeFetchResponse(200, new ArrayBuffer(8)));
-    const adapter = createOmlxTtsAdapter(ENGINE, { fetch: fakeFetch });
+    const adapter = createOpenAiTtsAdapter(ENGINE, { fetch: fakeFetch });
 
     const result = await adapter.synthesize({ text: "   " });
 
@@ -153,7 +153,7 @@ describe("createOmlxTtsAdapter — coded failures", () => {
   });
 
   it("caller abort settles fast with TTS_FAILED", async () => {
-    const adapter = createOmlxTtsAdapter(ENGINE, {
+    const adapter = createOpenAiTtsAdapter(ENGINE, {
       fetch: (_input, init) =>
         new Promise<Response>((_resolve, reject) => {
           init?.signal?.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError")));
@@ -175,7 +175,7 @@ describe("createOmlxTtsAdapter — coded failures", () => {
   it("hung engine aborts at the configured timeout with TTS_TIMEOUT", async () => {
     vi.useFakeTimers();
     try {
-      const adapter = createOmlxTtsAdapter(
+      const adapter = createOpenAiTtsAdapter(
         { ...ENGINE, timeoutSeconds: 0.05 },
         {
           fetch: (_input, init) =>
@@ -201,7 +201,7 @@ describe("createOmlxTtsAdapter — coded failures", () => {
 
   it("zero-byte audio is a coded failure", async () => {
     const { fetch: fakeFetch } = captureFetch(() => makeFetchResponse(200, ""));
-    const adapter = createOmlxTtsAdapter(ENGINE, { fetch: fakeFetch });
+    const adapter = createOpenAiTtsAdapter(ENGINE, { fetch: fakeFetch });
 
     const result = await adapter.synthesize({ text: "hi" });
 
@@ -211,7 +211,7 @@ describe("createOmlxTtsAdapter — coded failures", () => {
 
 describe("capabilities", () => {
   it("honest: no streaming, cloning yes (Higgs ref voice)", () => {
-    const adapter = createOmlxTtsAdapter(ENGINE);
+    const adapter = createOpenAiTtsAdapter(ENGINE);
     expect(adapter.capabilities).toEqual({ streaming: false, voiceCloning: true });
   });
 });
