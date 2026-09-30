@@ -15,14 +15,92 @@ describe("normalizePrompt", () => {
     expect(prompt).toContain("the language of the input text");
   });
 
-  it("demands JSON-only output", () => {
+  it("leaves the JSON shape to the response schema instead of the prose", () => {
     const prompt = buildNormalizeSystemPrompt(["en"]);
 
-    expect(prompt).toContain("ONLY a JSON object");
+    expect(prompt).not.toContain("JSON");
   });
 
   it("user prompt is the raw text", () => {
     expect(buildNormalizeUserPrompt("hi there")).toBe("hi there");
+  });
+});
+
+describe("createLlmNormalizer", () => {
+  const reply = (content: string) => ({ complete: async () => ({ ok: true as const, content }) });
+
+  it("asks the engine for a json_schema constrained to the allowed languages", async () => {
+    const seen: unknown[] = [];
+    const chatClient = {
+      complete: async (request: { jsonSchema?: unknown }) => {
+        seen.push(request.jsonSchema);
+        return { ok: true as const, content: '{"language":"bg","text":"да"}' };
+      },
+    };
+    const { createLlmNormalizer } = await import("../src/normalize.js");
+    const normalize = createLlmNormalizer({ url: "http://engine/v1", model: "m", chatClient });
+
+    await normalize("здравей", ["bg", "en"]);
+
+    expect(seen[0]).toEqual({
+      name: "speech",
+      schema: {
+        type: "object",
+        properties: { language: { type: "string", enum: ["bg", "en"] }, text: { type: "string" } },
+        required: ["language", "text"],
+        additionalProperties: false,
+      },
+    });
+  });
+
+  it("leaves the language free when no languages are configured", async () => {
+    const seen: unknown[] = [];
+    const chatClient = {
+      complete: async (request: { jsonSchema?: unknown }) => {
+        seen.push(request.jsonSchema);
+        return { ok: true as const, content: '{"language":"bg","text":"да"}' };
+      },
+    };
+    const { createLlmNormalizer } = await import("../src/normalize.js");
+    const normalize = createLlmNormalizer({ url: "http://engine/v1", model: "m", chatClient });
+
+    await normalize("здравей", []);
+
+    expect(seen[0]).toEqual({
+      name: "speech",
+      schema: {
+        type: "object",
+        properties: { language: { type: "string" }, text: { type: "string" } },
+        required: ["language", "text"],
+        additionalProperties: false,
+      },
+    });
+  });
+
+  it("still accepts a fenced reply from an engine that ignores the schema", async () => {
+    const { createLlmNormalizer } = await import("../src/normalize.js");
+    const normalize = createLlmNormalizer({
+      url: "http://engine/v1",
+      model: "m",
+      chatClient: reply('```json\n{"language":"en","text":"hello there"}\n```'),
+    });
+
+    const result = await normalize("hi", ["en"]);
+
+    expect(result).toEqual({ ok: true, normalizedText: "hello there", language: "en", usedFallbackStructure: false });
+  });
+
+  it("reports a coded failure when the engine returns prose", async () => {
+    const { createLlmNormalizer } = await import("../src/normalize.js");
+    const normalize = createLlmNormalizer({ url: "http://engine/v1", model: "m", chatClient: reply("sorry, no idea") });
+
+    const result = await normalize("hi", ["en"]);
+
+    expect(result).toEqual({
+      ok: false,
+      errorCode: "NORMALIZE_BAD_RESPONSE",
+      message: "engine did not return the expected JSON object",
+    });
   });
 });
 

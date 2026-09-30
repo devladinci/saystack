@@ -34,7 +34,7 @@ const STT_KEYS = ["url", "token", "model", "timeoutSeconds"] as const;
 
 const TTS_KEYS = ["url", "token", "model", "timeoutSeconds"] as const;
 
-const LLM_KEYS = ["url", "token", "model", "prompt", "timeoutSeconds"] as const;
+const LLM_KEYS = ["url", "token", "model", "prompt", "timeoutSeconds", "disableThinking"] as const;
 
 function isHttpUrl(value: string): boolean {
   try {

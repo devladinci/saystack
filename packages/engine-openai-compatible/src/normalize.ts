@@ -1,7 +1,7 @@
 import type { INormalizeFn, INormalizeResult } from "@saystack/core";
 import { httpChatComplete } from "./chatCompletionsClient.js";
 import { buildNormalizeSystemPrompt, buildNormalizeUserPrompt } from "./normalizePrompt.js";
-import type { ILlmChatClient } from "./llmTypes.js";
+import type { IJsonSchemaFormat, ILlmChatClient } from "./llmTypes.js";
 import { normalizeBaseUrl } from "./omlxSttAdapter.js";
 
 export interface IChatCompletionsSpec {
@@ -16,6 +16,20 @@ export interface IChatCompletionsSpec {
 
 export function createLlmNormalizer(spec: IChatCompletionsSpec): INormalizeFn {
   return (text, languages) => normalizeWithChat(spec, text, languages);
+}
+
+function normalizeSchema(languages: readonly string[]): IJsonSchemaFormat {
+  const language = languages.length > 0 ? { type: "string", enum: [...languages] } : { type: "string" };
+
+  return {
+    name: "speech",
+    schema: {
+      type: "object",
+      properties: { language, text: { type: "string" } },
+      required: ["language", "text"],
+      additionalProperties: false,
+    },
+  };
 }
 
 function joinUrl(base: string): string {
@@ -35,7 +49,7 @@ async function normalizeWithChat(
 
   const timeoutMs = (spec.timeoutSeconds ?? 30) * 1000;
   const system = spec.prompt ?? buildNormalizeSystemPrompt(languages);
-  const chatResponse = await runChat(spec, system, buildNormalizeUserPrompt(text), timeoutMs);
+  const chatResponse = await runChat(spec, system, buildNormalizeUserPrompt(text), timeoutMs, languages);
 
   if (!chatResponse.ok) {
     return {
@@ -63,29 +77,28 @@ async function normalizeWithChat(
   };
 }
 
-function runChat(spec: IChatCompletionsSpec, system: string, user: string, timeoutMs: number) {
+function runChat(
+  spec: IChatCompletionsSpec,
+  system: string,
+  user: string,
+  timeoutMs: number,
+  languages: readonly string[],
+) {
+  const request = {
+    model: spec.model,
+    system,
+    user,
+    timeoutMs,
+    jsonSchema: normalizeSchema(languages),
+    ...(spec.disableThinking !== undefined ? { disableThinking: spec.disableThinking } : {}),
+    ...(spec.token !== undefined ? { token: spec.token } : {}),
+  };
+
   if (spec.chatClient !== undefined) {
-    return spec.chatClient.complete({
-      model: spec.model,
-      system,
-      user,
-      timeoutMs,
-      ...(spec.disableThinking !== undefined ? { disableThinking: spec.disableThinking } : {}),
-      ...(spec.token !== undefined ? { token: spec.token } : {}),
-    });
+    return spec.chatClient.complete(request);
   }
 
-  return httpChatComplete(
-    {
-      model: spec.model,
-      system,
-      user,
-      timeoutMs,
-      ...(spec.disableThinking !== undefined ? { disableThinking: spec.disableThinking } : {}),
-      ...(spec.token !== undefined ? { token: spec.token } : {}),
-    },
-    joinUrl(spec.url),
-  );
+  return httpChatComplete(request, joinUrl(spec.url));
 }
 
 function toNormalizeErrorCode(code: "LLM_UNAVAILABLE" | "LLM_TIMEOUT" | "LLM_RETRYABLE" | "LLM_BAD_RESPONSE") {

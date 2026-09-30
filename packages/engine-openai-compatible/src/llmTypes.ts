@@ -1,11 +1,17 @@
 export type LlmErrorCode = "LLM_UNAVAILABLE" | "LLM_TIMEOUT" | "LLM_RETRYABLE" | "LLM_BAD_RESPONSE";
 
+export interface IJsonSchemaFormat {
+  name: string;
+  schema: Record<string, unknown>;
+}
+
 export interface ILlmChatRequest {
   model: string;
   system: string;
   user: string;
   timeoutMs?: number;
   disableThinking?: boolean;
+  jsonSchema?: IJsonSchemaFormat;
   token?: string;
 }
 

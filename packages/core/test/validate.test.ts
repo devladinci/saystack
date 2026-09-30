@@ -103,6 +103,25 @@ describe("validateConfig — serializable settings checks", () => {
     );
   });
 
+  it("accepts llm.disableThinking", () => {
+    const result = validateConfig({
+      ...validSttConfig,
+      llm: { url: "http://127.0.0.1:7777", model: "gemma-4", disableThinking: true },
+    });
+
+    expect(result.ok).toBe(true);
+  });
+
+  it("rejects unknown llm keys (UNKNOWN_KEY)", () => {
+    const errors = expectErrors({
+      ...validSttConfig,
+      llm: { url: "http://127.0.0.1:7777", model: "gemma-4", think: true } as unknown as NonNullable<IConfig["llm"]>,
+    });
+
+    expect(errors[0]?.code).toBe("UNKNOWN_KEY");
+    expect(errors[0]?.message).toContain("llm.think");
+  });
+
   it("rejects unknown stt keys (UNKNOWN_KEY)", () => {
     const errors = expectErrors({
       ...validSttConfig,
