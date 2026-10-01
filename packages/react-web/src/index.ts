@@ -20,7 +20,7 @@ export type { IWordReveal } from "./useWordReveal.js";
 export { useWordReveal } from "./useWordReveal.js";
 
 export type { IReadAloudSnapshot } from "./useReadAloud.js";
-export type { IReadAloudView, ReadAloudId, RewriteFn, SummarizeFn } from "@saystack/react";
+export type { IReadAloudView, IRewriteResult, IStyleMap, ReadAloudId, RewriteFn, SummarizeFn } from "@saystack/react";
 export { ReadAloudProvider } from "./ReadAloudProvider.js";
 export type { IReadAloud } from "./useReadAloud.js";
 export { useReadAloud } from "./useReadAloud.js";

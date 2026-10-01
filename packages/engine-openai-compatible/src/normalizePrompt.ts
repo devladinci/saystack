@@ -11,6 +11,11 @@ export function buildNormalizeSystemPrompt(languages: readonly string[]): string
   ].join(" ");
 }
 
-export function buildNormalizeUserPrompt(text: string): string {
-  return text;
+// Only added when the caller offers styles, so a rewriter that was given none cannot pick one.
+function buildStyleLine(styleChoices: readonly string[]): string {
+  return `Choose the delivery style for this reply from: ${styleChoices.join(", ")}.`;
+}
+
+export function buildNormalizeUserPrompt(text: string, styleChoices?: readonly string[]): string {
+  return styleChoices === undefined || styleChoices.length === 0 ? text : `${buildStyleLine(styleChoices)}\n\n${text}`;
 }

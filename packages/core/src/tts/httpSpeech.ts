@@ -51,6 +51,7 @@ export function createHttpSynthesize({
   return async (input) => {
     const body = {
       text: input.text,
+      ...(input.fields === undefined ? {} : { fields: input.fields }),
       ...(input.refAudio !== undefined && input.refText !== undefined
         ? { refAudio: input.refAudio, refText: input.refText }
         : {}),

@@ -1,18 +1,24 @@
-import type { ITtsDriver } from "@saystack/core";
+import type { IRewriteFn, IRewriteResult, IStyleMap, ITtsDriver } from "@saystack/core";
 import { createSpeechSession, hasSpeechText } from "@saystack/core";
 
 import { createSpeechApi } from "../useSpeech.js";
 import type { IReadAloudStore, ReadAloudId } from "./readAloudStore.js";
 import { createReadAloudStore } from "./readAloudStore.js";
 
-export type RewriteFn = (markdown: string, signal: AbortSignal) => Promise<string | null>;
+export type RewriteFn = IRewriteFn;
 
-export type SummarizeFn = (id: ReadAloudId, markdown: string, signal: AbortSignal) => Promise<string | null>;
+// A summary may carry a style too, the same way a rewrite does.
+export type SummarizeFn = (
+  id: ReadAloudId,
+  markdown: string,
+  signal: AbortSignal,
+) => Promise<string | IRewriteResult | null>;
 
 export interface IReadAloudSources {
   rewrite?: RewriteFn;
   shouldRewrite?: (markdown: string) => boolean;
   summarize?: SummarizeFn;
+  styleMap?: IStyleMap;
 }
 
 export interface ICreateReadAloudOptions {
@@ -33,7 +39,7 @@ export function createReadAloud<TAnchor>({
 
     if (current.summarize !== undefined && id !== null) {
       const summary = await current.summarize(id, markdown, signal);
-      const isSummary = summary !== null && hasSpeechText(summary);
+      const isSummary = summary !== null && hasSpeechText(typeof summary === "string" ? summary : summary.text);
       store.markSummary(id, isSummary);
 
       if (isSummary) {
@@ -52,6 +58,9 @@ export function createReadAloud<TAnchor>({
     },
     get shouldRewrite() {
       return sources().shouldRewrite;
+    },
+    get styleMap() {
+      return sources().styleMap;
     },
   });
   const store = createReadAloudStore<TAnchor>(session, createSpeechApi(session, driver), readLevels);

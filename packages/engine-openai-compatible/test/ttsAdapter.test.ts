@@ -84,6 +84,43 @@ describe("createOpenAiTtsAdapter — wire shape", () => {
     expect("ref_audio" in second).toBe(false);
   });
 
+  it("extra fields ride in the body exactly as declared", async () => {
+    const { fetch: fakeFetch, requests } = captureFetch(() => makeFetchResponse(200, new ArrayBuffer(8)));
+    const adapter = createOpenAiTtsAdapter(ENGINE, { fetch: fakeFetch });
+
+    await adapter.synthesize({ text: "styled", fields: { instructions: "calm", emotions: "amusement" } });
+
+    const body = JSON.parse(String(requests[0]?.init.body)) as Record<string, unknown>;
+    expect(body.instructions).toBe("calm");
+    expect(body.emotions).toBe("amusement");
+  });
+
+  it("a field cannot replace the keys the adapter owns", async () => {
+    const { fetch: fakeFetch, requests } = captureFetch(() => makeFetchResponse(200, new ArrayBuffer(8)));
+    const adapter = createOpenAiTtsAdapter(ENGINE, { fetch: fakeFetch });
+
+    await adapter.synthesize({
+      text: "styled",
+      fields: { model: "pricier", input: "x".repeat(50), response_format: "mp3", instructions: "calm" },
+    });
+
+    const body = JSON.parse(String(requests[0]?.init.body)) as Record<string, unknown>;
+    expect(body.model).toBe(ENGINE.model);
+    expect(body.input).toBe("styled");
+    expect(body.response_format).toBe("wav");
+    expect(body.instructions).toBe("calm");
+  });
+
+  it("no fields means no extra keys at all", async () => {
+    const { fetch: fakeFetch, requests } = captureFetch(() => makeFetchResponse(200, new ArrayBuffer(8)));
+    const adapter = createOpenAiTtsAdapter(ENGINE, { fetch: fakeFetch });
+
+    await adapter.synthesize({ text: "plain", fields: {} });
+
+    const body = JSON.parse(String(requests[0]?.init.body)) as Record<string, unknown>;
+    expect(Object.keys(body).sort()).toEqual(["input", "model", "response_format"]);
+  });
+
   it("sends the configured model as-is", async () => {
     const { fetch: fakeFetch, requests } = captureFetch(() => makeFetchResponse(200, new ArrayBuffer(8)));
     const adapter = createOpenAiTtsAdapter({ ...ENGINE, model: "my-tts" }, { fetch: fakeFetch });

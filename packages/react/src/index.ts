@@ -37,12 +37,16 @@ export type {
 } from "@saystack/core";
 export { setVoiceRecorder, getVoiceRecorder } from "@saystack/core";
 export type {
+  IRewriteResult,
   ISpeechChunk,
   ISpeechClip,
   ISpeechClipResult,
   ISpeechPosition,
   ISpeechSessionOptions,
   ISpeechState,
+  IStyleChannel,
+  IStyleMap,
+  IStyleRule,
   ITtsDriver,
   TtsErrorCode,
   TtsPhase,

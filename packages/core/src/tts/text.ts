@@ -98,15 +98,16 @@ export const needsSummary = (markdown: string): boolean =>
 
 const sentences = (text: string): string[] => (text.match(SENTENCE) ?? []).map((s) => s.trim()).filter(Boolean);
 
-export function speechChunks(text: string): string[] {
+export function speechChunks(text: string, reserve = 0): string[] {
   const chunks: string[] = [];
   let current = "";
-  let limit = FIRST_CHUNK_CHARS;
+  // Anything the caller adds in front of a chunk — a style tag — counts against the same budget.
+  let limit = Math.max(1, FIRST_CHUNK_CHARS - reserve);
 
   const flush = () => {
     chunks.push(current);
     current = "";
-    limit = Math.min(MAX_CHUNK_CHARS, Math.round(limit * CHUNK_GROWTH));
+    limit = Math.max(1, Math.min(MAX_CHUNK_CHARS, Math.round(limit * CHUNK_GROWTH)) - reserve);
   };
 
   for (const sentence of sentences(text)) {

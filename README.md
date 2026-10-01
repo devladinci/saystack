@@ -35,6 +35,11 @@ saystack is pre-1.0: APIs may still change in minor versions, and every change i
   rewrites it for the ear: numbers, dates, money and links become the words a person would say, lists
   become sentences, and code is announced rather than spelled out. Any OpenAI-compatible chat model
   works, a 4B model on Ollama included. If the model fails, the reply is read as written.
+- **Delivery style.** A rewrite may also name a style, and how that reaches the voice is the app's
+  call: an extra field in the request body, or a tag prefixed to the text. Both the vocabulary and
+  the channel come from the app (`IStyleMap`), so it fits an engine's `instructions` field, an
+  inline emotion tag, or nothing at all — saystack ships no styles of its own, and a style nobody
+  declared is dropped rather than guessed at.
 - **Read-along.** Map the words being spoken onto the words on screen and highlight them, including
   word-level timings when the engine provides them.
 - **Dictation.** Stream recognised words into a composer as they are said, with a realtime WebSocket
