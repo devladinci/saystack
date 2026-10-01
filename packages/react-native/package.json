@@ -1,6 +1,6 @@
 {
   "name": "@saystack/react-native",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React Native voice UI: the spectral aura on the GPU, a blurred spotlight for dictation and read-aloud, live captions and a player.",
   "license": "MIT",
   "author": "DeVladinci",

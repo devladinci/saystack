@@ -1,5 +1,12 @@
 # @saystack/engine-openai-compatible
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [b86fbbf]
+  - @saystack/core@0.1.1
+
 ## 0.1.1
 
 ### Patch Changes
