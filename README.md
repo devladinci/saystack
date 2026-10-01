@@ -31,6 +31,10 @@ saystack is pre-1.0: APIs may still change in minor versions, and every change i
 
 - **Speakable text.** Strip markdown, code, tables and rules out of a reply, split it into blocks and
   chunk it for streaming playback â€” so audio starts before the reply is complete.
+- **Speech rewriting.** Before a reply with a table, code or a lot of text is read aloud, a chat model
+  rewrites it for the ear: numbers, dates, money and links become the words a person would say, lists
+  become sentences, and code is announced rather than spelled out. Any OpenAI-compatible chat model
+  works, a 4B model on Ollama included. If the model fails, the reply is read as written.
 - **Read-along.** Map the words being spoken onto the words on screen and highlight them, including
   word-level timings when the engine provides them.
 - **Dictation.** Stream recognised words into a composer as they are said, with a realtime WebSocket
@@ -79,8 +83,10 @@ Each piece takes its own URL and model, so they can point at different servers â
 server for speech and a hosted model for rewriting. Any other engine plugs in by implementing
 `ISttAdapter`, `ITtsAdapter` or `ISttRealtimeAdapter` from `@saystack/core`.
 
-Tested end to end against: oMLX (all of the above). The OpenAI Realtime adapter is tested against a
-fake server that follows OpenAI's published protocol; it has not yet been run against a live one.
+Tested end to end against oMLX (all of the above), and against [Speaches](https://speaches.ai) with
+Ollama (upload dictation, read aloud and speech rewriting). The OpenAI Realtime adapter is tested against
+a fake server that follows OpenAI's published protocol; it has not yet been run against OpenAI itself.
+Speaches 0.1 speaks an older version of that protocol, so live dictation does not work with it yet.
 
 ## React Native
 
