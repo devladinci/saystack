@@ -73,14 +73,12 @@ async function readResponse(response: Response): Promise<ISttTranscribeResult> {
     | undefined;
 
   if (response.ok && parsed?.text !== undefined) {
-    const okResult: ISttTranscribeResult = { ok: true, text: parsed.text };
-    if (parsed.language !== undefined) {
-      return { ok: true, text: parsed.text, language: parsed.language };
-    }
-    if (parsed.durationSeconds !== undefined) {
-      return { ok: true, text: parsed.text, durationSeconds: parsed.durationSeconds };
-    }
-    return okResult;
+    return {
+      ok: true,
+      text: parsed.text,
+      ...(parsed.language !== undefined ? { language: parsed.language } : {}),
+      ...(parsed.durationSeconds !== undefined ? { durationSeconds: parsed.durationSeconds } : {}),
+    };
   }
 
   if (!isSttErrorCode(parsed?.errorCode)) {

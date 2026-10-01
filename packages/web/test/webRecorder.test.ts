@@ -3,8 +3,18 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { createWebRecorder } from "../src/webRecorder.js";
 
 class FakeRecorder extends EventTarget {
+  static made: FakeRecorder[] = [];
   state: "inactive" | "recording" = "inactive";
   mimeType = "audio/webm";
+
+  constructor() {
+    super();
+    FakeRecorder.made.push(this);
+  }
+
+  deliver(text: string): void {
+    this.dispatchEvent(Object.assign(new Event("dataavailable"), { data: new Blob([text]) }));
+  }
 
   start(): void {
     this.state = "recording";
@@ -18,6 +28,7 @@ class FakeRecorder extends EventTarget {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  FakeRecorder.made = [];
 });
 
 describe("createWebRecorder", () => {
@@ -43,5 +54,23 @@ describe("createWebRecorder", () => {
     await expect(stopping).resolves.toMatchObject({ blob: expect.any(Blob) });
     expect(track.stop).toHaveBeenCalled();
     expect(recorder.stream).toBeNull();
+  });
+
+  it("keeps a released recorder's late audio out of the next take", async () => {
+    const track = { stop: vi.fn() };
+    vi.stubGlobal("MediaRecorder", FakeRecorder);
+    vi.stubGlobal("navigator", {
+      mediaDevices: { getUserMedia: async () => ({ getTracks: () => [track] }) as unknown as MediaStream },
+    });
+    const recorder = createWebRecorder();
+
+    await recorder.startRecording();
+    await recorder.startRecording();
+    const [released, current] = FakeRecorder.made;
+    released?.deliver("late");
+    current?.deliver("fresh");
+    const recording = await recorder.stopRecording();
+
+    expect("blob" in recording ? await recording.blob.text() : null).toBe("fresh");
   });
 });

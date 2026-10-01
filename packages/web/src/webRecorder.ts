@@ -52,10 +52,12 @@ export function createWebRecorder({
       throw error;
     }
 
-    parts = [];
+    // A recorder released mid-take can still fire dataavailable; it lands in its own list, not the next take's.
+    const chunks: Blob[] = [];
+    parts = chunks;
     media.addEventListener("dataavailable", (event) => {
       if (event.data.size > 0) {
-        parts.push(event.data);
+        chunks.push(event.data);
       }
     });
     stream = next;

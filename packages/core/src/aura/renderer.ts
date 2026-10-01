@@ -90,6 +90,7 @@ type Uniforms = Record<(typeof UNIFORMS)[number], WebGLUniformLocation | null>;
 type BlurUniforms = Record<(typeof BLUR_UNIFORMS)[number], WebGLUniformLocation | null>;
 
 interface IPrograms {
+  vertices: WebGLBuffer | null;
   aura: WebGLProgram;
   uniforms: Uniforms;
   blur: WebGLProgram | null;
@@ -223,18 +224,19 @@ const pointAt = (gl: WebGLRenderingContext, target: WebGLProgram): void => {
 function link(gl: WebGLRenderingContext, isBlurring: boolean): IPrograms {
   const aura = program(gl, FRAGMENT_SHADER);
   gl.useProgram(aura);
-  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  const vertices = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertices);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
   pointAt(gl, aura);
   const uniforms = locate(gl, aura, UNIFORMS);
 
   if (!isBlurring) {
-    return { aura, uniforms, blur: null, blurUniforms: null };
+    return { vertices, aura, uniforms, blur: null, blurUniforms: null };
   }
 
   const blur = program(gl, BLUR_FRAGMENT_SHADER);
 
-  return { aura, uniforms, blur, blurUniforms: locate(gl, blur, BLUR_UNIFORMS) };
+  return { vertices, aura, uniforms, blur, blurUniforms: locate(gl, blur, BLUR_UNIFORMS) };
 }
 
 const emptyTarget = (): ITarget => ({ texture: null, buffer: null, width: 0, height: 0 });
@@ -685,6 +687,7 @@ export function createAuraRenderer(
     dispose() {
       releaseTarget(scene);
       releaseTarget(pass);
+      gl.deleteBuffer(programs.vertices);
       gl.deleteProgram(programs.aura);
 
       if (programs.blur !== null) {

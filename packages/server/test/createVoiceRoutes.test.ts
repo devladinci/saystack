@@ -180,6 +180,44 @@ describe("createVoiceRoutes — transcription routing", () => {
     expect(body.errorCode).toBe("AUDIO_TOO_LARGE");
   });
 
+  it("a chunked upload that declares no length is still held to maxBodyBytes", async () => {
+    let calls = 0;
+    const deps = makeDeps({
+      maxBodyBytes: 4,
+      createSttAdapter: () => ({
+        capabilities: { streaming: false, interimResults: false, wordTimings: false, languages: [] },
+        transcribe: async () => {
+          calls += 1;
+
+          return { ok: true, text: "ok" };
+        },
+      }),
+    });
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new Uint8Array(3));
+        controller.enqueue(new Uint8Array(6));
+        controller.close();
+      },
+    });
+    const init = { method: "POST", body, duplex: "half", headers: { "content-type": "audio/wav" } };
+    const res = await createVoiceRoutes(deps).request("/audio/transcriptions", init as RequestInit);
+
+    expect(res.status).toBe(413);
+    const answer = (await res.json()) as { errorCode: string };
+    expect(answer.errorCode).toBe("AUDIO_TOO_LARGE");
+    expect(calls).toBe(0);
+  });
+
+  it("multipart over maxBodyBytes is refused even without a declared length", async () => {
+    const deps = makeDeps({ maxBodyBytes: 64 });
+    const form = new FormData();
+    form.append("file", new Blob([new Uint8Array(512)]), "big.wav");
+    const res = await createVoiceRoutes(deps).request("/audio/transcriptions", { method: "POST", body: form });
+
+    expect(res.status).toBe(413);
+  });
+
   it("multipart without a declared length still passes through; the adapter enforces its own cap", async () => {
     const seen: Array<{ byteLength: number }> = [];
     const deps = makeDeps({
