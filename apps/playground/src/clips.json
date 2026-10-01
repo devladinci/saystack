@@ -1,0 +1,659 @@
+{
+  "voice": "Kokoro-82M (Apache-2.0)",
+  "replies": [
+    {
+      "text": "Yes.",
+      "file": "a924e7408e88.m4a",
+      "duration": 1.35,
+      "marks": [
+        {
+          "charIndex": 0,
+          "time": 0.4
+        }
+      ]
+    },
+    {
+      "text": "Press the speaker under any reply and I'll read it to you, one word at a time.",
+      "file": "8c1df2ef4076.m4a",
+      "duration": 4.725,
+      "marks": [
+        {
+          "charIndex": 0,
+          "time": 0.25
+        },
+        {
+          "charIndex": 6,
+          "time": 0.5
+        },
+        {
+          "charIndex": 10,
+          "time": 0.6
+        },
+        {
+          "charIndex": 18,
+          "time": 1.025
+        },
+        {
+          "charIndex": 24,
+          "time": 1.25
+        },
+        {
+          "charIndex": 28,
+          "time": 1.45
+        },
+        {
+          "charIndex": 34,
+          "time": 1.925
+        },
+        {
+          "charIndex": 38,
+          "time": 2.038
+        },
+        {
+          "charIndex": 43,
+          "time": 2.225
+        },
+        {
+          "charIndex": 48,
+          "time": 2.413
+        },
+        {
+          "charIndex": 51,
+          "time": 2.5
+        },
+        {
+          "charIndex": 54,
+          "time": 2.625
+        },
+        {
+          "charIndex": 59,
+          "time": 3.163
+        },
+        {
+          "charIndex": 63,
+          "time": 3.4
+        },
+        {
+          "charIndex": 68,
+          "time": 3.638
+        },
+        {
+          "charIndex": 71,
+          "time": 3.712
+        },
+        {
+          "charIndex": 73,
+          "time": 3.775
+        }
+      ]
+    },
+    {
+      "text": "Sure.",
+      "file": "1c5dfb90f4da.m4a",
+      "duration": 1.3,
+      "marks": [
+        {
+          "charIndex": 0,
+          "time": 0.425
+        }
+      ]
+    },
+    {
+      "text": "The aura splits your voice into six frequency bands, from the low hum of vowels up to the hiss of an s.",
+      "file": "853d7625d607.m4a",
+      "duration": 6.5,
+      "marks": [
+        {
+          "charIndex": 0,
+          "time": 0.25
+        },
+        {
+          "charIndex": 4,
+          "time": 0.388
+        },
+        {
+          "charIndex": 9,
+          "time": 0.713
+        },
+        {
+          "charIndex": 16,
+          "time": 1.062
+        },
+        {
+          "charIndex": 21,
+          "time": 1.175
+        },
+        {
+          "charIndex": 27,
+          "time": 1.538
+        },
+        {
+          "charIndex": 32,
+          "time": 1.8
+        },
+        {
+          "charIndex": 36,
+          "time": 2.125
+        },
+        {
+          "charIndex": 46,
+          "time": 2.575
+        },
+        {
+          "charIndex": 53,
+          "time": 3.4
+        },
+        {
+          "charIndex": 58,
+          "time": 3.538
+        },
+        {
+          "charIndex": 62,
+          "time": 3.65
+        },
+        {
+          "charIndex": 66,
+          "time": 3.95
+        },
+        {
+          "charIndex": 70,
+          "time": 4.138
+        },
+        {
+          "charIndex": 73,
+          "time": 4.225
+        },
+        {
+          "charIndex": 80,
+          "time": 4.725
+        },
+        {
+          "charIndex": 83,
+          "time": 4.925
+        },
+        {
+          "charIndex": 86,
+          "time": 5.013
+        },
+        {
+          "charIndex": 90,
+          "time": 5.1
+        },
+        {
+          "charIndex": 95,
+          "time": 5.425
+        },
+        {
+          "charIndex": 98,
+          "time": 5.537
+        },
+        {
+          "charIndex": 101,
+          "time": 5.625
+        }
+      ]
+    },
+    {
+      "text": "Each band has its own color. When you are silent, all six sit on top of each other and add up to white.",
+      "file": "8311263338c9.m4a",
+      "duration": 6.35,
+      "marks": [
+        {
+          "charIndex": 0,
+          "time": 0.275
+        },
+        {
+          "charIndex": 5,
+          "time": 0.525
+        },
+        {
+          "charIndex": 10,
+          "time": 0.85
+        },
+        {
+          "charIndex": 14,
+          "time": 1.012
+        },
+        {
+          "charIndex": 18,
+          "time": 1.15
+        },
+        {
+          "charIndex": 22,
+          "time": 1.375
+        },
+        {
+          "charIndex": 29,
+          "time": 2.2
+        },
+        {
+          "charIndex": 34,
+          "time": 2.337
+        },
+        {
+          "charIndex": 38,
+          "time": 2.425
+        },
+        {
+          "charIndex": 42,
+          "time": 2.562
+        },
+        {
+          "charIndex": 50,
+          "time": 3.288
+        },
+        {
+          "charIndex": 54,
+          "time": 3.538
+        },
+        {
+          "charIndex": 58,
+          "time": 3.837
+        },
+        {
+          "charIndex": 62,
+          "time": 3.987
+        },
+        {
+          "charIndex": 65,
+          "time": 4.1
+        },
+        {
+          "charIndex": 69,
+          "time": 4.338
+        },
+        {
+          "charIndex": 72,
+          "time": 4.412
+        },
+        {
+          "charIndex": 77,
+          "time": 4.588
+        },
+        {
+          "charIndex": 83,
+          "time": 4.875
+        },
+        {
+          "charIndex": 87,
+          "time": 5.013
+        },
+        {
+          "charIndex": 91,
+          "time": 5.213
+        },
+        {
+          "charIndex": 94,
+          "time": 5.375
+        },
+        {
+          "charIndex": 97,
+          "time": 5.5
+        }
+      ]
+    },
+    {
+      "text": "When you speak, each band rises with its own energy, so the colors pull apart. Where two bands still overlap, their colors mix, like light through a prism. Vowels light up the warm colors.",
+      "file": "68ce61a67387.m4a",
+      "duration": 12.0,
+      "marks": [
+        {
+          "charIndex": 0,
+          "time": 0.25
+        },
+        {
+          "charIndex": 5,
+          "time": 0.375
+        },
+        {
+          "charIndex": 9,
+          "time": 0.512
+        },
+        {
+          "charIndex": 16,
+          "time": 1.025
+        },
+        {
+          "charIndex": 21,
+          "time": 1.275
+        },
+        {
+          "charIndex": 26,
+          "time": 1.6
+        },
+        {
+          "charIndex": 32,
+          "time": 2.062
+        },
+        {
+          "charIndex": 37,
+          "time": 2.188
+        },
+        {
+          "charIndex": 41,
+          "time": 2.35
+        },
+        {
+          "charIndex": 45,
+          "time": 2.575
+        },
+        {
+          "charIndex": 53,
+          "time": 3.25
+        },
+        {
+          "charIndex": 56,
+          "time": 3.388
+        },
+        {
+          "charIndex": 60,
+          "time": 3.475
+        },
+        {
+          "charIndex": 67,
+          "time": 3.875
+        },
+        {
+          "charIndex": 72,
+          "time": 4.075
+        },
+        {
+          "charIndex": 79,
+          "time": 5.025
+        },
+        {
+          "charIndex": 85,
+          "time": 5.213
+        },
+        {
+          "charIndex": 89,
+          "time": 5.425
+        },
+        {
+          "charIndex": 95,
+          "time": 5.8
+        },
+        {
+          "charIndex": 101,
+          "time": 6.075
+        },
+        {
+          "charIndex": 110,
+          "time": 6.85
+        },
+        {
+          "charIndex": 116,
+          "time": 7.025
+        },
+        {
+          "charIndex": 123,
+          "time": 7.438
+        },
+        {
+          "charIndex": 128,
+          "time": 7.975
+        },
+        {
+          "charIndex": 133,
+          "time": 8.213
+        },
+        {
+          "charIndex": 139,
+          "time": 8.537
+        },
+        {
+          "charIndex": 147,
+          "time": 8.75
+        },
+        {
+          "charIndex": 149,
+          "time": 8.825
+        },
+        {
+          "charIndex": 156,
+          "time": 9.775
+        },
+        {
+          "charIndex": 163,
+          "time": 10.287
+        },
+        {
+          "charIndex": 169,
+          "time": 10.488
+        },
+        {
+          "charIndex": 172,
+          "time": 10.613
+        },
+        {
+          "charIndex": 176,
+          "time": 10.7
+        },
+        {
+          "charIndex": 181,
+          "time": 11.0
+        }
+      ]
+    },
+    {
+      "text": "Sounds like s and sh push the blue and violet bands.",
+      "file": "a64a1618b83c.m4a",
+      "duration": 3.575,
+      "marks": [
+        {
+          "charIndex": 0,
+          "time": 0.3
+        },
+        {
+          "charIndex": 7,
+          "time": 0.562
+        },
+        {
+          "charIndex": 12,
+          "time": 0.762
+        },
+        {
+          "charIndex": 14,
+          "time": 1.225
+        },
+        {
+          "charIndex": 21,
+          "time": 1.375
+        },
+        {
+          "charIndex": 26,
+          "time": 1.613
+        },
+        {
+          "charIndex": 30,
+          "time": 1.725
+        },
+        {
+          "charIndex": 35,
+          "time": 2.087
+        },
+        {
+          "charIndex": 39,
+          "time": 2.225
+        },
+        {
+          "charIndex": 46,
+          "time": 2.625
+        }
+      ]
+    },
+    {
+      "text": "This is a playground, so my replies are canned.",
+      "file": "016b913e02b3.m4a",
+      "duration": 3.2,
+      "marks": [
+        {
+          "charIndex": 0,
+          "time": 0.275
+        },
+        {
+          "charIndex": 5,
+          "time": 0.475
+        },
+        {
+          "charIndex": 8,
+          "time": 0.588
+        },
+        {
+          "charIndex": 10,
+          "time": 0.65
+        },
+        {
+          "charIndex": 22,
+          "time": 1.525
+        },
+        {
+          "charIndex": 25,
+          "time": 1.637
+        },
+        {
+          "charIndex": 28,
+          "time": 1.775
+        },
+        {
+          "charIndex": 36,
+          "time": 2.188
+        },
+        {
+          "charIndex": 40,
+          "time": 2.275
+        }
+      ]
+    },
+    {
+      "text": "Press the speaker under any reply to hear it again.",
+      "file": "e607f4db5b94.m4a",
+      "duration": 3.25,
+      "marks": [
+        {
+          "charIndex": 0,
+          "time": 0.25
+        },
+        {
+          "charIndex": 6,
+          "time": 0.5
+        },
+        {
+          "charIndex": 10,
+          "time": 0.6
+        },
+        {
+          "charIndex": 18,
+          "time": 1.175
+        },
+        {
+          "charIndex": 24,
+          "time": 1.4
+        },
+        {
+          "charIndex": 28,
+          "time": 1.6
+        },
+        {
+          "charIndex": 34,
+          "time": 2.025
+        },
+        {
+          "charIndex": 37,
+          "time": 2.125
+        },
+        {
+          "charIndex": 42,
+          "time": 2.312
+        },
+        {
+          "charIndex": 45,
+          "time": 2.388
+        }
+      ]
+    }
+  ],
+  "dictation": {
+    "text": "Could you read your last answer out loud? I want to see how the colors move while you talk.",
+    "file": "ffc179bc361e.m4a",
+    "duration": 6.1,
+    "marks": [
+      {
+        "charIndex": 0,
+        "time": 0.35
+      },
+      {
+        "charIndex": 6,
+        "time": 0.475
+      },
+      {
+        "charIndex": 10,
+        "time": 0.637
+      },
+      {
+        "charIndex": 15,
+        "time": 0.95
+      },
+      {
+        "charIndex": 20,
+        "time": 1.137
+      },
+      {
+        "charIndex": 25,
+        "time": 1.562
+      },
+      {
+        "charIndex": 32,
+        "time": 1.975
+      },
+      {
+        "charIndex": 36,
+        "time": 2.2
+      },
+      {
+        "charIndex": 42,
+        "time": 3.025
+      },
+      {
+        "charIndex": 44,
+        "time": 3.138
+      },
+      {
+        "charIndex": 49,
+        "time": 3.288
+      },
+      {
+        "charIndex": 52,
+        "time": 3.375
+      },
+      {
+        "charIndex": 56,
+        "time": 3.575
+      },
+      {
+        "charIndex": 60,
+        "time": 3.737
+      },
+      {
+        "charIndex": 64,
+        "time": 3.862
+      },
+      {
+        "charIndex": 71,
+        "time": 4.287
+      },
+      {
+        "charIndex": 76,
+        "time": 4.7
+      },
+      {
+        "charIndex": 82,
+        "time": 4.925
+      },
+      {
+        "charIndex": 86,
+        "time": 5.088
+      }
+    ]
+  }
+}

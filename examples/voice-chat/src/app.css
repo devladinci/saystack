@@ -1,0 +1,240 @@
+:root {
+  --background: #0b0c0f;
+  --surface: #14161b;
+  --raised: #1b1e24;
+  --line: #262a31;
+  --text: #eceef2;
+  --muted: #9aa1ad;
+  --accent: #f2f4f7;
+  --on-accent: #0b0c0f;
+  --saystack-aura-mode: dark;
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #f3f4f6;
+    --surface: #ffffff;
+    --raised: #eceef1;
+    --line: #dcdfe4;
+    --text: #15171b;
+    --muted: #59606c;
+    --accent: #15171b;
+    --on-accent: #ffffff;
+    --saystack-aura-mode: light;
+
+    color-scheme: light;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--background);
+  color: var(--text);
+  font:
+    15px/1.6 ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.app__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.app__title {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.app__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.app__thread {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 22px;
+  min-height: 0;
+  padding: 28px 20px;
+  overflow-y: auto;
+}
+
+.app__waiting,
+.app__notice {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.message--user {
+  align-self: flex-end;
+  max-width: 80%;
+}
+
+.bubble {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px 18px 6px;
+  background: var(--raised);
+}
+
+.message__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-radius: 16px;
+}
+
+.message__body p,
+.message__body h3,
+.message__body ul {
+  margin: 0;
+}
+
+.message__body pre {
+  margin: 0;
+  padding: 12px 14px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  font:
+    13px/1.6 ui-monospace,
+    "SF Mono",
+    Menlo,
+    monospace;
+}
+
+.message__body table {
+  border-collapse: collapse;
+  border: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.message__body th,
+.message__body td {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.speak {
+  align-self: flex-start;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.speak[aria-pressed="true"] {
+  background: var(--raised);
+  color: var(--text);
+}
+
+.app__dock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 20px 18px;
+}
+
+.composer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 8px 8px 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+}
+
+.composer__field {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  resize: none;
+}
+
+.composer__mic,
+.composer__send {
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 18px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.composer__mic {
+  background: var(--raised);
+  color: var(--text);
+}
+
+.composer__mic[aria-pressed="true"],
+.composer__send {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.composer__send:disabled,
+.composer__mic:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+.composer__error {
+  flex-basis: 100%;
+  margin: 0;
+  color: #e5534b;
+  font-size: 13px;
+}

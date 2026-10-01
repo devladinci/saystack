@@ -1,0 +1,64 @@
+{
+  "name": "@saystack/web",
+  "version": "0.0.1",
+  "description": "Browser voice UI without a framework: spectral aura, audio levels, read-along highlighting and streaming dictation.",
+  "license": "MIT",
+  "author": "DeVladinci",
+  "homepage": "https://github.com/devladinci/saystack#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devladinci/saystack.git",
+    "directory": "packages/web"
+  },
+  "bugs": {
+    "url": "https://github.com/devladinci/saystack/issues"
+  },
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./styles.css"
+  },
+  "files": [
+    "dist",
+    "src",
+    "styles.css"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@saystack/core": "workspace:*"
+  },
+  "devDependencies": {
+    "happy-dom": "^20.14.5",
+    "typescript": "7.0.2",
+    "vitest": "5.0.2"
+  },
+  "keywords": [
+    "voice",
+    "speech",
+    "tts",
+    "stt",
+    "webgl",
+    "web-audio",
+    "read-along",
+    "visualizer"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

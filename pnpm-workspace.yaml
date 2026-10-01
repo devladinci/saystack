@@ -1,0 +1,6 @@
+packages:
+  - "packages/*"
+  - "examples/*"
+  - "apps/*"
+minimumReleaseAgeExclude:
+  - "@hono/node-server@2.1.3"

@@ -1,0 +1,60 @@
+{
+  "name": "@saystack/server",
+  "version": "0.0.1",
+  "description": "Mountable Hono routes for voice: transcription, speech and a realtime dictation socket, with fixed error codes.",
+  "license": "MIT",
+  "author": "DeVladinci",
+  "homepage": "https://github.com/devladinci/saystack#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devladinci/saystack.git",
+    "directory": "packages/server"
+  },
+  "bugs": {
+    "url": "https://github.com/devladinci/saystack/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@saystack/core": "workspace:*",
+    "hono": "^4.9.0"
+  },
+  "devDependencies": {
+    "@saystack/engine-openai-compatible": "workspace:*",
+    "@types/node": "^24.19.0",
+    "typescript": "7.0.2",
+    "vitest": "5.0.2"
+  },
+  "keywords": [
+    "stt",
+    "voice",
+    "transcription",
+    "http",
+    "hono",
+    "server"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

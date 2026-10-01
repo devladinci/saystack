@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+pnpm-lock.yaml
+*.log
+
+# Editor/tooling state, not project source.
+.claude
