@@ -67,6 +67,28 @@ to change what a long reply sounds like before it is spoken. Instead of `endpoin
 audio from anywhere else (it still plays through the aura and the player), or a whole `driver` of your own.
 `<ReadAloudAura anchor={ref} />` puts the glow around another element, or the page edges with `null`.
 
+## Delivery style
+
+`ReadAloudProvider` also takes a `styleMap`, alongside `rewrite` and `summarize`. When a rewrite or a summary
+names a style, it travels to your `endpoint` with the speech, on the channel the map declares — a field in the
+request body, or a tag pasted in front of the text:
+
+```tsx
+import type { IRewriteFn, IStyleMap } from "@saystack/core";
+
+const styleMap: IStyleMap = {
+  channel: { mode: "field", field: "instructions" },
+  rules: [{ value: "amused" }, { value: "enthusiastic", label: "excited" }],
+};
+
+const rewriteForSpeech: IRewriteFn = async (markdown) => ({ text: markdown, style: "excited" });
+
+<ReadAloudProvider endpoint="/voice/speech" rewrite={rewriteForSpeech} styleMap={styleMap}>
+```
+
+saystack ships no styles of its own: `IStyleMap`, imported from `@saystack/core`, holds your vocabulary and one
+channel. If that endpoint is `@saystack/server`, the field has to be opened there as well.
+
 ## Dictation
 
 ```tsx

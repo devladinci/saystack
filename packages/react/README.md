@@ -71,6 +71,29 @@ export function VoiceControls({ driver, recorder, reply, onText }: IProps) {
 `createReadAloud` is the store behind both `ReadAloudProvider`s: one speech session for a whole chat, keyed by
 message id.
 
+## Delivery style
+
+`useSpeech` takes a `styleMap` option, and `createReadAloud` takes one among its sources. A rewrite — or a
+summary — may then answer with `{ text, style }` where it used to answer with a string, and the matched style
+travels to the engine with every chunk:
+
+```tsx
+import type { IRewriteFn, IStyleMap } from "@saystack/core";
+
+const styleMap: IStyleMap = {
+  channel: { mode: "field", field: "instructions" },
+  rules: [{ value: "amused" }, { value: "enthusiastic", label: "excited" }],
+};
+
+const rewriteForSpeech: IRewriteFn = async (markdown) => ({ text: markdown, style: "excited" });
+
+const [speech, api] = useSpeech(driver, { rewrite: rewriteForSpeech, styleMap });
+```
+
+The map is read when speech starts, so a fresh one on every render is fine, and a style nobody declared is dropped
+before anything leaves the client. `IStyleMap`, `IStyleRule` and `IStyleChannel` come from `@saystack/core`, which
+describes the three channels a style can travel on and why the vocabulary is yours.
+
 ## Related packages
 
 [`@saystack/core`](https://www.npmjs.com/package/@saystack/core),

@@ -51,12 +51,33 @@ serve({ fetch: app.fetch, port: 3000 });
 | ------------------------------------------ | ------------------------------------------------------------- |
 | `GET /voice/capabilities`                  | What the speech-to-text engine supports                       |
 | `POST /voice/audio/transcriptions`         | Audio as a multipart `file` or a raw body, returns `{ text }` |
-| `POST /voice/speech`                       | `{ text }` as JSON, returns audio                             |
+| `POST /voice/speech`                       | `{ text, fields? }` as JSON, returns audio                    |
 | `GET /voice/audio/transcriptions/realtime` | Live dictation over a WebSocket, when `realtime` is set       |
 
 Failures come back as JSON with an `errorCode` and a matching HTTP status. `getSettings` runs on every request,
 so settings can change while the server runs. Other options: `maxBodyBytes`, `maxTextChars`, and `cors` (any
 origin by default, `false` to leave CORS to your app).
+
+## Delivery style
+
+`/voice/speech` accepts the caller's extra engine body fields alongside the text — `{ text, fields }` — and
+forwards them only when an operator names them. That is the `createVoiceRoutes` call above, with one option added:
+
+```ts
+createVoiceRoutes({
+  getSettings: () => settings,
+  createSttAdapter: (engine) => createOpenAiSttAdapter(engine),
+  createTtsAdapter: (engine) => createOpenAiTtsAdapter(engine, { voice: "marin" }),
+  engineBodyFields: ["instructions"],
+});
+```
+
+`engineBodyFields` is empty by default, so a client cannot set an engine field the operator did not open. Names
+the adapter owns (`model`, `input`, `response_format`, `voice`, `ref_audio`, `ref_text`, `max_tokens`) are held
+back even if they are listed. This is how a rewrite's delivery style reaches the engine: the caller's style map
+decides the key, and the operator decides whether it may travel. Each value has to be a string, and `maxTextChars`
+counts the field names and values along with the text, so a chunk that was sized to fit under the limit is not
+refused once its fields are attached.
 
 ## Live dictation
 

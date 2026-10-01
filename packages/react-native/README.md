@@ -97,6 +97,28 @@ Endpoints must be absolute URLs, such as the routes `@saystack/server` serves. A
 `useNativeDictation` to stream words while they are said. `voiceTheme("dark", overrides)` builds a theme, and a
 spotlight's `container` prop mounts it in a full-window host.
 
+## Delivery style
+
+`ReadAloudProvider` takes a `styleMap`, alongside `rewrite` and `summarize`. A rewrite or a summary that names a
+style has it carried to your `endpoint` with the speech, on the channel the map declares — a field in the request
+body, or a tag pasted in front of the text:
+
+```tsx
+import type { IRewriteFn, IStyleMap } from "@saystack/core";
+
+const styleMap: IStyleMap = {
+  channel: { mode: "field", field: "instructions" },
+  rules: [{ value: "amused" }, { value: "enthusiastic", label: "excited" }],
+};
+
+const rewriteForSpeech: IRewriteFn = async (markdown) => ({ text: markdown, style: "excited" });
+
+<ReadAloudProvider endpoint={`${API}/speech`} rewrite={rewriteForSpeech} styleMap={styleMap}>
+```
+
+saystack ships no styles of its own: `IStyleMap`, imported from `@saystack/core`, holds your vocabulary and one
+channel. If that endpoint is `@saystack/server`, the field has to be opened there as well.
+
 ## Related packages
 
 [`@saystack/react`](https://www.npmjs.com/package/@saystack/react),

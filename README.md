@@ -158,6 +158,7 @@ ENGINE_TOKEN=sk-… pnpm --filter @saystack/example-voice-chat dev
 ### Minimal read-aloud
 
 ```tsx
+import type { IStyleMap } from "@saystack/core";
 import { ReadAloudProvider, ReadAloudPlayer, useReadAloudMessage } from "@saystack/react-web";
 import "@saystack/react-web/styles.css";
 
@@ -183,9 +184,20 @@ function Reply({ id, markdown }: { id: string; markdown: string }) {
   );
 }
 
+// Your vocabulary, and the one channel a style may travel on: a body field here.
+const styleMap: IStyleMap = {
+  channel: { mode: "field", field: "instructions" },
+  rules: [{ value: "amused" }, { value: "enthusiastic", label: "excited" }],
+};
+
 export function App({ children }: { children: ReactNode }) {
   return (
-    <ReadAloudProvider endpoint="/api/tts" headers={() => ({ authorization: token })} summarize={summarize}>
+    <ReadAloudProvider
+      endpoint="/api/tts"
+      headers={() => ({ authorization: token })}
+      summarize={summarize}
+      styleMap={styleMap}
+    >
       {children}
       <ReadAloudPlayer />
     </ReadAloudProvider>
@@ -195,7 +207,11 @@ export function App({ children }: { children: ReactNode }) {
 
 `endpoint` and `headers` describe _your_ backend. `summarize` lets the server decide what a long reply
 should sound like before it is spoken: it receives `(id, markdown, signal)` and returns the shorter text
-to speak instead, or `null` to speak the reply as written.
+to speak instead, or `null` to speak the reply as written. `styleMap` is your own style vocabulary and the
+channel it travels on, so a rewrite or a summary that answers with `{ text, style }` decides how the reply
+sounds — saystack ships no styles of its own, and a style nobody declared is dropped. The channels, and what
+an engine needs at its end, are in the [`@saystack/core`](https://github.com/devladinci/saystack/blob/main/packages/core#delivery-style)
+and [`@saystack/server`](https://github.com/devladinci/saystack/blob/main/packages/server#delivery-style) READMEs.
 
 ## Developing
 
