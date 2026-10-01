@@ -127,14 +127,19 @@ describe("createWebTtsDriver", () => {
     );
     const driver = createWebTtsDriver({ endpoint: "/voice/speech", fetch });
 
-    const result = await driver.synthesize({ text: "Hello.", refAudio: "clip", refText: "words" });
+    const result = await driver.synthesize({
+      text: "Hello.",
+      fields: { instructions: "calm" },
+      refAudio: "clip",
+      refText: "words",
+    });
 
     expect(result).toMatchObject({ ok: true, mimeType: "audio/wav" });
     expect(fetch).toHaveBeenCalledWith(
       "/voice/speech",
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ text: "Hello.", refAudio: "clip", refText: "words" }),
+        body: JSON.stringify({ text: "Hello.", fields: { instructions: "calm" }, refAudio: "clip", refText: "words" }),
       }),
     );
   });

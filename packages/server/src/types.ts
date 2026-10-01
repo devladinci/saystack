@@ -31,6 +31,9 @@ export interface IVoiceServerDeps {
   realtime?: IRealtimeRouteDeps;
   maxBodyBytes?: number;
   maxTextChars?: number;
+  // Body keys a client may set on the engine request — for example an "instructions" field. Empty by
+  // default, and never the keys the adapter owns.
+  engineBodyFields?: readonly string[];
   // Any origin by default; false leaves CORS to the host app.
   cors?: { origin: string | string[] } | false;
 }

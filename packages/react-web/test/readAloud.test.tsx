@@ -129,6 +129,53 @@ describe("ReadAloudProvider", () => {
     expect(synthesize).toHaveBeenCalledWith(expect.objectContaining({ text: "Reply a says hello." }));
   });
 
+  it("carries a rewrite's style on the channel the app declared", async () => {
+    const fake = fakeDriver();
+    renderApp(
+      <ReadAloudProvider
+        driver={fake.driver}
+        styleMap={{
+          channel: { mode: "field", field: "instructions" },
+          rules: [{ value: "amusement", label: "amused" }],
+        }}
+        rewrite={async () => ({ text: "Short speakable reply.", style: "amused" })}
+        shouldRewrite={() => true}
+      >
+        <Reply id="a" />
+      </ReadAloudProvider>,
+    );
+
+    act(() => messages.a?.speak("Reply a says hello."));
+    await flush();
+
+    expect(fake.synthesize).toHaveBeenCalledWith(expect.objectContaining({ fields: { instructions: "amusement" } }));
+  });
+
+  it("a summary can carry a style too, so long replies are not spoken plainly", async () => {
+    const fake = fakeDriver();
+    const summarize = vi.fn(async () => ({ text: "A short summary.", style: "amused" }));
+    renderApp(
+      <ReadAloudProvider
+        driver={fake.driver}
+        styleMap={{
+          channel: { mode: "field", field: "instructions" },
+          rules: [{ value: "amusement", label: "amused" }],
+        }}
+        summarize={summarize}
+        shouldRewrite={() => true}
+      >
+        <Reply id="a" />
+        <Watcher />
+      </ReadAloudProvider>,
+    );
+
+    act(() => messages.a?.speak("A very long reply with a table."));
+    await flush();
+
+    expect(latest.readAloud?.isSummary).toBe(true);
+    expect(fake.synthesize).toHaveBeenCalledWith(expect.objectContaining({ fields: { instructions: "amusement" } }));
+  });
+
   it("plays the same reply again from the audio it already has", async () => {
     const fake = fakeDriver();
     renderApp(

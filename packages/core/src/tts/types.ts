@@ -22,6 +22,8 @@ export interface ITtsCapabilities {
 
 export interface ITtsSynthesizeInput {
   text: string;
+  // Extra body fields the engine understands, decided by the declared style channel.
+  fields?: Readonly<Record<string, string>>;
   refAudio?: string;
   refText?: string;
   signal?: AbortSignal;

@@ -64,10 +64,28 @@ export type {
   TtsPhase,
 } from "./tts/types.js";
 
-export type { ISpeechOutcome, ISpeechOptions, ISpeechSession, ISpeechSessionOptions } from "./tts/session.js";
+export type {
+  IRewriteFn,
+  IRewriteResult,
+  ISpeechOutcome,
+  ISpeechOptions,
+  ISpeechSession,
+  ISpeechSessionOptions,
+} from "./tts/session.js";
 export { createSpeechSession } from "./tts/session.js";
 
 export { hasSpeechText, needsSummary, speechChunks, toReadingBlocks, toSpeechText } from "./tts/text.js";
+
+export type { IStyleChannel, IStyleMap, IStyleRule, IStyledText } from "./tts/style.js";
+export {
+  applyStyle,
+  EMPTY_STYLE_MAP,
+  matchStyle,
+  NO_STYLE_CHANNEL,
+  STYLE_SLOT,
+  styleChoices,
+  styleReserve,
+} from "./tts/style.js";
 
 export type { IHttpSpeechOptions, SpeechFetch } from "./tts/httpSpeech.js";
 export { createHttpSynthesize } from "./tts/httpSpeech.js";

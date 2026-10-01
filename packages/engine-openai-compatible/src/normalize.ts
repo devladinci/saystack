@@ -12,21 +12,32 @@ export interface IChatCompletionsSpec {
   disableThinking?: boolean;
   timeoutSeconds?: number;
   chatClient?: ILlmChatClient;
+  // The delivery styles this rewriter may choose from — the labels of the caller's own style map.
+  styleChoices?: readonly string[];
 }
 
 export function createLlmNormalizer(spec: IChatCompletionsSpec): INormalizeFn {
   return (text, languages) => normalizeWithChat(spec, text, languages);
 }
 
-function normalizeSchema(languages: readonly string[]): IJsonSchemaFormat {
+function normalizeSchema(languages: readonly string[], styleChoices?: readonly string[]): IJsonSchemaFormat {
   const language = languages.length > 0 ? { type: "string", enum: [...languages] } : { type: "string" };
+  const hasStyles = styleChoices !== undefined && styleChoices.length > 0;
 
   return {
     name: "speech",
     schema: {
       type: "object",
-      properties: { language, text: { type: "string" } },
-      required: ["language", "text"],
+      properties: {
+        language,
+        text: { type: "string" },
+        // Only present when the caller offers styles; omitted otherwise, so the model cannot invent one.
+        ...(hasStyles ? { style: { type: "string", enum: [...styleChoices] } } : {}),
+      },
+      // A style left optional is a style a model may skip — and, measured on a local 4-bit model, skip by
+      // writing the style word into the spoken text instead ("Thoughtful, the plan is now…"). Required, the
+      // same model answers cleanly and names the style in its own field.
+      required: hasStyles ? ["language", "text", "style"] : ["language", "text"],
       additionalProperties: false,
     },
   };
@@ -49,7 +60,14 @@ async function normalizeWithChat(
 
   const timeoutMs = (spec.timeoutSeconds ?? 30) * 1000;
   const system = spec.prompt ?? buildNormalizeSystemPrompt(languages);
-  const chatResponse = await runChat(spec, system, buildNormalizeUserPrompt(text), timeoutMs, languages);
+  const chatResponse = await runChat(
+    spec,
+    system,
+    buildNormalizeUserPrompt(text, spec.styleChoices),
+    timeoutMs,
+    languages,
+    spec.styleChoices,
+  );
 
   if (!chatResponse.ok) {
     return {
@@ -74,6 +92,7 @@ async function normalizeWithChat(
     normalizedText: parsed.text,
     language: parsed.language,
     usedFallbackStructure: false,
+    ...(parsed.style === undefined ? {} : { style: parsed.style }),
   };
 }
 
@@ -83,13 +102,14 @@ function runChat(
   user: string,
   timeoutMs: number,
   languages: readonly string[],
+  styleChoices?: readonly string[],
 ) {
   const request = {
     model: spec.model,
     system,
     user,
     timeoutMs,
-    jsonSchema: normalizeSchema(languages),
+    jsonSchema: normalizeSchema(languages, styleChoices),
     ...(spec.disableThinking !== undefined ? { disableThinking: spec.disableThinking } : {}),
     ...(spec.token !== undefined ? { token: spec.token } : {}),
   };
@@ -117,7 +137,7 @@ function toNormalizeErrorCode(code: "LLM_UNAVAILABLE" | "LLM_TIMEOUT" | "LLM_RET
   return "NORMALIZE_BAD_RESPONSE";
 }
 
-export function parseNormalized(content: string): { text: string; language: string } | null {
+export function parseNormalized(content: string): { text: string; language: string; style?: string } | null {
   const stripped = stripFences(content);
 
   try {
@@ -139,7 +159,7 @@ export function parseNormalized(content: string): { text: string; language: stri
       return null;
     }
 
-    return { text, language: language.trim() };
+    return { text, language: language.trim(), ...readStyle(record) };
   } catch {
     return extractLooseJson(stripped);
   }
@@ -155,7 +175,14 @@ function stripFences(content: string): string {
   return content.trim();
 }
 
-function extractLooseJson(content: string): { text: string; language: string } | null {
+// A style is optional and only ever a string; anything else is left to the caller's map to reject.
+function readStyle(record: Record<string, unknown>): { style?: string } {
+  const style = record.style;
+
+  return typeof style === "string" && style.trim().length > 0 ? { style: style.trim() } : {};
+}
+
+function extractLooseJson(content: string): { text: string; language: string; style?: string } | null {
   const start = content.indexOf("{");
   const end = content.lastIndexOf("}");
 
@@ -182,7 +209,7 @@ function extractLooseJson(content: string): { text: string; language: string } |
       return null;
     }
 
-    return { text, language: language.trim() };
+    return { text, language: language.trim(), ...readStyle(record) };
   } catch {
     return null;
   }

@@ -77,6 +77,76 @@ describe("createLlmNormalizer", () => {
     });
   });
 
+  it("offers the caller's styles as an enum, so the model can only pick a declared one", async () => {
+    const seen: {
+      jsonSchema?: { schema?: { properties?: Record<string, unknown>; required?: readonly string[] } };
+      user?: string;
+    }[] = [];
+    const chatClient = {
+      complete: async (request: {
+        jsonSchema?: { schema?: { properties?: Record<string, unknown>; required?: readonly string[] } };
+        user?: string;
+      }) => {
+        seen.push(request);
+        return { ok: true as const, content: '{"language":"en","text":"hello","style":"amused"}' };
+      },
+    };
+    const { createLlmNormalizer } = await import("../src/normalize.js");
+    const normalize = createLlmNormalizer({
+      url: "http://engine/v1",
+      model: "m",
+      chatClient,
+      styleChoices: ["calm", "amused"],
+    });
+
+    const result = await normalize("hi", ["en"]);
+
+    expect(seen[0]?.jsonSchema?.schema?.properties?.style).toEqual({ type: "string", enum: ["calm", "amused"] });
+    // Required, not optional: measured against a local model, an optional style was skipped by writing the
+    // style word into the spoken text instead of into the field.
+    expect(seen[0]?.jsonSchema?.schema?.required).toEqual(["language", "text", "style"]);
+    expect(seen[0]?.user).toContain("calm, amused");
+    expect(result).toEqual({
+      ok: true,
+      normalizedText: "hello",
+      language: "en",
+      usedFallbackStructure: false,
+      style: "amused",
+    });
+  });
+
+  it("no style choices means no style field, and a style the model invents is ignored", async () => {
+    const seen: {
+      jsonSchema?: { schema?: { properties?: Record<string, unknown>; required?: readonly string[] } };
+      user?: string;
+    }[] = [];
+    const chatClient = {
+      complete: async (request: {
+        jsonSchema?: { schema?: { properties?: Record<string, unknown>; required?: readonly string[] } };
+        user?: string;
+      }) => {
+        seen.push(request);
+        return { ok: true as const, content: '{"language":"en","text":"hello","style":"amused"}' };
+      },
+    };
+    const { createLlmNormalizer } = await import("../src/normalize.js");
+    const normalize = createLlmNormalizer({ url: "http://engine/v1", model: "m", chatClient });
+
+    const result = await normalize("hi", ["en"]);
+
+    expect(seen[0]?.jsonSchema?.schema?.properties?.style).toBeUndefined();
+    expect(seen[0]?.jsonSchema?.schema?.required).toEqual(["language", "text"]);
+    expect(seen[0]?.user).toBe("hi");
+    // The normalizer passes it through; matching it against the caller's map is the session's job.
+    expect(result).toEqual({
+      ok: true,
+      normalizedText: "hello",
+      language: "en",
+      usedFallbackStructure: false,
+      style: "amused",
+    });
+  });
+
   it("still accepts a fenced reply from an engine that ignores the schema", async () => {
     const { createLlmNormalizer } = await import("../src/normalize.js");
     const normalize = createLlmNormalizer({
@@ -158,5 +228,29 @@ describe.skipIf(!hasLiveLlm)("live LLM normalizer", () => {
     expect(result.normalizedText).not.toContain("```");
     expect(result.normalizedText).not.toContain("+359888123456");
     expect(result.normalizedText.length).toBeGreaterThan(20);
+  });
+});
+
+describe("parseNormalized — the optional style", () => {
+  it("keeps a style the engine returned as a string", () => {
+    expect(parseNormalized('{"language":"en","text":"hi","style":"calm"}')).toEqual({
+      text: "hi",
+      language: "en",
+      style: "calm",
+    });
+  });
+
+  it("a null, blank or non-string style is left out", () => {
+    expect(parseNormalized('{"language":"en","text":"hi","style":null}')).toEqual({ text: "hi", language: "en" });
+    expect(parseNormalized('{"language":"en","text":"hi","style":"  "}')).toEqual({ text: "hi", language: "en" });
+    expect(parseNormalized('{"language":"en","text":"hi","style":7}')).toEqual({ text: "hi", language: "en" });
+  });
+
+  it("a style still parses from a loose reply", () => {
+    expect(parseNormalized('sure: {"language":"en","text":"hi","style":"calm"} ok')).toEqual({
+      text: "hi",
+      language: "en",
+      style: "calm",
+    });
   });
 });

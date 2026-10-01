@@ -373,6 +373,112 @@ describe("createVoiceRoutes — speech routing", () => {
     expect(seen).toEqual([{ text: "hello there" }]);
   });
 
+  it("only the operator's own field names travel, and only with a value worth sending", async () => {
+    const seen: Array<Record<string, string> | undefined> = [];
+    const deps = makeDeps({
+      engineBodyFields: ["instructions"],
+      createTtsAdapter: () => ({
+        capabilities: { streaming: false, voiceCloning: false },
+        synthesize: async (input) => {
+          seen.push(input.fields);
+          return { ok: true, audio: new ArrayBuffer(8), mimeType: "audio/wav" };
+        },
+      }),
+    });
+    const post = (fields: unknown) =>
+      createVoiceRoutes(deps).request("/speech", {
+        method: "POST",
+        body: JSON.stringify({ text: "hi", fields }),
+        headers: { "content-type": "application/json" },
+      });
+
+    await post({ instructions: "calm", emotions: "amusement" });
+    await post({ instructions: "   " });
+    await post({ instructions: 7 });
+    await post("not-an-object");
+    await post([1, 2, 3]);
+
+    expect(seen[0]).toEqual({ instructions: "calm" });
+    expect(seen[1]).toBeUndefined();
+    expect(seen[2]).toBeUndefined();
+    expect(seen[3]).toBeUndefined();
+    expect(seen[4]).toBeUndefined();
+  });
+
+  it("no allowlist means no fields, so a client cannot set one by default", async () => {
+    const seen: Array<Record<string, string> | undefined> = [];
+    const deps = makeDeps({
+      createTtsAdapter: () => ({
+        capabilities: { streaming: false, voiceCloning: false },
+        synthesize: async (input) => {
+          seen.push(input.fields);
+          return { ok: true, audio: new ArrayBuffer(8), mimeType: "audio/wav" };
+        },
+      }),
+    });
+
+    await createVoiceRoutes(deps).request("/speech", {
+      method: "POST",
+      body: JSON.stringify({ text: "hi", fields: { instructions: "calm" } }),
+      headers: { "content-type": "application/json" },
+    });
+
+    expect(seen[0]).toBeUndefined();
+  });
+
+  it("a client cannot overwrite the keys the adapter owns, even when the operator lists them", async () => {
+    const seen: Array<Record<string, string> | undefined> = [];
+    const deps = makeDeps({
+      engineBodyFields: ["model", "input", "response_format", "voice", "ref_audio", "max_tokens", "instructions"],
+      createTtsAdapter: () => ({
+        capabilities: { streaming: false, voiceCloning: false },
+        synthesize: async (input) => {
+          seen.push(input.fields);
+          return { ok: true, audio: new ArrayBuffer(8), mimeType: "audio/wav" };
+        },
+      }),
+    });
+
+    await createVoiceRoutes(deps).request("/speech", {
+      method: "POST",
+      body: JSON.stringify({
+        text: "hi",
+        fields: {
+          model: "pricier",
+          input: "x".repeat(50),
+          response_format: "mp3",
+          voice: "other",
+          instructions: "calm",
+        },
+      }),
+      headers: { "content-type": "application/json" },
+    });
+
+    expect(seen[0]).toEqual({ instructions: "calm" });
+  });
+
+  it("maxTextChars counts the fields too, so a chunk sized to fit is not refused", async () => {
+    const deps = makeDeps({
+      maxTextChars: 20,
+      engineBodyFields: ["instructions"],
+      createTtsAdapter: () => ({
+        capabilities: { streaming: false, voiceCloning: false },
+        synthesize: async () => ({ ok: true, audio: new ArrayBuffer(8), mimeType: "audio/wav" }),
+      }),
+    });
+    const post = (text: string, fields?: unknown) =>
+      createVoiceRoutes(deps).request("/speech", {
+        method: "POST",
+        body: JSON.stringify(fields === undefined ? { text } : { text, fields }),
+        headers: { "content-type": "application/json" },
+      });
+
+    // 15 characters of text alone are inside the limit.
+    expect((await post("a".repeat(15))).status).toBe(200);
+    // The same text with a field that adds 16 more characters is not.
+    expect((await post("a".repeat(15), { instructions: "calm" })).status).toBe(413);
+  });
+
   it("blank text is the caller's fault: 400 EMPTY_TEXT, adapter untouched", async () => {
     const seen: string[] = [];
     const deps = makeDeps({

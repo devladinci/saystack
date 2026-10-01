@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import type { WSEvents } from "hono/ws";
 
+import { engineFields } from "./engineFields.js";
 import { readAudioInput } from "./readAudioInput.js";
 import { createRealtimeBridge } from "./realtimeBridge.js";
 import { statusForErrorCode } from "./statusForErrorCode.js";
@@ -19,6 +20,22 @@ const refused: WSEvents = {
     ws.close(UNAUTHORIZED_CLOSE, "unauthorized");
   },
 };
+
+// Only the operator's own field names travel on, and only with a value worth sending; anything else in the
+// body is ignored rather than forwarded. The adapter sends these as body keys, so an open list would let a
+// client overwrite the ones the adapter owns — the model, the text, the response format.
+function readStringFields(value: unknown, allowed: ReadonlySet<string>): Readonly<Record<string, string>> | undefined {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return undefined;
+  }
+
+  const entries = Object.entries(value).filter(
+    (entry): entry is [string, string] =>
+      typeof entry[1] === "string" && entry[1].trim().length > 0 && allowed.has(entry[0]),
+  );
+
+  return entries.length === 0 ? undefined : Object.fromEntries(entries);
+}
 
 export function createVoiceRoutes(deps: IVoiceServerDeps): Hono {
   const app = new Hono();
@@ -143,22 +160,31 @@ export function createVoiceRoutes(deps: IVoiceServerDeps): Hono {
     const markdown = typeof record.text === "string" ? record.text : "";
     const refAudio = typeof record.refAudio === "string" ? record.refAudio : undefined;
     const refText = typeof record.refText === "string" ? record.refText : undefined;
+    const allowed = engineFields(deps.engineBodyFields ?? []);
+    const fields = readStringFields(record.fields, allowed);
 
     if (markdown.trim().length === 0) {
       return c.json({ errorCode: "EMPTY_TEXT", message: "text is empty" }, 400);
     }
 
-    if (deps.maxTextChars !== undefined && markdown.length > deps.maxTextChars) {
-      return c.json(
-        { errorCode: "TEXT_TOO_LONG", message: `text is longer than ${deps.maxTextChars} characters` },
-        statusForSpeechErrorCode("TEXT_TOO_LONG"),
-      );
+    if (deps.maxTextChars !== undefined) {
+      // The adapter sends these as extra body keys and the engine may or may not count them; the limit
+      // counts everything that travels, so a chunk an operator sized to fit is not refused.
+      const extra = Object.entries(fields ?? {}).reduce((total, [key, entry]) => total + key.length + entry.length, 0);
+
+      if (markdown.length + extra > deps.maxTextChars) {
+        return c.json(
+          { errorCode: "TEXT_TOO_LONG", message: `text is longer than ${deps.maxTextChars} characters` },
+          statusForSpeechErrorCode("TEXT_TOO_LONG"),
+        );
+      }
     }
 
     const adapter = deps.createTtsAdapter(settings.config.tts);
     const result = await adapter.synthesize({
       text: markdown,
       signal: c.req.raw.signal,
+      ...(fields === undefined ? {} : { fields }),
       ...(refAudio !== undefined && refText !== undefined ? { refAudio, refText } : {}),
     });
 

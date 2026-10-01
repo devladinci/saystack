@@ -1,6 +1,6 @@
 import type { ITtsDriver, RequestHeaders } from "@saystack/core";
 import { resolveHeaders } from "@saystack/core";
-import type { IReadAloudSources, IReadAloudStore, RewriteFn, SummarizeFn } from "@saystack/react";
+import type { IReadAloudSources, IReadAloudStore, IStyleMap, RewriteFn, SummarizeFn } from "@saystack/react";
 import { createReadAloud } from "@saystack/react";
 import type { IAudioLevels } from "@saystack/web";
 import { createWebTtsDriver } from "@saystack/web";
@@ -22,6 +22,7 @@ interface IProps extends ISpeechSource {
   rewrite?: RewriteFn;
   shouldRewrite?: (markdown: string) => boolean;
   summarize?: SummarizeFn;
+  styleMap?: IStyleMap;
   children: ReactNode;
 }
 
@@ -58,6 +59,7 @@ export function ReadAloudProvider({
   rewrite,
   shouldRewrite,
   summarize,
+  styleMap,
   children,
 }: IProps) {
   const levels = useAudioLevels(bands === undefined ? { isAudible: true } : { isAudible: true, bands });
@@ -74,6 +76,7 @@ export function ReadAloudProvider({
       ...(rewrite === undefined ? {} : { rewrite }),
       ...(shouldRewrite === undefined ? {} : { shouldRewrite }),
       ...(summarize === undefined ? {} : { summarize }),
+      ...(styleMap === undefined ? {} : { styleMap }),
     };
   });
 

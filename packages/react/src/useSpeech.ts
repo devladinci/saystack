@@ -62,6 +62,9 @@ export function useSpeech(driver: ITtsDriver, options?: ISpeechSessionOptions): 
         get shouldRewrite() {
           return optionsRef.current?.shouldRewrite;
         },
+        get styleMap() {
+          return optionsRef.current?.styleMap;
+        },
       }),
     };
   }

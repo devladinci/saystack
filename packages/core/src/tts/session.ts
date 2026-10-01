@@ -1,3 +1,5 @@
+import type { IStyleMap } from "./style.js";
+import { applyStyle, EMPTY_STYLE_MAP, matchStyle, styleReserve } from "./style.js";
 import { hasSpeechText, needsSummary, speechChunks, toSpeechText } from "./text.js";
 import { estimateWordTimings, wordAt, wordTimingsFromMarks } from "./timing.js";
 import type { ISpeechMark, IWordTiming } from "./timing.js";
@@ -13,15 +15,26 @@ import type {
   TtsPhase,
 } from "./types.js";
 
+export type IRewriteFn = (markdown: string, signal: AbortSignal) => Promise<string | IRewriteResult | null>;
+
+export interface IRewriteResult {
+  readonly text: string;
+  // Free-form on purpose: it is matched against the caller's own style map, and anything nobody declared is dropped.
+  readonly style?: string | null;
+}
+
 export interface ISpeechOptions {
   readonly refAudio?: string;
   readonly refText?: string;
 }
 
 export interface ISpeechSessionOptions {
-  readonly rewrite?: ((markdown: string, signal: AbortSignal) => Promise<string | null>) | undefined;
+  readonly rewrite?: IRewriteFn | undefined;
   readonly shouldRewrite?: ((markdown: string) => boolean) | undefined;
+  readonly styleMap?: IStyleMap | undefined;
 }
+
+type IResolvedSpeech = { readonly text: string; readonly style: string | undefined };
 
 export type ISpeechOutcome = { ok: true } | { ok: false; errorCode: TtsErrorCode; message: string };
 
@@ -51,8 +64,12 @@ interface ICachedAudio {
 interface IRun {
   readonly markdown: string;
   readonly options: ISpeechOptions;
+  readonly styleMap: IStyleMap;
+  style: string | undefined;
   readonly audio: Map<number, ICachedAudio>;
   texts: readonly string[];
+  // Characters the style channel adds in front of every chunk it speaks.
+  reserve: number;
   controller: AbortController;
   playback: number;
   settle: (outcome: ISpeechOutcome) => void;
@@ -76,11 +93,21 @@ const IDLE: ISpeechState = { phase: "idle", text: "", errorCode: null, errorMess
 const messageOf = (error: unknown, fallback: string): string =>
   error instanceof Error && error.message.length > 0 ? error.message : fallback;
 
-function wordsFor(text: string, clip: ISpeechClip, marks?: readonly ISpeechMark[]): readonly IWordTiming[] {
+function wordsFor(
+  text: string,
+  clip: ISpeechClip,
+  marks?: readonly ISpeechMark[],
+  marksOffset = 0,
+): readonly IWordTiming[] {
   const duration = clip.duration ?? 0;
 
   if (marks !== undefined && marks.length > 0) {
-    return wordTimingsFromMarks(text, marks, duration);
+    // A tag channel speaks the tag ahead of the text, so the engine counts marks against the tagged text;
+    // the words are timed against the text alone.
+    const shifted =
+      marksOffset === 0 ? marks : marks.map((mark) => ({ ...mark, charIndex: mark.charIndex - marksOffset }));
+
+    return wordTimingsFromMarks(text, shifted, duration);
   }
 
   if (clip.envelope !== undefined) {
@@ -138,9 +165,13 @@ export function createSpeechSession(driver: ITtsDriver, sessionOptions: ISpeechS
       return cached.promise;
     }
 
+    const styled = applyStyle(current.styleMap.channel, current.style, current.texts[index] ?? "");
+    const hasFields = Object.keys(styled.fields).length > 0;
+
     const input: ITtsSynthesizeInput = {
-      text: current.texts[index] ?? "",
+      text: styled.text,
       signal: current.controller.signal,
+      ...(hasFields ? { fields: styled.fields } : {}),
       ...(current.options.refAudio !== undefined && current.options.refText !== undefined
         ? { refAudio: current.options.refAudio, refText: current.options.refText }
         : {}),
@@ -224,7 +255,11 @@ export function createSpeechSession(driver: ITtsDriver, sessionOptions: ISpeechS
 
     const chunks = state.chunks.map((chunk, chunkIndex): ISpeechChunk =>
       chunkIndex === index
-        ? { text: chunk.text, words: wordsFor(chunk.text, built.clip, audio.marks), duration: built.clip.duration ?? 0 }
+        ? {
+            text: chunk.text,
+            words: wordsFor(chunk.text, built.clip, audio.marks, current.reserve),
+            duration: built.clip.duration ?? 0,
+          }
         : chunk,
     );
 
@@ -302,19 +337,31 @@ export function createSpeechSession(driver: ITtsDriver, sessionOptions: ISpeechS
     }
   };
 
-  const spokenSource = async (markdown: string, signal: AbortSignal): Promise<string> => {
+  const spokenSource = async (markdown: string, styleMap: IStyleMap, signal: AbortSignal): Promise<IResolvedSpeech> => {
     const { rewrite, shouldRewrite = needsSummary } = sessionOptions;
+    const asIs: IResolvedSpeech = { text: markdown, style: undefined };
 
     if (rewrite === undefined || !shouldRewrite(markdown)) {
-      return markdown;
+      return asIs;
     }
 
     try {
       const rewritten = await rewrite(markdown, signal);
+      // A rewrite that answers with nothing, or with a shape nobody promised, reads as written.
+      const result: IRewriteResult | null =
+        typeof rewritten === "string"
+          ? { text: rewritten }
+          : typeof rewritten === "object" && rewritten !== null && typeof rewritten.text === "string"
+            ? rewritten
+            : null;
 
-      return rewritten !== null && hasSpeechText(rewritten) ? rewritten : markdown;
+      if (result === null || !hasSpeechText(result.text)) {
+        return asIs;
+      }
+
+      return { text: result.text, style: matchStyle(styleMap, result.style)?.value };
     } catch {
-      return markdown;
+      return asIs;
     }
   };
 
@@ -331,9 +378,15 @@ export function createSpeechSession(driver: ITtsDriver, sessionOptions: ISpeechS
     });
     let isSettled = false;
 
+    const styleMap = sessionOptions.styleMap ?? EMPTY_STYLE_MAP;
+    const reserve = styleReserve(styleMap);
+
     const current: IRun = {
       markdown,
       options,
+      styleMap,
+      reserve,
+      style: undefined,
       audio: new Map(),
       texts: [],
       controller: new AbortController(),
@@ -351,13 +404,15 @@ export function createSpeechSession(driver: ITtsDriver, sessionOptions: ISpeechS
     lastTime = 0;
     update({ phase: "loading", text: markdown, errorCode: null, errorMessage: null, chunks: [], chunkIndex: -1 });
 
-    const source = await spokenSource(markdown, current.controller.signal);
+    const source = await spokenSource(markdown, styleMap, current.controller.signal);
 
     if (run !== current || current.controller.signal.aborted) {
       return outcome;
     }
 
-    const texts = speechChunks(toSpeechText(source));
+    current.style = source.style;
+
+    const texts = speechChunks(toSpeechText(source.text), current.reserve);
 
     if (texts.length === 0) {
       fail(current, "EMPTY_TEXT", EMPTY_MESSAGE);

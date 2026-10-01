@@ -96,7 +96,10 @@ export const createOpenAiTtsAdapter = (
             ...(token !== undefined && token !== "" ? { Authorization: `Bearer ${token}` } : {}),
             "Content-Type": "application/json",
           },
+          // The engine's own keys are set after the caller's extra fields, so a field can add to the
+          // request but never replace the model, the text or the response format.
           body: JSON.stringify({
+            ...(input.fields ?? {}),
             model,
             input: input.text,
             response_format: "wav",

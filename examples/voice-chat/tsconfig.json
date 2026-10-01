@@ -12,6 +12,8 @@
     "exactOptionalPropertyTypes": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
+    // server.ts is run by node directly, whose type stripping resolves the path it is given, not .js to .ts.
+    "allowImportingTsExtensions": true,
     "skipLibCheck": true,
     "noEmit": true
   },

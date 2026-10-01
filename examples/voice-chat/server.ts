@@ -1,7 +1,7 @@
 import type { WebSocketServerLike } from "@hono/node-server";
 import { serve, upgradeWebSocket } from "@hono/node-server";
 import type { IConfig, ISttEngineConfig } from "@saystack/core";
-import { validateConfig } from "@saystack/core";
+import { styleChoices, validateConfig } from "@saystack/core";
 import {
   createLlmNormalizer,
   createOmlxRealtimeSttAdapter,
@@ -15,6 +15,8 @@ import { Hono } from "hono";
 import { createServer } from "vite";
 import { WebSocketServer } from "ws";
 
+import { speechStyleMap } from "./src/speechStyle.ts";
+
 interface IPreset {
   url: string;
   sttModel: string;
@@ -25,6 +27,8 @@ interface IPreset {
   chatModel?: string;
   capsAudioTokens: boolean;
   disablesThinking: boolean;
+  // Whether this engine reads delivery styles as inline tags, and so may be offered them.
+  styles: boolean;
 }
 
 const PRESETS: Readonly<Record<string, IPreset>> = {
@@ -38,6 +42,7 @@ const PRESETS: Readonly<Record<string, IPreset>> = {
     chatModel: "gpt-6-luna",
     capsAudioTokens: false,
     disablesThinking: false,
+    styles: false,
   },
   omlx: {
     url: "http://127.0.0.1:7777/v1",
@@ -46,6 +51,7 @@ const PRESETS: Readonly<Record<string, IPreset>> = {
     realtime: "omlx",
     capsAudioTokens: true,
     disablesThinking: true,
+    styles: true,
   },
 };
 
@@ -102,6 +108,7 @@ const rewriteForSpeech = createLlmNormalizer({
   url: chatUrl,
   model: chatModel,
   ...(preset.disablesThinking ? { disableThinking: true } : {}),
+  ...(preset.styles ? { styleChoices: styleChoices(speechStyleMap) } : {}),
   ...chatToken,
 });
 
@@ -122,7 +129,10 @@ app.post("/voice/rewrite", async (c) => {
   const text = typeof body.text === "string" ? body.text : "";
   const result = await rewriteForSpeech(text, config.languages);
 
-  return c.json({ text: result.ok ? result.normalizedText : null });
+  return c.json({
+    text: result.ok ? result.normalizedText : null,
+    ...(result.ok && result.style !== undefined ? { style: result.style } : {}),
+  });
 });
 
 app.post("/api/chat", async (c) => {

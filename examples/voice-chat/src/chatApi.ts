@@ -1,3 +1,5 @@
+import type { IRewriteResult } from "@saystack/core";
+
 export interface IChatTurn {
   role: "user" | "assistant";
   content: string;
@@ -25,7 +27,7 @@ export async function askChat(turns: readonly IChatTurn[]): Promise<IChatReply> 
   return { ok: true, text: body.text };
 }
 
-export async function rewriteForSpeech(markdown: string, signal: AbortSignal): Promise<string | null> {
+export async function rewriteForSpeech(markdown: string, signal: AbortSignal): Promise<IRewriteResult | null> {
   const response = await fetch("/voice/rewrite", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -37,7 +39,12 @@ export async function rewriteForSpeech(markdown: string, signal: AbortSignal): P
     return null;
   }
 
-  const body: { text?: unknown } = await response.json().catch(() => ({}));
+  const body: { text?: unknown; style?: unknown } = await response.json().catch(() => ({}));
 
-  return typeof body.text === "string" ? body.text : null;
+  if (typeof body.text !== "string") {
+    return null;
+  }
+
+  // A style the app never declared is dropped by the session, so it travels as it arrives.
+  return { text: body.text, ...(typeof body.style === "string" ? { style: body.style } : {}) };
 }
