@@ -66,6 +66,36 @@ rewritten for speech. The realtime adapters plug into `realtime.createAdapter` i
   not yet been run against OpenAI itself. Speaches 0.1 speaks an older version of that protocol, so use upload
   dictation with Speaches for now.
 
+## Delivery style
+
+`createLlmNormalizer` rewrites a reply for the ear, and a reply can carry a delivery style with it. Offer the
+styles a model may choose from and it names one in a field of its own, rather than writing the style word into
+the spoken text:
+
+```ts
+const openai = { url: "https://api.openai.com/v1", token: process.env.OPENAI_API_KEY ?? "" };
+
+const rewrite = createLlmNormalizer({
+  ...openai,
+  model: "gpt-6-luna",
+  styleChoices: ["amused", "enthusiastic", "thoughtful"],
+});
+
+const spoken = await rewrite("## Release\n\nThe build **passed**.", ["en"]);
+// spoken.ok, spoken.normalizedText — and spoken.style, when the model named one of the choices
+```
+
+The choices are added to the JSON schema the model answers with, and the field is required, so a model is not
+free to skip it — a style left optional is one a small model tends to skip by writing the style word into the
+text instead. With no `styleChoices`, the request has no style field at all and a style the model invents anyway
+is ignored. saystack ships no style vocabulary: the choices are the labels of the caller's own style map, as in
+the [core README](../core#delivery-style), and the chosen style travels from there.
+
+A style the model returns reaches the engine when the server forwards it: `/voice/speech` sends the caller's
+`fields` on to the adapter only for the keys an operator listed in `engineBodyFields`, and the adapter writes
+them into the request body ahead of its own keys — so a field can add to the request, never replace the model,
+the input or the response format. Field names the adapter owns are refused even if an operator lists them.
+
 ## Related packages
 
 [`@saystack/core`](https://www.npmjs.com/package/@saystack/core),

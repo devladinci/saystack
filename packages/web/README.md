@@ -48,6 +48,14 @@ export async function readAloud(reply: Element, markdown: string): Promise<void>
 Call it from a click, so the browser lets audio play. `endpoint` receives `{ text }` as JSON and returns audio,
 which is what `@saystack/server` serves. Clicking a word while it plays seeks there.
 
+## Delivery style
+
+The driver posts whatever the speech session attached to the words, so a `styleMap` on
+[`createSpeechSession`](https://www.npmjs.com/package/@saystack/core) reaches your `endpoint` as it is, without
+the web layer knowing what a style is: a field channel adds `fields` to the JSON body next to `text`, and a tag
+channel has already pasted the tag into the text. The map itself — the vocabulary, and which of the two a style
+travels on — is described in the core README.
+
 ## The aura
 
 ```ts

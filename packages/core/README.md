@@ -40,6 +40,45 @@ short and grow, so the first audio is ready quickly. `toReadingBlocks` gives wha
 heading, paragraph or list item, without code and tables. `needsSummary` is true for replies with code, tables or
 a lot of text, which are better rewritten before they are spoken.
 
+## Delivery style
+
+A rewrite can also name a style, and how one reaches the voice is the app's call:
+
+```ts
+import type { IRewriteFn, IStyleMap, ITtsDriver } from "@saystack/core";
+import { createSpeechSession } from "@saystack/core";
+
+// An ITtsDriver: an adapter of your own (see below) plus clips, or the browser one, `createWebTtsDriver`
+// in `@saystack/web`.
+declare const driver: ITtsDriver;
+
+// The app's own vocabulary, and the one channel a style may travel on.
+const styleMap: IStyleMap = {
+  channel: { mode: "field", field: "instructions" },
+  rules: [{ value: "amused" }, { value: "enthusiastic", label: "excited" }],
+};
+
+// A rewrite answers with `{ text, style }` where it used to answer with a string.
+const rewriteForSpeech: IRewriteFn = async (markdown) => ({ text: markdown, style: "excited" });
+
+const session = createSpeechSession(driver, { rewrite: rewriteForSpeech, styleMap });
+```
+
+The style is free-form: it is matched against the map's own `rules`, case-insensitively, by `value` or by the
+`label` a rewrite model was offered, and the matched rule's `value` is what travels to the engine. A style nobody
+declared is dropped rather than guessed at, and saystack ships no styles of its own. The channel is one of three:
+
+- `{ mode: "none" }` — the words are spoken alone, whatever style was named.
+- `{ mode: "field", field }` — the value arrives as an extra key in the request body, for an engine that has a
+  field for it.
+- `{ mode: "tag", template }` — the value is pasted into the text where the `{style}` slot sits in the template,
+  for an engine that reads inline tags. A tag is characters the engine speaks around, so chunking reserves room
+  for the longest tag the map can produce, and word timings from the engine are shifted back onto the words.
+
+`applyStyle`, `matchStyle`, `styleChoices`, `styleReserve`, `EMPTY_STYLE_MAP`, `NO_STYLE_CHANNEL` and `STYLE_SLOT`
+are those pieces if you are wiring an engine or a UI of your own. With no map at all, speech is exactly what it
+was before.
+
 ## Your own engine
 
 An engine implements `ITtsAdapter`, `ISttAdapter` or `ISttRealtimeAdapter`. Failures come back as coded results
