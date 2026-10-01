@@ -1,5 +1,13 @@
 # @saystack/react
 
+## 0.2.1
+
+### Patch Changes
+
+- 120b41a: README: the `styleMap` option `useSpeech` and `createReadAloud` take, so a rewrite may answer with `{ text, style }`.
+- Updated dependencies [120b41a]
+  - @saystack/core@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes

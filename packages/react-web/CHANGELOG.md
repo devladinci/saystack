@@ -1,5 +1,17 @@
 # @saystack/react-web
 
+## 0.2.1
+
+### Patch Changes
+
+- 120b41a: README: the `styleMap` prop on `ReadAloudProvider` for the web, so a rewrite may answer with `{ text, style }` and have the style reach the speech route — as a field in the request body, or a tag in front of the text.
+- Updated dependencies [120b41a]
+- Updated dependencies [120b41a]
+- Updated dependencies [120b41a]
+  - @saystack/core@0.2.1
+  - @saystack/react@0.2.1
+  - @saystack/web@0.1.3
+
 ## 0.2.0
 
 ### Minor Changes

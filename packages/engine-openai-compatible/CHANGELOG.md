@@ -1,5 +1,13 @@
 # @saystack/engine-openai-compatible
 
+## 0.1.4
+
+### Patch Changes
+
+- 120b41a: README: `styleChoices` on `createLlmNormalizer` — the style field it adds to the response schema, why it is required, and how the caller’s `fields` reach the request body.
+- Updated dependencies [120b41a]
+  - @saystack/core@0.2.1
+
 ## 0.1.3
 
 ### Patch Changes

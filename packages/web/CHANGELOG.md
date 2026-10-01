@@ -1,5 +1,13 @@
 # @saystack/web
 
+## 0.1.3
+
+### Patch Changes
+
+- 120b41a: README: how a delivery style reaches the endpoint — the driver posts the session’s `fields` next to `text`, or a tag already pasted into the text.
+- Updated dependencies [120b41a]
+  - @saystack/core@0.2.1
+
 ## 0.1.2
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@saystack/web",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Browser voice UI without a framework: spectral aura, audio levels, read-along highlighting and streaming dictation.",
   "license": "MIT",
   "author": "DeVladinci",
