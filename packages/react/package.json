@@ -1,6 +1,6 @@
 {
   "name": "@saystack/react",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React hooks for voice chat on any platform: dictation and read-aloud sessions with coded errors.",
   "license": "MIT",
   "author": "DeVladinci",
