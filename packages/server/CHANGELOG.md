@@ -1,5 +1,13 @@
 # @saystack/server
 
+## 0.1.3
+
+### Patch Changes
+
+- 120b41a: README: `engineBodyFields` on `createVoiceRoutes` — which caller fields may travel to the engine, the adapter keys held back, and `maxTextChars` counting the fields with the text. The `/voice/speech` route row now reads `{ text, fields? }`.
+- Updated dependencies [120b41a]
+  - @saystack/core@0.2.1
+
 ## 0.1.2
 
 ### Patch Changes
