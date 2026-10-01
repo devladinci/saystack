@@ -28,6 +28,8 @@ jobs:
 
       - run: pnpm build
 
+      # No npm token: each package trusts this workflow (npm trusted publishing), so the publish
+      # authenticates with the job's OIDC token (id-token: write) and gets provenance.
       - uses: changesets/action@v1
         with:
           publish: pnpm changeset publish
@@ -35,5 +37,4 @@ jobs:
           commit: Version packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
