@@ -1,6 +1,6 @@
 {
   "name": "@saystack/react-web",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "React voice UI for the web: spectral aura, read-along, streaming dictation and a read-aloud player.",
   "license": "MIT",
   "author": "DeVladinci",
