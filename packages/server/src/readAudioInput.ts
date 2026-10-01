@@ -2,6 +2,9 @@ import type { Context } from "hono";
 
 import type { IAudioReadResult } from "./types.js";
 
+const isRawAudio = (contentType: string): boolean =>
+  contentType === "" || contentType.startsWith("audio/") || contentType === "application/octet-stream";
+
 export async function readAudioInput(c: Context, maxBodyBytes: number): Promise<IAudioReadResult> {
   const contentType = c.req.header("content-type")?.split(";")[0]?.trim().toLowerCase() ?? "";
 
@@ -15,34 +18,78 @@ export async function readAudioInput(c: Context, maxBodyBytes: number): Promise<
     };
   }
 
-  if (contentType.startsWith("multipart/form-data")) {
-    return readMultipart(c);
+  const isMultipart = contentType.startsWith("multipart/form-data");
+
+  if (!isMultipart && !isRawAudio(contentType)) {
+    return { ok: false, errorCode: "UNSUPPORTED_MEDIA", message: `unsupported content-type '${contentType}'` };
   }
 
-  if (contentType === "" || contentType.startsWith("audio/") || contentType === "application/octet-stream") {
-    const buffer = await c.req.arrayBuffer();
-    const audio = new Uint8Array(buffer);
-    const mimeType = contentType === "" ? undefined : contentType;
-    const filename = c.req.header("x-audio-filename");
-    const language = c.req.header("x-audio-language");
+  // content-length is only what the client claims, and a chunked upload sends none, so the bytes are counted too.
+  const body = await readCapped(c.req.raw.body, maxBodyBytes);
 
-    return {
-      ok: true,
-      audio,
-      ...(mimeType !== undefined ? { mimeType } : {}),
-      ...(filename !== undefined ? { filename } : {}),
-      ...(language !== undefined && language.length > 0 ? { language } : {}),
-    };
+  if (body === null) {
+    return { ok: false, errorCode: "AUDIO_TOO_LARGE", message: `body exceeds limit ${maxBodyBytes}` };
   }
 
-  return { ok: false, errorCode: "UNSUPPORTED_MEDIA", message: `unsupported content-type '${contentType}'` };
+  if (isMultipart) {
+    return readMultipart(body, c.req.header("content-type") ?? "");
+  }
+
+  const mimeType = contentType === "" ? undefined : contentType;
+  const filename = c.req.header("x-audio-filename");
+  const language = c.req.header("x-audio-language");
+
+  return {
+    ok: true,
+    audio: body,
+    ...(mimeType !== undefined ? { mimeType } : {}),
+    ...(filename !== undefined ? { filename } : {}),
+    ...(language !== undefined && language.length > 0 ? { language } : {}),
+  };
 }
 
-async function readMultipart(c: Context): Promise<IAudioReadResult> {
+async function readCapped(stream: ReadableStream<Uint8Array> | null, maxBytes: number): Promise<Uint8Array | null> {
+  if (stream === null) {
+    return new Uint8Array(0);
+  }
+
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+
+  for (;;) {
+    const { done, value } = await reader.read();
+
+    if (done) {
+      break;
+    }
+
+    size += value.byteLength;
+
+    if (size > maxBytes) {
+      await reader.cancel();
+      return null;
+    }
+
+    chunks.push(value);
+  }
+
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  return bytes;
+}
+
+async function readMultipart(body: Uint8Array, contentType: string): Promise<IAudioReadResult> {
   let form: FormData;
 
   try {
-    form = await c.req.formData();
+    form = await new Response(body, { headers: { "content-type": contentType } }).formData();
   } catch {
     return { ok: false, errorCode: "ENGINE_REJECTED_INPUT", message: "malformed multipart body" };
   }

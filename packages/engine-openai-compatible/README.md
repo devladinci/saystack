@@ -63,7 +63,8 @@ rewritten for speech. The realtime adapters plug into `realtime.createAdapter` i
   not part of the OpenAI API; use it for servers such as oMLX whose models can run on.
 - Each adapter takes its own URL, token and model, so speech and rewriting can live on different servers.
 - The OpenAI Realtime adapter is tested against a fake server that follows OpenAI's published protocol. It has
-  not yet been run against a live one.
+  not yet been run against OpenAI itself. Speaches 0.1 speaks an older version of that protocol, so use upload
+  dictation with Speaches for now.
 
 ## Related packages
 

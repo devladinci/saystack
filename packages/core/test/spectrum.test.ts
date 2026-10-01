@@ -27,6 +27,13 @@ const naiveDecibels = (samples: Float32Array, bin: number, smoothing: number): n
 };
 
 describe("createSpectrumAnalyser", () => {
+  it("reports digital silence as a finite floor, not -Infinity", () => {
+    const analyser = createSpectrumAnalyser({ fftSize: 256 });
+    const levels = analyser.analyse(new Float32Array(256));
+
+    expect(Array.from(levels).every(Number.isFinite)).toBe(true);
+  });
+
   it("puts a tone in its bin", () => {
     const analyser = createSpectrumAnalyser({ fftSize: 1024 });
     const spectrum = analyser.analyse(tone(1000, 16000, 1024));

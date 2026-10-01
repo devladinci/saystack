@@ -85,7 +85,7 @@ const createUpsampler = (): ((pcm: Uint8Array) => Buffer) => {
 };
 
 // The OpenAI Realtime transcription protocol: a transcription session.update, base64 24 kHz PCM16 appends,
-// then one commit whose .completed event carries the final transcript. OpenAI, speaches and others speak it.
+// then one commit whose .completed event carries the final transcript.
 export function createOpenAiRealtimeSttAdapter(
   engine: { url: string; token?: string; model?: string },
   { model: defaultModel, handshakeTimeoutMs = 10_000, stopTimeoutMs = 10_000 }: IOpenAiRealtimeOptions = {},

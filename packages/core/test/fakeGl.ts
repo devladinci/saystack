@@ -103,7 +103,7 @@ export function createFakeGl(): { gl: WebGLRenderingContext; calls: IGlCall[] } 
     framebufferTexture2D: quiet,
     checkFramebufferStatus: () => 36053,
     deleteFramebuffer: quiet,
-    deleteBuffer: quiet,
+    deleteBuffer: record("deleteBuffer"),
     getExtension: () => null,
   };
 

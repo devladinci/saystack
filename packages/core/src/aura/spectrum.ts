@@ -53,6 +53,9 @@ export interface ISampleWindow {
   clear(): void;
 }
 
+// What analyse() reports for a bin with no energy at all, where the decibels would be -Infinity.
+const SILENCE_DB = -200;
+
 const isPowerOfTwo = (value: number): boolean => value >= 2 && (value & (value - 1)) === 0;
 
 // The browser analyser looks at 2048 samples at 48 kHz; other rates keep about the same span of time.
@@ -146,7 +149,7 @@ export function createSpectrumAnalyser({
         const magnitude = Math.hypot(real[bin] ?? 0, imaginary[bin] ?? 0) / size;
         const value = smoothing * (smoothed[bin] ?? 0) + (1 - smoothing) * magnitude;
         smoothed[bin] = value;
-        out[bin] = 20 * Math.log10(value);
+        out[bin] = value > 0 ? 20 * Math.log10(value) : SILENCE_DB;
       }
 
       return out;

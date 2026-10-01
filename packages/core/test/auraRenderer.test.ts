@@ -48,6 +48,15 @@ const uniform = (calls: IGlCall[], name: string): unknown[][] =>
   calls.filter((call) => call.name.startsWith("uniform") && call.args[0] === name).map((call) => call.args.slice(1));
 
 describe("createAuraRenderer", () => {
+  it("frees its vertex buffer when disposed", () => {
+    const { renderer, calls } = setup();
+    renderer.dispose();
+
+    expect(calls.filter((call) => call.name === "deleteBuffer")).toEqual([
+      { name: "deleteBuffer", args: [expect.stringMatching(/^buffer/)] },
+    ]);
+  });
+
   it("draws straight to the screen when the look needs no blur or scaling", () => {
     const { renderer, calls } = setup();
     renderer.setState("active");
