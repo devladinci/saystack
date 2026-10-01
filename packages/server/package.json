@@ -1,6 +1,6 @@
 {
   "name": "@saystack/server",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Mountable Hono routes for voice: transcription, speech and a realtime dictation socket, with fixed error codes.",
   "license": "MIT",
   "author": "DeVladinci",
