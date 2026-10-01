@@ -139,6 +139,26 @@ describe("createWebTtsDriver", () => {
     );
   });
 
+  it("takes its audio from synthesize instead of an endpoint", async () => {
+    const audio = fakeAudio(2);
+    const synthesize = vi.fn(async () => ({ ok: true as const, audio: new ArrayBuffer(8), mimeType: "audio/wav" }));
+    const fetch = vi.fn();
+    vi.stubGlobal("fetch", fetch);
+    const driver = createWebTtsDriver({ synthesize, context: audio.context });
+
+    const result = await driver.synthesize({ text: "Hello." });
+    const clip = await driver.createClip(new ArrayBuffer(8));
+
+    expect(result).toMatchObject({ ok: true });
+    expect(synthesize).toHaveBeenCalledWith({ text: "Hello." });
+    expect(fetch).not.toHaveBeenCalled();
+    expect(clip.ok).toBe(true);
+  });
+
+  it("needs an endpoint or synthesize", () => {
+    expect(() => createWebTtsDriver({})).toThrow("endpoint or synthesize");
+  });
+
   it("passes the server's error code through", async () => {
     const fetch = vi.fn(async () => Response.json({ errorCode: "TTS_RETRYABLE", message: "busy" }, { status: 503 }));
     const driver = createWebTtsDriver({ endpoint: "/voice/speech", fetch });

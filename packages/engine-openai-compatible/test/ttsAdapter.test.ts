@@ -33,7 +33,7 @@ function captureFetch(responder: (init: RequestInit) => Response): {
   };
 }
 
-describe("maxAudioTokens — the token-cap formula from PR #58", () => {
+describe("maxAudioTokens", () => {
   it("50 base + 5 per char", () => {
     expect(maxAudioTokens("abcd")).toBe(70);
   });
@@ -94,9 +94,29 @@ describe("createOpenAiTtsAdapter — wire shape", () => {
     expect(body.model).toBe("my-tts");
   });
 
-  it("caps max_tokens by the text length", async () => {
+  it("sends only standard fields by default: no voice, no max_tokens", async () => {
     const { fetch: fakeFetch, requests } = captureFetch(() => makeFetchResponse(200, new ArrayBuffer(8)));
     const adapter = createOpenAiTtsAdapter(ENGINE, { fetch: fakeFetch });
+
+    await adapter.synthesize({ text: "abcd" });
+
+    const body = JSON.parse(String(requests[0]?.init.body)) as Record<string, unknown>;
+    expect(Object.keys(body).sort()).toEqual(["input", "model", "response_format"]);
+  });
+
+  it("sends the voice when one is set", async () => {
+    const { fetch: fakeFetch, requests } = captureFetch(() => makeFetchResponse(200, new ArrayBuffer(8)));
+    const adapter = createOpenAiTtsAdapter(ENGINE, { fetch: fakeFetch, voice: "marin" });
+
+    await adapter.synthesize({ text: "abcd" });
+
+    const body = JSON.parse(String(requests[0]?.init.body)) as Record<string, unknown>;
+    expect(body.voice).toBe("marin");
+  });
+
+  it("caps max_tokens by the text length when maxTokens is set", async () => {
+    const { fetch: fakeFetch, requests } = captureFetch(() => makeFetchResponse(200, new ArrayBuffer(8)));
+    const adapter = createOpenAiTtsAdapter(ENGINE, { fetch: fakeFetch, maxTokens: maxAudioTokens });
 
     await adapter.synthesize({ text: "abcd" });
 

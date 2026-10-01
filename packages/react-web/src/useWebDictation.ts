@@ -12,7 +12,8 @@ export interface IRealtimeOptions {
   params?: Readonly<Record<string, unknown>>;
 }
 
-export interface IUseWebDictationOptions extends Omit<IUseDictationOptions, "recorder" | "live"> {
+// recorder and live replace the microphone and the realtime socket, e.g. with a clip or the browser's own recognition.
+export interface IUseWebDictationOptions extends IUseDictationOptions {
   realtime?: IRealtimeOptions;
   constraints?: MediaTrackConstraints;
   mimeType?: string;
@@ -29,20 +30,25 @@ export function useWebDictation({
   constraints,
   mimeType,
   bands,
+  recorder: customRecorder,
+  live: customLive,
   ...options
 }: IUseWebDictationOptions): IWebDictation {
-  const [recorder] = useState(() =>
+  const [microphone] = useState(() =>
     createWebRecorder({
       ...(constraints === undefined ? {} : { constraints }),
       ...(mimeType === undefined ? {} : { mimeType }),
     }),
   );
+  const recorder = customRecorder ?? microphone;
   const realtimeRef = useRef(realtime);
   const languageRef = useRef(options.language);
+  const recorderRef = useRef(recorder);
 
   useEffect(() => {
     realtimeRef.current = realtime;
     languageRef.current = options.language;
+    recorderRef.current = recorder;
   });
 
   const live = useCallback<LiveTranscriptionFactory>((active, onText) => {
@@ -59,11 +65,12 @@ export function useWebDictation({
     });
   }, []);
 
-  const dictation = useDictation({ ...options, recorder, ...(realtime === undefined ? {} : { live }) });
+  const liveSource = customLive ?? (realtime === undefined ? undefined : live);
+  const dictation = useDictation({ ...options, recorder, ...(liveSource === undefined ? {} : { live: liveSource }) });
   const levels = useAudioLevels(bands === undefined ? {} : { bands });
   const readLevels = useCallback(() => levels?.read(), [levels]);
 
-  useRecorderLevels(levels, dictation.state === "recording", () => recorder.stream ?? null);
+  useRecorderLevels(levels, dictation.state === "recording", () => recorderRef.current.stream ?? null);
 
   return { ...dictation, readLevels };
 }

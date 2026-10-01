@@ -84,4 +84,41 @@ describe("useWebDictation", () => {
     expect(web.started).toEqual([]);
     expect(onText).toHaveBeenCalledWith("Batch text.");
   });
+
+  it("uses the recorder and live transcription it is given instead of the microphone and the socket", async () => {
+    const started: string[] = [];
+    const recorder: IPlatformRecorder = {
+      stream: null,
+      startRecording: async () => {
+        started.push("clip");
+      },
+      stopRecording: async () => ({ blob: new Blob(["clip"], { type: "audio/wav" }) }),
+    };
+    const shown: string[] = [];
+    const ended: (string | null)[] = [];
+    const { result } = renderHook(() =>
+      useWebDictation({
+        recorder,
+        live: (_active, onText) => {
+          onText("From the clip");
+
+          return { isLive: true, finish: async () => "From the clip.", cancel: () => undefined };
+        },
+        realtime: { url: "ws://unused" },
+        input: { show: (text) => shown.push(text), end: (text) => ended.push(text) },
+      }),
+    );
+
+    act(() => {
+      result.current.handlePressStart();
+    });
+    await act(async () => {
+      result.current.handlePressEnd();
+    });
+
+    expect(started).toEqual(["clip"]);
+    expect(web.started).toEqual([]);
+    expect(shown).toEqual(["From the clip"]);
+    expect(ended).toEqual(["From the clip."]);
+  });
 });

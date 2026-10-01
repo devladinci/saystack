@@ -1,11 +1,19 @@
 # saystack
 
+[![CI](https://github.com/devladinci/saystack/actions/workflows/ci.yml/badge.svg)](https://github.com/devladinci/saystack/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/@saystack/core.svg)](https://www.npmjs.com/package/@saystack/core)
+
+**[Try it in the playground](https://devladinci.github.io/saystack/)**: dictate, hear a reply read aloud, and tune the aura with live band meters.
+Nothing to install.
+
 Voice I/O for LLM chat UIs. Turn model output into speakable text, chunk it so playback can start
 before the answer finishes, highlight the words as they are read, and capture speech back — against
 any OpenAI-compatible TTS/STT engine.
 
 It is a set of small, separately installable pieces rather than a framework. `@saystack/core` has no
 runtime dependencies and no vendor knowledge; engines and UI plug into its contracts.
+
+saystack is pre-1.0: APIs may still change in minor versions, and every change is in the changelog.
 
 ## What it does
 
@@ -53,7 +61,7 @@ fake server that follows OpenAI's published protocol; it has not yet been run ag
 
 ## React Native
 
-`@saystack/react-native` needs `expo-audio` and `expo-file-system`. `expo-gl` (the aura) and `expo-blur` (the
+`@saystack/react-native` needs `expo-audio`, `expo-file-system` and `expo-modules-core`. `expo-gl` (the aura) and `expo-blur` (the
 spotlight backdrop) are optional: without them the aura is off and a stronger veil stands in for the blur.
 
 With pnpm, `expo-gl` can find an incomplete `react-native-reanimated` that another package pulled in, and
@@ -82,7 +90,7 @@ core                     text, chunking, sessions, aura maths        no deps, no
       └── react-native   native components
 server                   optional HTTP + websocket layer
 examples/voice-chat      a complete chat wired end to end
-playground               hand-written labs for the animations (not published)
+apps/playground          the hosted playground (not published)
 ```
 
 Dependencies only ever point downward, and `core` never learns about a vendor or a platform.
@@ -94,17 +102,23 @@ pnpm install
 pnpm -r build
 ```
 
+The playground, on the packages in this repo:
+
+```bash
+pnpm --filter @saystack/playground dev
+```
+
 Every check at once:
 
 ```bash
 pnpm check     # lint, format, typecheck, build, test, knip
 ```
 
-The full example needs an OpenAI-compatible speech server for STT/TTS and a chat endpoint for replies —
-see [`examples/voice-chat`](examples/voice-chat):
+The full example runs on OpenAI with one key, or on any OpenAI-compatible server — see
+[`examples/voice-chat`](examples/voice-chat):
 
 ```bash
-ENGINE_TOKEN=… LLM_TOKEN=… pnpm --filter @saystack/example-voice-chat dev
+ENGINE_TOKEN=sk-… pnpm --filter @saystack/example-voice-chat dev
 ```
 
 ### Minimal read-aloud
@@ -156,6 +170,10 @@ to speak instead, or `null` to speak the reply as written.
 - `pnpm knip` finds unused files, exports and dependencies. Public library surface is configured in
   [`knip.json`](knip.json).
 - Releases use [Changesets](.changeset): `pnpm changeset`, then merge the version pull request.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Report security problems privately, as [SECURITY.md](SECURITY.md) explains.
 
 ## License
 

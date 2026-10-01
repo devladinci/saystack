@@ -14,8 +14,12 @@ interface IResponseLike {
   text: () => Promise<string>;
 }
 
-export interface ITtsAdapterDeps {
+export interface IOpenAiTtsOptions {
   readonly fetch?: (input: string, init?: RequestInit) => Promise<Response>;
+  // OpenAI requires a voice; servers that pick one from the model can go without.
+  readonly voice?: string;
+  // A cap on generated audio tokens, for models that can run on (pass maxAudioTokens). Not part of the OpenAI API.
+  readonly maxTokens?: (text: string) => number;
 }
 
 const MAX_AUDIO_TOKENS = 2048;
@@ -45,8 +49,11 @@ const isAbortName = (error: unknown): boolean => {
   return error.name === "AbortError" || error.name === "TimeoutError";
 };
 
-export const createOpenAiTtsAdapter = (engine: ITtsEngineConfig, deps: ITtsAdapterDeps = {}): ITtsAdapter => {
-  const doFetch = deps.fetch ?? ((input: string, init?: RequestInit) => fetch(input, init));
+export const createOpenAiTtsAdapter = (
+  engine: ITtsEngineConfig,
+  { fetch: fetchOption, voice, maxTokens }: IOpenAiTtsOptions = {},
+): ITtsAdapter => {
+  const doFetch = fetchOption ?? ((input: string, init?: RequestInit) => fetch(input, init));
 
   const url = normalizeBaseUrl(engine.url);
   const token = engine.token;
@@ -93,7 +100,8 @@ export const createOpenAiTtsAdapter = (engine: ITtsEngineConfig, deps: ITtsAdapt
             model,
             input: input.text,
             response_format: "wav",
-            max_tokens: maxAudioTokens(input.text),
+            ...(voice === undefined ? {} : { voice }),
+            ...(maxTokens === undefined ? {} : { max_tokens: maxTokens(input.text) }),
             ...reference,
           }),
           signal: controller.signal,

@@ -12,6 +12,7 @@ export type { IChatCompletionsSpec } from "./normalize.js";
 export type { INormalizeFn } from "@saystack/core";
 export type { ILlmChatRequest, ILlmChatResponse, LlmErrorCode, ILlmChatClient } from "./llmTypes.js";
 export type { IOpenAiSttOptions } from "./sttAdapter.js";
+export type { IOpenAiTtsOptions } from "./ttsAdapter.js";
 export type { IOmlxRealtimeOptions } from "./omlxRealtimeSttAdapter.js";
 export type { IOpenAiRealtimeOptions } from "./openAiRealtimeSttAdapter.js";
 export type { IListSpeechModelsOptions, IListSpeechModelsResult, ISpeechModel, SpeechModelKind } from "./models.js";

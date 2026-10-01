@@ -8,36 +8,87 @@ import {
   createOpenAiRealtimeSttAdapter,
   createOpenAiSttAdapter,
   createOpenAiTtsAdapter,
+  maxAudioTokens,
 } from "@saystack/engine-openai-compatible";
 import { createVoiceRoutes } from "@saystack/server";
 import { Hono } from "hono";
 import { createServer } from "vite";
 import { WebSocketServer } from "ws";
 
+interface IPreset {
+  url: string;
+  sttModel: string;
+  ttsModel: string;
+  voice?: string;
+  realtime: "openai" | "omlx";
+  realtimeModel?: string;
+  chatModel?: string;
+  capsAudioTokens: boolean;
+  disablesThinking: boolean;
+}
+
+const PRESETS: Readonly<Record<string, IPreset>> = {
+  openai: {
+    url: "https://api.openai.com/v1",
+    sttModel: "gpt-transcribe",
+    ttsModel: "gpt-4o-mini-tts",
+    voice: "marin",
+    realtime: "openai",
+    realtimeModel: "gpt-live-transcribe",
+    chatModel: "gpt-6-luna",
+    capsAudioTokens: false,
+    disablesThinking: false,
+  },
+  omlx: {
+    url: "http://127.0.0.1:7777/v1",
+    sttModel: "whisper-large-v3-turbo",
+    ttsModel: "higgs_audio_v3-tts-4b",
+    realtime: "omlx",
+    capsAudioTokens: true,
+    disablesThinking: true,
+  },
+};
+
 const env = process.env;
-const apiPort = Number(env.API_PORT ?? 5181);
-const webPort = Number(env.PORT ?? 5180);
-const engineUrl = env.ENGINE_URL ?? "http://127.0.0.1:7777/v1";
-const chatUrl = (env.LLM_URL ?? "https://ollama.com/v1").replace(/\/+$/, "");
-const chatModel = env.LLM_MODEL ?? "deepseek-v4.1-flash";
+const presetName = env.ENGINE ?? "openai";
+const preset = PRESETS[presetName];
+
+if (preset === undefined) {
+  throw new Error(`ENGINE must be one of ${Object.keys(PRESETS).join(", ")}, got '${presetName}'`);
+}
 
 const withToken = (token: string | undefined): { token?: string } =>
   token === undefined || token === "" ? {} : { token };
 
+const apiPort = Number(env.API_PORT ?? 5181);
+const webPort = Number(env.PORT ?? 5180);
+const engineUrl = env.ENGINE_URL ?? preset.url;
 const engineToken = withToken(env.ENGINE_TOKEN);
-const chatToken = withToken(env.LLM_TOKEN);
+const chatUrl = (env.LLM_URL ?? engineUrl).replace(/\/+$/, "");
+const chatToken = withToken(env.LLM_TOKEN ?? env.ENGINE_TOKEN);
+const chatModel = env.LLM_MODEL ?? preset.chatModel;
+
+if (chatModel === undefined) {
+  throw new Error(`set LLM_MODEL: the ${presetName} preset has no default chat model`);
+}
+
+const voice = env.TTS_VOICE ?? preset.voice;
+const ttsOptions = {
+  ...(voice === undefined ? {} : { voice }),
+  ...(preset.capsAudioTokens ? { maxTokens: maxAudioTokens } : {}),
+};
 
 const config: IConfig = {
-  languages: ["en", "bg"],
-  stt: { url: engineUrl, model: env.STT_MODEL ?? "whisper-large-v3-turbo", ...engineToken },
-  tts: { url: engineUrl, model: env.TTS_MODEL ?? "higgs_audio_v3-tts-4b", ...engineToken },
+  languages: (env.LANGUAGES ?? "en").split(",").map((language) => language.trim()),
+  stt: { url: engineUrl, model: env.STT_MODEL ?? preset.sttModel, ...engineToken },
+  tts: { url: engineUrl, model: env.TTS_MODEL ?? preset.ttsModel, ...engineToken },
 };
 const settings = validateConfig(config);
 
-// Live dictation: "openai" speaks the OpenAI Realtime protocol (OpenAI, speaches, …); "omlx" speaks oMLX's own.
-const realtimeModel = env.REALTIME_MODEL === undefined ? {} : { model: env.REALTIME_MODEL };
+const realtimeModelName = env.REALTIME_MODEL ?? preset.realtimeModel;
+const realtimeModel = realtimeModelName === undefined ? {} : { model: realtimeModelName };
 const createRealtimeAdapter =
-  env.REALTIME_PROTOCOL === "openai"
+  (env.REALTIME_PROTOCOL ?? preset.realtime) === "openai"
     ? (engine: ISttEngineConfig) => createOpenAiRealtimeSttAdapter(engine, realtimeModel)
     : (engine: ISttEngineConfig) => createOmlxRealtimeSttAdapter(engine, realtimeModel);
 
@@ -47,7 +98,12 @@ const SYSTEM_PROMPT = [
   "Keep answers to two to five sentences unless the user asks for code, a list or a table.",
 ].join(" ");
 
-const rewriteForSpeech = createLlmNormalizer({ url: chatUrl, model: chatModel, disableThinking: true, ...chatToken });
+const rewriteForSpeech = createLlmNormalizer({
+  url: chatUrl,
+  model: chatModel,
+  ...(preset.disablesThinking ? { disableThinking: true } : {}),
+  ...chatToken,
+});
 
 const app = new Hono();
 
@@ -56,7 +112,7 @@ app.route(
   createVoiceRoutes({
     getSettings: () => settings,
     createSttAdapter: (engine) => createOpenAiSttAdapter(engine),
-    createTtsAdapter: (engine) => createOpenAiTtsAdapter(engine),
+    createTtsAdapter: (engine) => createOpenAiTtsAdapter(engine, ttsOptions),
     realtime: { upgradeWebSocket, createAdapter: createRealtimeAdapter },
   }),
 );

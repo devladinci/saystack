@@ -129,15 +129,17 @@ describe("parseNormalized", () => {
     expect(parseNormalized("no json here")).toBeNull();
   });
 });
-const hasLiveLlm = process.env.LLM_TOKEN !== undefined && process.env.LLM_TOKEN.length > 0;
+const { LLM_URL = "", LLM_TOKEN = "", LLM_MODEL = "" } = process.env;
+
+const hasLiveLlm = [LLM_URL, LLM_TOKEN, LLM_MODEL].every((value) => value.length > 0);
 
 describe.skipIf(!hasLiveLlm)("live LLM normalizer", () => {
   it("normalizes numbers, money and code blocks end to end", { timeout: 60_000 }, async () => {
     const { createLlmNormalizer } = await import("../src/normalize.js");
     const normalize = createLlmNormalizer({
-      url: process.env.LLM_URL ?? "http://127.0.0.1:7777/v1",
-      ...(process.env.LLM_TOKEN !== undefined ? { token: process.env.LLM_TOKEN } : {}),
-      model: process.env.LLM_MODEL ?? "gemma-4-26B-A4B-it-QAT-MLX-4bit",
+      url: LLM_URL,
+      token: LLM_TOKEN,
+      model: LLM_MODEL,
       timeoutSeconds: 45,
     });
 

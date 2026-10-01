@@ -5,20 +5,34 @@ import { sharedAudioContext, unlockWebAudio } from "./audioContext.js";
 import { createWebClip } from "./webClip.js";
 
 export interface IWebTtsDriverOptions {
-  endpoint: string;
+  endpoint?: string;
+  // Where the audio comes from when it is not an HTTP endpoint; it still plays through output.
+  synthesize?: ITtsDriver["synthesize"];
   headers?: RequestHeaders;
   context?: AudioContext;
   output?: AudioNode | (() => AudioNode | null);
   fetch?: SpeechFetch;
 }
 
-export function createWebTtsDriver({
+const synthesizeFrom = ({
   endpoint,
+  synthesize,
   headers = {},
-  context,
-  output,
   fetch,
-}: IWebTtsDriverOptions): ITtsDriver {
+}: IWebTtsDriverOptions): ITtsDriver["synthesize"] => {
+  if (synthesize !== undefined) {
+    return synthesize;
+  }
+
+  if (endpoint === undefined) {
+    throw new Error("saystack: createWebTtsDriver needs an endpoint or synthesize");
+  }
+
+  return createHttpSynthesize({ endpoint, headers, ...(fetch === undefined ? {} : { fetch }) });
+};
+
+export function createWebTtsDriver(options: IWebTtsDriverOptions): ITtsDriver {
+  const { context, output } = options;
   const audioContext = (): AudioContext => context ?? sharedAudioContext();
 
   return {
@@ -26,7 +40,7 @@ export function createWebTtsDriver({
       unlockWebAudio(context);
     },
 
-    synthesize: createHttpSynthesize({ endpoint, headers, ...(fetch === undefined ? {} : { fetch }) }),
+    synthesize: synthesizeFrom(options),
 
     createClip: async (audio): Promise<ISpeechClipResult> => {
       const destination = typeof output === "function" ? output() : (output ?? null);

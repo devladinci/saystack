@@ -111,6 +111,24 @@ describe("ReadAloudProvider", () => {
     expect(latest.readAloud?.anchor).toBe(screen.getByTestId("body-a"));
   });
 
+  it("asks synthesize for the audio when the app brings its own source", async () => {
+    const synthesize = vi.fn(async (): Promise<ITtsSynthesizeResult> => ({
+      ok: false,
+      errorCode: "TTS_FAILED",
+      message: "x",
+    }));
+    renderApp(
+      <ReadAloudProvider synthesize={synthesize}>
+        <Reply id="a" />
+      </ReadAloudProvider>,
+    );
+
+    act(() => messages.a?.speak("Reply a says hello."));
+    await flush();
+
+    expect(synthesize).toHaveBeenCalledWith(expect.objectContaining({ text: "Reply a says hello." }));
+  });
+
   it("plays the same reply again from the audio it already has", async () => {
     const fake = fakeDriver();
     renderApp(
@@ -164,10 +182,10 @@ describe("ReadAloudProvider", () => {
     expect(messages.a?.isActive).toBe(false);
   });
 
-  it("refuses to start without an endpoint or a driver", () => {
+  it("refuses to start without an endpoint, synthesize or a driver", () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
 
-    expect(() => render(<ReadAloudProvider>{null}</ReadAloudProvider>)).toThrow(/endpoint or a driver/);
+    expect(() => render(<ReadAloudProvider>{null}</ReadAloudProvider>)).toThrow(/endpoint, synthesize or a driver/);
   });
 });
 

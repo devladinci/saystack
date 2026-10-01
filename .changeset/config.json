@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@saystack/example-voice-chat"]
+  "ignore": ["@saystack/example-voice-chat", "@saystack/playground"]
 }

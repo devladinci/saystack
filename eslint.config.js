@@ -6,13 +6,7 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    ignores: [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/coverage/**",
-      "playground/voice-ui/vendor/**",
-      "playground/**/*.min.js",
-    ],
+    ignores: ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
   },
   js.configs.recommended,
   tseslint.configs.recommended,
@@ -50,7 +44,7 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
   {
-    files: ["playground/**/*.js", "examples/**/*.tsx"],
+    files: ["apps/**/*.js", "examples/**/*.tsx"],
     languageOptions: { globals: { ...globals.browser } },
   },
   prettier,

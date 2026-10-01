@@ -1,16 +1,24 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { pcm16ToWav } from "@saystack/core";
+
 import { createOpenAiSttAdapter, extForMime, guessFilename } from "../src/sttAdapter.js";
 
-const ENGINE_URL = process.env.ENGINE_URL ?? "http://127.0.0.1:7777/v1";
+const { ENGINE_URL = "", ENGINE_TOKEN = "", STT_MODEL = "" } = process.env;
 
-const token = process.env.ENGINE_TOKEN ?? "";
+const config = { url: ENGINE_URL, token: ENGINE_TOKEN, model: STT_MODEL } as const;
 
-const model = process.env.STT_MODEL ?? "parakeet-tdt-0.6b-v3";
+const hasLiveServer = [ENGINE_URL, ENGINE_TOKEN, STT_MODEL].every((value) => value.length > 0);
 
-const config = { url: ENGINE_URL, token, model } as const;
+const toneWav = (): Uint8Array => {
+  const samples = new Int16Array(16000);
 
-const hasLiveServer = token.length > 0;
+  for (let index = 0; index < samples.length; index += 1) {
+    samples[index] = Math.round(Math.sin((2 * Math.PI * 440 * index) / 16000) * 8000);
+  }
+
+  return pcm16ToWav([new Uint8Array(samples.buffer)]);
+};
 
 describe("filename/mime mapping", () => {
   it("mp3 is recognised as .mp3, not forced to .wav", () => {
@@ -63,7 +71,7 @@ describe("declared languages", () => {
 
 describe("status mapping — honest blame", () => {
   it("auth problems say BAD_TOKEN, not 'engine down'", () => {
-    expect(createOpenAiSttAdapter({ url: ENGINE_URL, token: "x", model: "m" }).capabilities.streaming).toBe(false);
+    expect(createOpenAiSttAdapter({ url: "http://x/v1", token: "x", model: "m" }).capabilities.streaming).toBe(false);
   });
 });
 
@@ -144,9 +152,7 @@ describe("createOpenAiSttAdapter — offline contract", () => {
 
 describe.skipIf(!hasLiveServer)("createOpenAiSttAdapter — live server", () => {
   it("transcribes a real wav against the live engine", { timeout: 60000 }, async () => {
-    const { readFileSync } = await import("node:fs");
-    const audio = new Uint8Array(readFileSync("/tmp/saystack-test-1s.wav"));
-
+    const audio = toneWav();
     const adapter = createOpenAiSttAdapter(config);
     const result = await adapter.transcribe({ audio, mimeType: "audio/wav", filename: "test.wav" });
 
@@ -167,7 +173,7 @@ describe.skipIf(!hasLiveServer)("createOpenAiSttAdapter — live server", () => 
   });
 
   it("surfaces a wrong token as BAD_TOKEN, not 'engine down'", { timeout: 30000 }, async () => {
-    const adapter = createOpenAiSttAdapter({ url: ENGINE_URL, token: "sk-wrong", model }, { minAudioBytes: 1 });
+    const adapter = createOpenAiSttAdapter({ ...config, token: "sk-wrong" }, { minAudioBytes: 1 });
     const result = await adapter.transcribe({
       audio: new Uint8Array([1, 2, 3]),
       mimeType: "audio/wav",

@@ -13,6 +13,7 @@ import { useAudioLevels } from "./useAudioLevels.js";
 interface ISpeechSource {
   endpoint?: string;
   headers?: RequestHeaders;
+  synthesize?: ITtsDriver["synthesize"];
   driver?: ITtsDriver;
 }
 
@@ -29,7 +30,7 @@ interface ILatest extends IReadAloudSources {
 }
 
 const driverFor = (
-  { endpoint, driver }: ISpeechSource,
+  { endpoint, synthesize, driver }: ISpeechSource,
   headers: () => Readonly<Record<string, string>>,
   output: () => AudioNode | null,
 ): ITtsDriver => {
@@ -37,8 +38,12 @@ const driverFor = (
     return driver;
   }
 
+  if (synthesize !== undefined) {
+    return createWebTtsDriver({ synthesize, output });
+  }
+
   if (endpoint === undefined) {
-    throw new Error("saystack: <ReadAloudProvider> needs an endpoint or a driver");
+    throw new Error("saystack: <ReadAloudProvider> needs an endpoint, synthesize or a driver");
   }
 
   return createWebTtsDriver({ endpoint, headers, output });
@@ -47,6 +52,7 @@ const driverFor = (
 export function ReadAloudProvider({
   endpoint,
   headers,
+  synthesize,
   driver,
   bands,
   rewrite,
@@ -74,7 +80,11 @@ export function ReadAloudProvider({
   const [store] = useState((): IReadAloudStore<Element> =>
     createReadAloud<Element>({
       driver: driverFor(
-        { ...(endpoint === undefined ? {} : { endpoint }), ...(driver === undefined ? {} : { driver }) },
+        {
+          ...(endpoint === undefined ? {} : { endpoint }),
+          ...(synthesize === undefined ? {} : { synthesize }),
+          ...(driver === undefined ? {} : { driver }),
+        },
         () => resolveHeaders(latestRef.current.headers),
         () => levelsRef.current?.input ?? null,
       ),

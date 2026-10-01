@@ -1,30 +1,36 @@
 // @vitest-environment node
-import { readFileSync } from "node:fs";
 import type { AddressInfo } from "node:net";
 
 import { serve } from "@hono/node-server";
 import { describe, expect, it } from "vitest";
 import { createOpenAiSttAdapter, createOpenAiTtsAdapter } from "@saystack/engine-openai-compatible";
-import { validateConfig } from "@saystack/core";
+import { pcm16ToWav, validateConfig } from "@saystack/core";
 
 import { sendDictation } from "../src/dictationSender.js";
 import { createVoiceRoutes } from "@saystack/server";
 import type { IVoiceServerDeps } from "@saystack/server";
 
-const ENGINE_URL = process.env.ENGINE_URL ?? "http://127.0.0.1:7777/v1";
-const token = process.env.ENGINE_TOKEN ?? "";
-const hasLiveServer = token.length > 0;
+const { ENGINE_URL = "", ENGINE_TOKEN = "", STT_MODEL = "" } = process.env;
+const hasLiveServer = [ENGINE_URL, ENGINE_TOKEN, STT_MODEL].every((value) => value.length > 0);
 
-const wavPath = "/tmp/saystack-e2e.wav";
-const wav = new Uint8Array(readFileSync(wavPath));
+const toneWav = (): Uint8Array<ArrayBuffer> => {
+  const samples = new Int16Array(16000);
+
+  for (let index = 0; index < samples.length; index += 1) {
+    samples[index] = Math.round(Math.sin((2 * Math.PI * 440 * index) / 16000) * 8000);
+  }
+
+  return pcm16ToWav([new Uint8Array(samples.buffer)]);
+};
+
+const wav = toneWav();
 
 function makeLiveDeps(): IVoiceServerDeps {
   return {
     getSettings: () =>
       validateConfig({
         languages: [],
-        stt: { url: ENGINE_URL, token, model: process.env.STT_MODEL ?? "parakeet-tdt-0.6b-v3" },
-        tts: { url: ENGINE_URL, token, model: process.env.TTS_MODEL ?? "higgs_audio_v3-tts-4b" },
+        stt: { url: ENGINE_URL, token: ENGINE_TOKEN, model: STT_MODEL },
       }),
     createSttAdapter: (engineConfig) => createOpenAiSttAdapter(engineConfig),
     createTtsAdapter: (engineConfig) => createOpenAiTtsAdapter(engineConfig),

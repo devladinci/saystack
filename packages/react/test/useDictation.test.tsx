@@ -49,7 +49,7 @@ describe("useDictation state machine (offline, mocked endpoints)", () => {
 
   it("full press cycle: recording → transcribing → done, text surfaces, onText fires", async () => {
     setVoiceRecorder(blobRecorder());
-    mockFetchJson({ text: "hello from kotys" });
+    mockFetchJson({ text: "hello there" });
     const onText = vi.fn();
     const { result } = renderHook(() => useDictation({ endpoint: ENDPOINT, onText }));
 
@@ -63,8 +63,8 @@ describe("useDictation state machine (offline, mocked endpoints)", () => {
     });
 
     expect(result.current.state).toBe("done");
-    expect(result.current.text).toBe("hello from kotys");
-    expect(onText).toHaveBeenCalledWith("hello from kotys");
+    expect(result.current.text).toBe("hello there");
+    expect(onText).toHaveBeenCalledWith("hello there");
     expect(result.current.errorCode).toBeUndefined();
   });
 
