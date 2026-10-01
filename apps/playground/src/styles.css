@@ -810,7 +810,7 @@ input[type="range"]::-moz-range-thumb {
   position: absolute;
   top: 66px;
   left: 50%;
-  z-index: 20;
+  z-index: 33;
   width: max-content;
   max-width: calc(100% - 32px);
   padding: 10px 14px;
@@ -1009,7 +1009,8 @@ input[type="range"]::-moz-range-thumb {
 
 /* ------------------------------------------------------------ mobile -- */
 /* The phone counterpart of the chat. The aura draws on its own canvas above the page (layer 30), so the bezel
-   (layer 31) covers what the wave draws past the screen's rounded corners. */
+   (layer 31) paints over what the wave draws past the screen's rounded corners: the frame inside the phone, and
+   the page colour just outside it. */
 .chat[data-view="mobile"] .chat-head {
   position: relative;
   z-index: 32;
@@ -1037,9 +1038,6 @@ input[type="range"]::-moz-range-thumb {
   padding: 11px;
   border-radius: 58px;
   background: var(--frame);
-  box-shadow:
-    0 0 0 1px var(--line-strong),
-    var(--shadow);
 }
 
 .screen {
@@ -1083,9 +1081,12 @@ input[type="range"]::-moz-range-thumb {
   position: absolute;
   inset: 0;
   z-index: 31;
-  overflow: hidden;
   border-radius: 58px;
   pointer-events: none;
+  box-shadow:
+    0 0 0 1px var(--line-strong),
+    var(--shadow),
+    0 0 0 40px var(--bg);
 }
 
 .bezel::before {
@@ -1093,7 +1094,7 @@ input[type="range"]::-moz-range-thumb {
   position: absolute;
   inset: 11px;
   border-radius: 47px;
-  box-shadow: 0 0 0 48px var(--frame);
+  box-shadow: 0 0 0 11px var(--frame);
 }
 
 .m-nav {
@@ -1210,13 +1211,12 @@ input[type="range"]::-moz-range-thumb {
   pointer-events: none;
 }
 
-/* Inset so the wave fades out before the rounded corners, where it would cross past the frame. */
 .wave-clip {
   position: absolute;
   top: -40px;
-  right: 20px;
+  right: 0;
   bottom: -200px;
-  left: 20px;
+  left: 0;
   pointer-events: none;
 }
 
@@ -1312,11 +1312,6 @@ input[type="range"]::-moz-range-thumb {
 
   .m-nav {
     padding-top: 10px;
-  }
-
-  .wave-clip {
-    right: 0;
-    left: 0;
   }
 
   .m-dock {
