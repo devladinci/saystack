@@ -20,7 +20,7 @@ export function App() {
   return (
     <ReadAloudProvider
       synthesize={synthesize}
-      bands={effectiveStyle("readAloud", settings.readAloud, background).bands}
+      bands={effectiveStyle("readAloud", settings.readAloud, background, settings.view).bands}
     >
       <Playground settings={settings} background={background} onChange={update} onReset={reset} />
     </ReadAloudProvider>

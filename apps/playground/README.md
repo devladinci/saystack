@@ -18,9 +18,14 @@ pnpm --filter @saystack/playground dev
   from the microphone and streams its words at the moments they are spoken. With the microphone, the words come from
   the browser's own speech recognition where there is one.
 - **Settings** live in the URL hash, so a link brings back the same look. **Copy code** turns them into the options
-  for `useDictationAura` and `<ReadAloudAura>`.
+  for `useDictationAura` and `<ReadAloudAura>`, or, in the mobile view, for `DictationSpotlight` and
+  `ReadAloudSpotlight`.
 
-`mobile.html` is a browser sketch of `@saystack/react-native`'s voice spotlight, drawn with the same aura.
+**Desktop | Mobile** in the header switches between the chat and a phone running the same conversation. The phone
+shows `@saystack/react-native`'s spotlights, drawn here with the web packages: while you dictate, the chat blurs and
+the words appear in the middle before they drop into the draft; while a reply is read, it lifts above the blur with
+its words marked and the player waits at the bottom. In both, the aura hangs from the top of the screen. On a real
+phone the mobile view fills the screen.
 
 ## The demo voice
 

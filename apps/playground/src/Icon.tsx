@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 export type IconName =
+  | "back"
   | "mic"
   | "stop"
   | "send"
@@ -21,6 +22,7 @@ interface IProps {
 }
 
 const PATHS: Readonly<Record<IconName, ReactNode>> = {
+  back: <path d="M15 5l-7 7 7 7" />,
   mic: (
     <>
       <rect x="9" y="3" width="6" height="12" rx="3" />

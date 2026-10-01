@@ -6,9 +6,6 @@
     },
     "examples/*": {
       "entry": ["src/readmeSnippet.tsx"]
-    },
-    "apps/*": {
-      "entry": ["src/main.tsx", "src/mobile/main.js", "scripts/chunks.ts"]
     }
   },
   "ignoreDependencies": ["@saystack/react"],

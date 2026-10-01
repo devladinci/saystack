@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <img alt="Dictating into the playground's composer: the words appear as they are spoken, colored bands ride the composer's top edge, and the band meters follow the voice" src=".github/assets/dictation.gif" width="880" />
+  <img alt="Dictating on desktop, where the words stream into the composer under the aura, then switching to the mobile view, where a reply lifts above the blurred chat and is read aloud with the bands hanging from the top of the phone" src=".github/assets/playground.gif" width="880" />
 </p>
 
 Voice I/O for LLM chat UIs. Turn model output into speakable text, chunk it so playback can start
@@ -44,11 +44,11 @@ saystack is pre-1.0: APIs may still change in minor versions, and every change i
   <img alt="A reply read aloud: each word lights up as it is spoken, the reply glows at its edges, and the player at the bottom shows the voice and the words" src=".github/assets/read-aloud.gif" width="760" />
 </p>
 
-Every part of the look is a setting. In the playground's tune panel you can change the colors, the layout, the
-number of bands and where they sit while the voice plays, then copy the code for what you picked.
+Every part of the look is a setting. In the playground's tune panel you can change the colors, the layout and the
+number of bands while the voice plays, on desktop or on a phone, then copy the code for what you picked.
 
 <p align="center">
-  <img alt="While dictating, the tune panel switches the aura's colors, layout, band count and placement, and the bands change with each click" src=".github/assets/tune.gif" width="880" />
+  <img alt="Dictating in the mobile view, with the words in the middle of the screen, while the tune panel switches the aura's colors, layout and band count" src=".github/assets/tune.gif" width="880" />
 </p>
 
 ## Packages

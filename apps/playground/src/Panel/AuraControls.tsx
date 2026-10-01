@@ -8,6 +8,7 @@ import { Segment } from "./Segment.js";
 interface IProps {
   target: AuraTarget;
   style: IAuraStyle;
+  hasPlacement: boolean;
   onTarget: (target: AuraTarget) => void;
   onChange: (next: Partial<IAuraStyle>) => void;
 }
@@ -48,7 +49,7 @@ const NUMERIC_CONTROLS: readonly INumericControl[] = [
   { key: "resolution", label: "Resolution", format: times },
 ];
 
-export function AuraControls({ target, style, onTarget, onChange }: IProps) {
+export function AuraControls({ target, style, hasPlacement, onTarget, onChange }: IProps) {
   return (
     <section className="p-section">
       <h2 className="p-title">Aura</h2>
@@ -66,12 +67,14 @@ export function AuraControls({ target, style, onTarget, onChange }: IProps) {
         options={AURA_PALETTES.map((value) => ({ value, label: PALETTE_LABELS[value] }))}
         onChange={(palette) => onChange({ palette })}
       />
-      <Segment
-        label="Bands sit on"
-        value={style.placement}
-        options={AURA_PLACEMENTS.map((value) => ({ value, label: PLACEMENT_LABELS[value] }))}
-        onChange={(placement) => onChange({ placement })}
-      />
+      {hasPlacement ? (
+        <Segment
+          label="Bands sit on"
+          value={style.placement}
+          options={AURA_PLACEMENTS.map((value) => ({ value, label: PLACEMENT_LABELS[value] }))}
+          onChange={(placement) => onChange({ placement })}
+        />
+      ) : null}
       <Segment
         label="Outline"
         value={style.outline}

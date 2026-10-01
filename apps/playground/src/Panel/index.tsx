@@ -58,9 +58,10 @@ export default function Panel({
   onCopyLink,
 }: IProps) {
   const [target, setTarget] = useState<AuraTarget>("dictation");
-  const style = effectiveStyle(target, settings[target], background);
+  const isMobile = settings.view === "mobile";
+  const style = effectiveStyle(target, settings[target], background, settings.view);
   const meterTarget = liveTarget ?? target;
-  const meterStyle = effectiveStyle(meterTarget, settings[meterTarget], background);
+  const meterStyle = effectiveStyle(meterTarget, settings[meterTarget], background, settings.view);
 
   const handleStyle = (next: Partial<IAuraStyle>): void => {
     onChange({ [target]: { ...settings[target], ...next } });
@@ -92,16 +93,24 @@ export default function Panel({
       </div>
       <div className="panel-scroll">
         <LiveBands bands={meterStyle.bands} palette={meterStyle.palette} status={status} readLevels={readLevels} />
-        <AuraControls target={target} style={style} onTarget={setTarget} onChange={handleStyle} />
+        <AuraControls
+          target={target}
+          style={style}
+          hasPlacement={!isMobile}
+          onTarget={setTarget}
+          onChange={handleStyle}
+        />
         <section className="p-section">
           <h2 className="p-title">Dictation</h2>
           <Segment label="Voice" value={settings.source} options={SOURCES} onChange={handleSource} />
-          <Segment
-            label="Anchor"
-            value={settings.dictationAnchor}
-            options={DICTATION_ANCHORS}
-            onChange={handleDictationAnchor}
-          />
+          {isMobile ? null : (
+            <Segment
+              label="Anchor"
+              value={settings.dictationAnchor}
+              options={DICTATION_ANCHORS}
+              onChange={handleDictationAnchor}
+            />
+          )}
           <p className="p-note">
             {hasRecognition
               ? "With the microphone, the words come from your browser's own speech recognition, which may send the audio to its maker's servers. The demo clip stays in the page."
@@ -110,12 +119,18 @@ export default function Panel({
         </section>
         <section className="p-section">
           <h2 className="p-title">Read aloud</h2>
-          <Select
-            label="Anchor"
-            value={settings.readAloudAnchor}
-            options={READ_ALOUD_ANCHORS}
-            onChange={handleReadAloudAnchor}
-          />
+          {isMobile ? (
+            <p className="p-note">
+              On a phone both spotlights hang the bands from the top of the screen, as @saystack/react-native does.
+            </p>
+          ) : (
+            <Select
+              label="Anchor"
+              value={settings.readAloudAnchor}
+              options={READ_ALOUD_ANCHORS}
+              onChange={handleReadAloudAnchor}
+            />
+          )}
           <Toggle
             label="Wait 1.2 s for the first audio, like an engine"
             isOn={settings.hasLatency}

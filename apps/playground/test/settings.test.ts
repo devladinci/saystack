@@ -18,6 +18,7 @@ const tuned: ISettings = {
   readAloud: { lineWidth: 3, palette: "sunset" },
   source: "mic",
   readAloudAnchor: "chat",
+  view: "mobile",
 };
 
 describe("share links", () => {
@@ -32,7 +33,13 @@ describe("share links", () => {
 
   it("fall back to the defaults for anything they do not know", () => {
     const hash = encodeURIComponent(
-      JSON.stringify({ theme: "neon", source: 3, dictation: { bands: 99, layout: "spiral", glow: 1 }, extra: true }),
+      JSON.stringify({
+        theme: "neon",
+        source: 3,
+        view: "tablet",
+        dictation: { bands: 99, layout: "spiral", glow: 1 },
+        extra: true,
+      }),
     );
 
     expect(decodeSettings(hash)).toEqual({ ...DEFAULT_SETTINGS, dictation: { bands: 8 } });
@@ -42,15 +49,25 @@ describe("share links", () => {
 
 describe("aura styles", () => {
   it("leave the library defaults alone until something is tuned", () => {
-    expect(effectiveStyle("dictation", {}, "dark")).toEqual(DEFAULT_AURA_STYLE);
-    expect(effectiveStyle("readAloud", {}, "dark")).toEqual(resolveAuraStyle(auraStyleFor(MESSAGE_AURA_STYLE, "dark")));
+    expect(effectiveStyle("dictation", {}, "dark", "desktop")).toEqual(DEFAULT_AURA_STYLE);
+    expect(effectiveStyle("readAloud", {}, "dark", "desktop")).toEqual(
+      resolveAuraStyle(auraStyleFor(MESSAGE_AURA_STYLE, "dark")),
+    );
+  });
+
+  it("read aloud on mobile with the wave from the top edge, as React Native does, not the glow around a reply", () => {
+    expect(effectiveStyle("readAloud", {}, "dark", "mobile")).toEqual(DEFAULT_AURA_STYLE);
+    expect(effectiveStyle("readAloud", { lineWidth: 3 }, "light", "mobile")).toEqual({
+      ...DEFAULT_AURA_STYLE,
+      lineWidth: 3,
+    });
   });
 
   it("apply a tuned read-aloud value on both backgrounds, even where the default differs per background", () => {
     const options = readAloudStyleOptions({ lineWidth: 3 });
 
-    expect(effectiveStyle("readAloud", { lineWidth: 3 }, "dark").lineWidth).toBe(3);
-    expect(effectiveStyle("readAloud", { lineWidth: 3 }, "light").lineWidth).toBe(3);
+    expect(effectiveStyle("readAloud", { lineWidth: 3 }, "dark", "desktop").lineWidth).toBe(3);
+    expect(effectiveStyle("readAloud", { lineWidth: 3 }, "light", "desktop").lineWidth).toBe(3);
     expect(options.dark?.lineWidth).toBe(3);
     expect(options.light?.lineWidth).toBe(3);
   });
@@ -65,7 +82,7 @@ describe("the copied config", () => {
   });
 
   it("carries every tuned value", () => {
-    const snippet = configSnippet(tuned);
+    const snippet = configSnippet({ ...tuned, view: "desktop" });
 
     expect(snippet).toContain(
       'useDictationAura(composerRef, dictation, { style: { bands: 5, layout: "mirror", lineWidth: 2.4 } });',
@@ -73,5 +90,24 @@ describe("the copied config", () => {
     expect(snippet).toContain("bands: 5 });");
     expect(snippet).toContain('palette: "sunset"');
     expect(snippet).toContain("dark: { lineWidth: 3,");
+  });
+});
+
+describe("the copied config on mobile", () => {
+  it("is React Native code with the spotlights' own defaults when nothing is tuned", () => {
+    const snippet = configSnippet({ ...DEFAULT_SETTINGS, view: "mobile" });
+
+    expect(snippet).toContain('from "@saystack/react-native";');
+    expect(snippet).toContain("<DictationSpotlight dictation={dictation} hold={hold} theme={theme} />");
+    expect(snippet).toContain("<ReadAloudSpotlight theme={theme} />");
+    expect(snippet).not.toContain("@saystack/react-web");
+  });
+
+  it("carries every tuned value as the spotlights' aura style", () => {
+    const snippet = configSnippet(tuned);
+
+    expect(snippet).toContain('auraStyle={{ bands: 5, layout: "mirror", lineWidth: 2.4 }}');
+    expect(snippet).toContain('<ReadAloudSpotlight theme={theme} auraStyle={{ lineWidth: 3, palette: "sunset" }} />');
+    expect(snippet).toContain("useNativeDictation({ endpoint: `${API}/audio/transcriptions`, bands: 5,");
   });
 });

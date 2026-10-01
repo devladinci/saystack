@@ -1,19 +1,20 @@
 import type { AuraBackground } from "@saystack/core";
-import { ReadAloudPlayer, useDictationAura, useFieldInput, useReadAloud } from "@saystack/react-web";
+import { useFieldInput, useReadAloud } from "@saystack/react-web";
 import { unlockWebAudio } from "@saystack/web";
 import { useEffect, useRef, useState } from "react";
 
 import type { IThreadMessage } from "./content.js";
 import { CANNED_REPLY, THREAD } from "./content.js";
-import { ChatMessage } from "./ChatMessage.js";
-import { Composer } from "./Composer.js";
+import Desktop from "./Desktop";
 import { hasBrowserRecognition } from "./dictation/browserRecognition.js";
 import { Icon } from "./Icon.js";
+import Mobile from "./Mobile";
+import { createCaptionInput } from "./Mobile/captionInput.js";
 import Panel from "./Panel";
-import { ReadAloudGlow } from "./ReadAloudGlow.js";
-import type { ISettings, Theme } from "./settings.js";
-import { configSnippet, effectiveStyle, readAloudStyleOptions } from "./settings.js";
+import type { ISettings, Theme, View } from "./settings.js";
+import { configSnippet, effectiveStyle } from "./settings.js";
 import { usePlaygroundDictation } from "./usePlaygroundDictation.js";
+import { ViewSwitch } from "./ViewSwitch.js";
 
 interface IProps {
   settings: ISettings;
@@ -42,19 +43,26 @@ export function Playground({ settings, background, onChange, onReset }: IProps) 
   const [toast, setToast] = useState<string | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [hasRecognition] = useState(hasBrowserRecognition);
-  const input = useFieldInput(fieldRef, setDraft);
-  const dictationStyle = effectiveStyle("dictation", settings.dictation, background);
-  const dictation = usePlaygroundDictation(settings.source, dictationStyle.bands, input);
+  const [caption, setCaption] = useState("");
+  const [isDropping, setIsDropping] = useState(false);
+  const fieldInput = useFieldInput(fieldRef, setDraft);
+  const [captionInput] = useState(() =>
+    createCaptionInput(fieldInput, {
+      onCaption: (text) => {
+        setCaption(text);
+        setIsDropping(false);
+      },
+      onDrop: () => setIsDropping(true),
+    }),
+  );
+  const isMobile = settings.view === "mobile";
+  const dictationStyle = effectiveStyle("dictation", settings.dictation, background, settings.view);
+  const dictation = usePlaygroundDictation(settings.source, dictationStyle.bands, isMobile ? captionInput : fieldInput);
   const readAloud = useReadAloud();
   const [speech, speechApi] = readAloud.speech;
   const isRecording = dictation.state === "recording";
   const isReading = speech.phase === "loading" || speech.phase === "playing" || speech.phase === "paused";
-  const dictationAnchor = { composer: formRef, mic: micRef, page: null }[settings.dictationAnchor];
-
-  useDictationAura(dictationAnchor, dictation, {
-    style: settings.dictation,
-    padding: settings.dictationAnchor === "mic" ? 2 : 0,
-  });
+  const messages = [...THREAD, ...sent];
 
   const notify = (message: string): void => {
     setToast(message);
@@ -109,6 +117,10 @@ export function Playground({ settings, background, onChange, onReset }: IProps) 
   const handleTheme = (): void => {
     const next = THEMES[(THEMES.indexOf(settings.theme) + 1) % THEMES.length] ?? "system";
     onChange({ theme: next });
+  };
+
+  const handleView = (view: View): void => {
+    onChange({ view });
   };
 
   const handleTogglePanel = (): void => {
@@ -177,17 +189,15 @@ export function Playground({ settings, background, onChange, onReset }: IProps) 
 
   return (
     <div className="app">
-      <main className="chat">
+      <main className="chat" data-view={settings.view}>
         <header className="chat-head">
           <div className="brand">
             <img className="brand-mark" src="./favicon.svg" alt="" width={22} height={22} />
             <span className="wordmark">saystack</span>
             <span className="brand-sub">Playground</span>
           </div>
+          <ViewSwitch view={settings.view} onChange={handleView} />
           <div className="head-actions">
-            <a className="text-link" href="./mobile.html">
-              Mobile
-            </a>
             <a className="text-link" href={REPO_URL}>
               GitHub
             </a>
@@ -219,44 +229,40 @@ export function Playground({ settings, background, onChange, onReset }: IProps) 
           </div>
         )}
 
-        <div ref={chatRef} className="scroll">
-          <div className="thread">
-            <p className="thread-note">
-              Try saystack&apos;s voice UI. The replies and the voice are pre-recorded, so nothing leaves the page
-              unless you use the microphone. Press the mic to dictate, or Read aloud under a reply.
-            </p>
-            {[...THREAD, ...sent].map((message) => (
-              <ChatMessage key={message.id} message={message} onCopy={handleCopyMessage} />
-            ))}
-          </div>
-        </div>
-
-        <div className="dock">
-          <div ref={playerRef}>
-            <ReadAloudPlayer style={effectiveStyle("readAloud", settings.readAloud, background)} />
-          </div>
-          <Composer
+        {isMobile ? (
+          <Mobile
+            settings={settings}
+            background={background}
+            messages={messages}
             dictation={dictation}
             draft={draft}
+            caption={caption}
+            isDropping={isDropping}
+            chatRef={chatRef}
             formRef={formRef}
             fieldRef={fieldRef}
             micRef={micRef}
             onDraft={setDraft}
             onSend={handleSend}
+            onCopyMessage={handleCopyMessage}
           />
-          <p className="dock-note">
-            <span>Voice: {settings.source === "demo" ? "demo clip" : "microphone"}</span>
-            <span>
-              <kbd>M</kbd> dictate
-            </span>
-            <span>
-              <kbd>Space</kbd> pause
-            </span>
-            <span>
-              <kbd>Esc</kbd> stop
-            </span>
-          </p>
-        </div>
+        ) : (
+          <Desktop
+            settings={settings}
+            background={background}
+            messages={messages}
+            dictation={dictation}
+            draft={draft}
+            chatRef={chatRef}
+            formRef={formRef}
+            fieldRef={fieldRef}
+            micRef={micRef}
+            playerRef={playerRef}
+            onDraft={setDraft}
+            onSend={handleSend}
+            onCopyMessage={handleCopyMessage}
+          />
+        )}
       </main>
 
       <Panel
@@ -274,13 +280,6 @@ export function Playground({ settings, background, onChange, onReset }: IProps) 
         onCopyLink={handleCopyLink}
       />
       {isPanelOpen ? <div className="scrim" aria-hidden="true" onClick={handleClosePanel} /> : null}
-
-      <ReadAloudGlow
-        anchor={settings.readAloudAnchor}
-        chatRef={chatRef}
-        playerRef={playerRef}
-        style={readAloudStyleOptions(settings.readAloud)}
-      />
     </div>
   );
 }

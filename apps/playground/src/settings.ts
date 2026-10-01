@@ -15,6 +15,7 @@ export type DictationSource = "mic" | "demo";
 export type DictationAnchor = "composer" | "mic" | "page";
 export type ReadAloudAnchor = "message" | "chat" | "player" | "page";
 export type AuraTarget = "dictation" | "readAloud";
+export type View = "desktop" | "mobile";
 export type StyleOverrides = Partial<IAuraStyle>;
 
 export interface ISettings {
@@ -25,6 +26,7 @@ export interface ISettings {
   dictationAnchor: DictationAnchor;
   readAloudAnchor: ReadAloudAnchor;
   hasLatency: boolean;
+  view: View;
 }
 
 export const DEFAULT_SETTINGS: Readonly<ISettings> = {
@@ -35,6 +37,7 @@ export const DEFAULT_SETTINGS: Readonly<ISettings> = {
   dictationAnchor: "composer",
   readAloudAnchor: "message",
   hasLatency: true,
+  view: "desktop",
 };
 
 const STYLE_CHOICES: Readonly<Record<string, readonly string[]>> = {
@@ -95,8 +98,14 @@ export function readAloudStyleOptions(overrides: StyleOverrides): IAuraStyleOpti
   return { ...base, ...shared, dark, light };
 }
 
-export function effectiveStyle(target: AuraTarget, overrides: StyleOverrides, background: AuraBackground): IAuraStyle {
-  if (target === "dictation") {
+// On mobile both spotlights hang the same wave from the top edge, so read-aloud has no glow defaults to start from.
+export function effectiveStyle(
+  target: AuraTarget,
+  overrides: StyleOverrides,
+  background: AuraBackground,
+  view: View,
+): IAuraStyle {
+  if (target === "dictation" || view === "mobile") {
     return resolveAuraStyle(overrides);
   }
 
@@ -147,6 +156,7 @@ export function decodeSettings(hash: string): ISettings {
       DEFAULT_SETTINGS.readAloudAnchor,
     ),
     hasLatency: typeof parsed.hasLatency === "boolean" ? parsed.hasLatency : DEFAULT_SETTINGS.hasLatency,
+    view: oneOf<View>(["desktop", "mobile"], parsed.view, DEFAULT_SETTINGS.view),
   };
 }
 
@@ -157,10 +167,11 @@ const objectLiteral = (entries: object): string =>
     .map(([key, value]) => `${key}: ${isRecord(value) ? objectLiteral(value) : literal(value)}`)
     .join(", ")} }`;
 
-export function configSnippet({ dictation, readAloud }: ISettings): string {
-  const dictationOptions = Object.keys(dictation).length === 0 ? "" : `, { style: ${objectLiteral(dictation)} }`;
-  const readAloudProps =
-    Object.keys(readAloud).length === 0 ? "" : ` style={${objectLiteral(readAloudStyleOptions(readAloud))}}`;
+const isTuned = (overrides: StyleOverrides): boolean => Object.keys(overrides).length > 0;
+
+function webSnippet({ dictation, readAloud }: ISettings): string {
+  const dictationOptions = isTuned(dictation) ? `, { style: ${objectLiteral(dictation)} }` : "";
+  const readAloudProps = isTuned(readAloud) ? ` style={${objectLiteral(readAloudStyleOptions(readAloud))}}` : "";
   const dictationBands = dictation.bands === undefined ? "" : `, bands: ${dictation.bands}`;
   const readAloudBands = readAloud.bands === undefined ? "" : ` bands={${readAloud.bands}}`;
 
@@ -174,4 +185,41 @@ export function configSnippet({ dictation, readAloud }: ISettings): string {
     `  <ReadAloudAura${readAloudProps} />`,
     "</ReadAloudProvider>",
   ].join("\n");
+}
+
+function nativeSnippet({ dictation, readAloud }: ISettings): string {
+  const dictationStyle = isTuned(dictation) ? ` auraStyle={${objectLiteral(dictation)}}` : "";
+  const readAloudStyle = isTuned(readAloud) ? ` auraStyle={${objectLiteral(readAloud)}}` : "";
+  const dictationBands = dictation.bands === undefined ? "" : ` bands: ${dictation.bands},`;
+  const readAloudBands = readAloud.bands === undefined ? "" : ` bands={${readAloud.bands}}`;
+
+  return [
+    "import {",
+    "  DictationSpotlight,",
+    "  ReadAloudProvider,",
+    "  ReadAloudSpotlight,",
+    "  useHoldToTalk,",
+    "  useNativeDictation,",
+    "  voiceTheme,",
+    '} from "@saystack/react-native";',
+    'import { useColorScheme } from "react-native";',
+    "",
+    'const theme = voiceTheme(useColorScheme() === "dark" ? "dark" : "light");',
+    `const dictation = useNativeDictation({ endpoint: \`\${API}/audio/transcriptions\`,${dictationBands} onInsert: setDraft });`,
+    "const hold = useHoldToTalk({",
+    "  onStart: dictation.handlePressStart,",
+    "  onEnd: dictation.handlePressEnd,",
+    "  onCancel: dictation.handleCancel,",
+    "});",
+    "",
+    `<DictationSpotlight dictation={dictation} hold={hold} theme={theme}${dictationStyle} />`,
+    "",
+    `<ReadAloudProvider endpoint={\`\${API}/speech\`}${readAloudBands}>`,
+    `  <ReadAloudSpotlight theme={theme}${readAloudStyle} />`,
+    "</ReadAloudProvider>",
+  ].join("\n");
+}
+
+export function configSnippet(settings: ISettings): string {
+  return settings.view === "mobile" ? nativeSnippet(settings) : webSnippet(settings);
 }
