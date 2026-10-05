@@ -2,7 +2,17 @@
   "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
   "changelog": "@changesets/cli/changelog",
   "commit": false,
-  "fixed": [],
+  "fixed": [
+    [
+      "@saystack/core",
+      "@saystack/engine-openai-compatible",
+      "@saystack/react",
+      "@saystack/react-native",
+      "@saystack/react-web",
+      "@saystack/server",
+      "@saystack/web"
+    ]
+  ],
   "linked": [],
   "access": "public",
   "baseBranch": "main",

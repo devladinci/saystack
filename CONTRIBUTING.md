@@ -50,6 +50,10 @@ Pick the packages, the bump (patch for fixes, minor for features and, before 1.0
 or two sentences for the changelog. Exported names, types and error codes are public API: changing them is a
 breaking change.
 
+All published packages share one version: a changeset for any of them releases all of them, so an app always
+installs a matching set. Merging the version pull request publishes to npm and creates the git tags and GitHub
+releases.
+
 ## Design rules
 
 - `@saystack/core` has no runtime dependencies and knows no vendor or platform.
