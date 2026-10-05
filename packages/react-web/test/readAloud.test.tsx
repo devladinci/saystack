@@ -162,7 +162,7 @@ describe("ReadAloudProvider", () => {
           rules: [{ value: "amusement", label: "amused" }],
         }}
         summarize={summarize}
-        shouldRewrite={() => true}
+        shouldSummarize={() => true}
       >
         <Reply id="a" />
         <Watcher />
@@ -199,7 +199,7 @@ describe("ReadAloudProvider", () => {
     const fake = fakeDriver();
     const summarize = vi.fn(async () => "A short summary.");
     renderApp(
-      <ReadAloudProvider driver={fake.driver} summarize={summarize} shouldRewrite={() => true}>
+      <ReadAloudProvider driver={fake.driver} summarize={summarize} shouldSummarize={() => true}>
         <Reply id="a" />
         <Watcher />
       </ReadAloudProvider>,
@@ -211,6 +211,52 @@ describe("ReadAloudProvider", () => {
     expect(summarize).toHaveBeenCalledWith("a", "A very long reply with a table.", expect.any(AbortSignal));
     expect(latest.readAloud?.isSummary).toBe(true);
     expect(fake.synthesize).toHaveBeenCalledWith(expect.objectContaining({ text: "A short summary." }));
+  });
+
+  it("rewrites a short reply a voice cannot read, and summarizes only a long one", async () => {
+    const fake = fakeDriver();
+    const rewrite = vi.fn(async () => "It costs twenty-five leva.");
+    const summarize = vi.fn(async () => "A short summary.");
+    const long = "Here are the plans:\n\n| Plan | Seats |\n| --- | --- |\n| Pro | 5 |";
+    renderApp(
+      <ReadAloudProvider driver={fake.driver} rewrite={rewrite} summarize={summarize}>
+        <Reply id="a" />
+        <Reply id="b" />
+        <Watcher />
+      </ReadAloudProvider>,
+    );
+
+    act(() => messages.a?.speak("It costs 25 лв."));
+    await flush();
+
+    expect(summarize).not.toHaveBeenCalled();
+    expect(rewrite).toHaveBeenCalledWith("It costs 25 лв.", expect.any(AbortSignal));
+    expect(fake.synthesize).toHaveBeenCalledWith(expect.objectContaining({ text: "It costs twenty-five leva." }));
+
+    act(() => messages.b?.speak(long));
+    await flush();
+
+    expect(summarize).toHaveBeenCalledWith("b", long, expect.any(AbortSignal));
+    expect(rewrite).toHaveBeenCalledOnce();
+    expect(latest.readAloud?.isSummary).toBe(true);
+  });
+
+  it("reads a plain reply as written, without a rewrite or a summary", async () => {
+    const fake = fakeDriver();
+    const rewrite = vi.fn(async () => "Not this.");
+    const summarize = vi.fn(async () => "Not this either.");
+    renderApp(
+      <ReadAloudProvider driver={fake.driver} rewrite={rewrite} summarize={summarize}>
+        <Reply id="a" />
+      </ReadAloudProvider>,
+    );
+
+    act(() => messages.a?.speak("Reply a says hello."));
+    await flush();
+
+    expect(rewrite).not.toHaveBeenCalled();
+    expect(summarize).not.toHaveBeenCalled();
+    expect(fake.synthesize).toHaveBeenCalledWith(expect.objectContaining({ text: "Reply a says hello." }));
   });
 
   it("stops reading when asked", async () => {

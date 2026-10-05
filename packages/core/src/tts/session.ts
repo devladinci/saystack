@@ -1,6 +1,6 @@
 import type { IStyleMap } from "./style.js";
 import { applyStyle, EMPTY_STYLE_MAP, matchStyle, styleReserve } from "./style.js";
-import { hasSpeechText, needsSummary, speechChunks, toSpeechText } from "./text.js";
+import { hasSpeechText, needsRewrite, speechChunks, toSpeechText } from "./text.js";
 import { estimateWordTimings, wordAt, wordTimingsFromMarks } from "./timing.js";
 import type { ISpeechMark, IWordTiming } from "./timing.js";
 import type {
@@ -338,7 +338,7 @@ export function createSpeechSession(driver: ITtsDriver, sessionOptions: ISpeechS
   };
 
   const spokenSource = async (markdown: string, styleMap: IStyleMap, signal: AbortSignal): Promise<IResolvedSpeech> => {
-    const { rewrite, shouldRewrite = needsSummary } = sessionOptions;
+    const { rewrite, shouldRewrite = needsRewrite } = sessionOptions;
     const asIs: IResolvedSpeech = { text: markdown, style: undefined };
 
     if (rewrite === undefined || !shouldRewrite(markdown)) {

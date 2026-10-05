@@ -74,7 +74,7 @@ export type {
 } from "./tts/session.js";
 export { createSpeechSession } from "./tts/session.js";
 
-export { hasSpeechText, needsSummary, speechChunks, toReadingBlocks, toSpeechText } from "./tts/text.js";
+export { hasSpeechText, needsRewrite, needsSummary, speechChunks, toReadingBlocks, toSpeechText } from "./tts/text.js";
 
 export type { IStyleChannel, IStyleMap, IStyleRule, IStyledText } from "./tts/style.js";
 export {

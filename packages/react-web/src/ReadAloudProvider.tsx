@@ -22,6 +22,7 @@ interface IProps extends ISpeechSource {
   rewrite?: RewriteFn;
   shouldRewrite?: (markdown: string) => boolean;
   summarize?: SummarizeFn;
+  shouldSummarize?: (markdown: string) => boolean;
   styleMap?: IStyleMap;
   children: ReactNode;
 }
@@ -59,6 +60,7 @@ export function ReadAloudProvider({
   rewrite,
   shouldRewrite,
   summarize,
+  shouldSummarize,
   styleMap,
   children,
 }: IProps) {
@@ -76,6 +78,7 @@ export function ReadAloudProvider({
       ...(rewrite === undefined ? {} : { rewrite }),
       ...(shouldRewrite === undefined ? {} : { shouldRewrite }),
       ...(summarize === undefined ? {} : { summarize }),
+      ...(shouldSummarize === undefined ? {} : { shouldSummarize }),
       ...(styleMap === undefined ? {} : { styleMap }),
     };
   });

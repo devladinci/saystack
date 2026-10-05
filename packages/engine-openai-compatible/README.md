@@ -66,6 +66,15 @@ rewritten for speech. The realtime adapters plug into `realtime.createAdapter` i
   not yet been run against OpenAI itself. Speaches 0.1 speaks an older version of that protocol, so use upload
   dictation with Speaches for now.
 
+## Speech rewriting
+
+`createLlmNormalizer` rewrites a reply in its own language and never translates it. Numbers stay in digits, exactly
+as written, while currency, percent, units, ranges and links become words, so `4,2%` is read as `4,2 процента`. A
+rewrite that changes, adds or leaves out a number, or switches to another writing system, comes back as
+`NORMALIZE_BAD_RESPONSE`, and the reply is read as written instead. The `languages` you pass are a hint about which
+languages to expect, not a target. The prompt spells out the answer's JSON shape as well as sending it as
+`response_format`, so servers that ignore structured output, such as Ollama's cloud models, work too.
+
 ## Delivery style
 
 `createLlmNormalizer` rewrites a reply for the ear, and a reply can carry a delivery style with it. Offer the

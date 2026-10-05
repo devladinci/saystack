@@ -16,7 +16,7 @@ npm install @saystack/core
 ## Speakable text
 
 ```ts
-import { needsSummary, speechChunks, toReadingBlocks, toSpeechText } from "@saystack/core";
+import { needsRewrite, speechChunks, toReadingBlocks, toSpeechText } from "@saystack/core";
 
 const reply = [
   "## Release",
@@ -31,14 +31,15 @@ const reply = [
 const speakable = toSpeechText(reply);
 const chunks = speechChunks(speakable);
 const blocks = toReadingBlocks(reply);
-const isWorthRewriting = needsSummary(reply);
+const isWorthRewriting = needsRewrite(reply);
 ```
 
-`toSpeechText` drops the markdown, code and tables and ends every line as a sentence:
-`Release. The build passed. Run pnpm release to publish it.` `speechChunks` splits that into pieces that start
-short and grow, so the first audio is ready quickly. `toReadingBlocks` gives what a reader sees: one block per
-heading, paragraph or list item, without code and tables. `needsSummary` is true for replies with code, tables or
-a lot of text, which are better rewritten before they are spoken.
+`toSpeechText` drops the markdown, code, tables and emoji, reads a link as its domain, and ends every line as a
+sentence: `Release. The build passed. Run pnpm release to publish it.` `speechChunks` splits that into pieces that
+start short and grow, so the first audio is ready quickly. `toReadingBlocks` gives what a reader sees: one block per
+heading, paragraph or list item, without code and tables. `needsRewrite` is true for a reply a voice can't read as
+written — one with numbers, symbols, links, code or a table — and decides when a speech session asks its `rewrite`
+by default. `needsSummary` is true for replies with code, tables or a lot of text.
 
 ## Delivery style
 

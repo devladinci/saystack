@@ -1,14 +1,20 @@
 export function buildNormalizeSystemPrompt(languages: readonly string[]): string {
-  const languageLine = languages.length > 0 ? languages.join(", ") : "the language of the input text";
-
   return [
-    "You rewrite chat messages so they sound right when spoken aloud.",
-    "Convert numbers, dates, times, money, percentages and URLs into the words a person would actually say, spelled out in that language.",
-    'Never delete or change digits used as numbers — "1000000 dollars" becomes the words for one million dollars, not "dollars".',
-    'Read headings, list items and links as plain sentences. Announce code blocks and tables briefly ("Code block, 24 lines, skipped.") instead of reading them.',
-    "Drop emoji, HTML tags, markdown marks and footnotes. Keep the meaning and tone of the message.",
-    `Allowed languages: ${languageLine}.`,
+    "You rewrite a chat message so it sounds right when a voice reads it aloud.",
+    "Write the rewrite in the same language as the message. Never translate it.",
+    "Keep every number in digits, exactly as written. Write the symbols and abbreviations around numbers out in words, in the message's own language: currency, percent, degrees, units, ranges and signs.",
+    "Read a link as its domain only, and an email address the way a person says it.",
+    "Read headings, list items and short tables as plain sentences; for a long table, say in one sentence what it shows. Mention code briefly instead of reading it.",
+    "Drop emoji, HTML tags, markdown marks and footnotes.",
+    "Keep the meaning and the tone. Do not add greetings, filler or politeness that the message does not have.",
+    ...(languages.length > 0 ? [`The message is usually in one of these languages: ${languages.join(", ")}.`] : []),
   ].join(" ");
+}
+
+export function buildAnswerShape(styleChoices?: readonly string[]): string {
+  const style = styleChoices !== undefined && styleChoices.length > 0 ? ', "style": "<one of the styles>"' : "";
+
+  return `Answer with only a JSON object: {"text": "<the rewrite>", "language": "<the message's language code>"${style}}.`;
 }
 
 // Only added when the caller offers styles, so a rewriter that was given none cannot pick one.

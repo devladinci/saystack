@@ -1,5 +1,5 @@
 import type { IRewriteFn, IRewriteResult, IStyleMap, ITtsDriver } from "@saystack/core";
-import { createSpeechSession, hasSpeechText } from "@saystack/core";
+import { createSpeechSession, hasSpeechText, needsRewrite, needsSummary } from "@saystack/core";
 
 import { createSpeechApi } from "../useSpeech.js";
 import type { IReadAloudStore, ReadAloudId } from "./readAloudStore.js";
@@ -18,6 +18,7 @@ export interface IReadAloudSources {
   rewrite?: RewriteFn;
   shouldRewrite?: (markdown: string) => boolean;
   summarize?: SummarizeFn;
+  shouldSummarize?: (markdown: string) => boolean;
   styleMap?: IStyleMap;
 }
 
@@ -34,11 +35,11 @@ export function createReadAloud<TAnchor>({
   sources,
 }: ICreateReadAloudOptions): IReadAloudStore<TAnchor> {
   const spoken: RewriteFn = async (markdown, signal) => {
-    const current = sources();
+    const { rewrite, shouldRewrite = needsRewrite, summarize, shouldSummarize = needsSummary } = sources();
     const id = store.speakingId();
 
-    if (current.summarize !== undefined && id !== null) {
-      const summary = await current.summarize(id, markdown, signal);
+    if (summarize !== undefined && id !== null && shouldSummarize(markdown)) {
+      const summary = await summarize(id, markdown, signal);
       const isSummary = summary !== null && hasSpeechText(typeof summary === "string" ? summary : summary.text);
       store.markSummary(id, isSummary);
 
@@ -47,7 +48,7 @@ export function createReadAloud<TAnchor>({
       }
     }
 
-    return current.rewrite === undefined ? null : current.rewrite(markdown, signal);
+    return rewrite !== undefined && shouldRewrite(markdown) ? rewrite(markdown, signal) : null;
   };
 
   const session = createSpeechSession(driver, {
@@ -56,9 +57,8 @@ export function createReadAloud<TAnchor>({
 
       return current.rewrite === undefined && current.summarize === undefined ? undefined : spoken;
     },
-    get shouldRewrite() {
-      return sources().shouldRewrite;
-    },
+    // spoken applies the summary's and the rewrite's own triggers, so the session must not gate it on either.
+    shouldRewrite: () => true,
     get styleMap() {
       return sources().styleMap;
     },
