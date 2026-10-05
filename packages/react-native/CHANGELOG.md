@@ -1,5 +1,18 @@
 # @saystack/react-native
 
+## 0.3.0
+
+### Minor Changes
+
+- 3faf824: `ReadAloudProvider` takes `shouldSummarize`. `rewrite` now also runs for short replies with numbers, symbols or links, and `shouldRewrite` no longer decides when `summarize` runs.
+
+### Patch Changes
+
+- Updated dependencies [3faf824]
+- Updated dependencies [3faf824]
+  - @saystack/core@0.3.0
+  - @saystack/react@0.3.0
+
 ## 0.2.1
 
 ### Patch Changes

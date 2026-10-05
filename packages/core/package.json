@@ -1,6 +1,6 @@
 {
   "name": "@saystack/core",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Engine-agnostic core: turn LLM output into speakable text, chunked for streaming.",
   "license": "MIT",
   "author": "DeVladinci",

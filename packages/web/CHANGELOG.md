@@ -1,5 +1,12 @@
 # @saystack/web
 
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [3faf824]
+  - @saystack/core@0.3.0
+
 ## 0.1.3
 
 ### Patch Changes
