@@ -127,6 +127,30 @@ describe("createSpeechSession — what gets spoken", () => {
     expect(fake.calls[0]).toBe("A short spoken version.");
   });
 
+  it("rewrites a short reply that a voice cannot read as written", async () => {
+    const fake = playbackDriver();
+    const rewrite = vi.fn(async () => "The meeting is at three in the afternoon.");
+    const session = createSpeechSession(fake.driver, { rewrite });
+
+    void session.speak("The meeting is at 3 pm.");
+    await settle();
+
+    expect(rewrite).toHaveBeenCalledWith("The meeting is at 3 pm.", expect.any(AbortSignal));
+    expect(fake.calls[0]).toBe("The meeting is at three in the afternoon.");
+  });
+
+  it("reads plain sentences without asking for a rewrite", async () => {
+    const fake = playbackDriver();
+    const rewrite = vi.fn(async () => "Not this.");
+    const session = createSpeechSession(fake.driver, { rewrite });
+
+    void session.speak("Sure, I'll read it to you.");
+    await settle();
+
+    expect(rewrite).not.toHaveBeenCalled();
+    expect(fake.calls[0]).toBe("Sure, I'll read it to you.");
+  });
+
   it("falls back to the full text when the rewrite fails", async () => {
     const fake = playbackDriver();
     const session = createSpeechSession(fake.driver, {

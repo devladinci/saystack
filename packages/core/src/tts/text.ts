@@ -9,27 +9,33 @@ const SUMMARY_MIN_CHARS = 600;
 const CODE_FENCE = /```[\s\S]*?(?:```|$)/g;
 const TABLE_ROW = /^\s*\|.*\|\s*$/;
 const RULE = /^\s*(?:[-*_]\s*){3,}$/;
-const LINE_MARKER = /^\s*(?:#{1,6}\s+|>\s?|[-*+]\s+|\d+[.)]\s+)/;
+const LINE_MARKER = /^\s*(?:#{1,6}\s+|>\s?|[-*+]\s+|\d{1,3}[.)]\s+)/;
 const IMAGE = /!\[[^\]]*\]\([^)]*\)/g;
 const LINK = /\[([^\]]*)\]\([^)]*\)/g;
-const URL = /\bhttps?:\/\/\S+/g;
+const URL =
+  /\bhttps?:\/\/(?:www\.)?([\p{L}\p{N}-]+(?:\.[\p{L}\p{N}-]+)*)(?::\d+)?(?:[/?#]\S*?)?(?=[.,;:!?)\]>"']*(?:\s|$))/gu;
 const INLINE_CODE = /`([^`]*)`/g;
-const HTML_TAG = /<\/?[a-z][^>]*>/gi;
+const HTML_TAG =
+  /<!--[\s\S]*?-->|<\/?(?:a|abbr|b|blockquote|br|code|del|details|div|em|h[1-6]|hr|i|img|ins|kbd|li|mark|ol|p|pre|s|small|span|strong|sub|summary|sup|table|tbody|td|th|thead|tr|u|ul)\b[^<>]*>/gi;
+const EMOJI =
+  /\s*(?:(?![©®™])\p{Extended_Pictographic}|\p{Regional_Indicator})(?:[\uFE0F\u20E3]|\p{Emoji_Modifier}|\u200D(?:\p{Extended_Pictographic}|\p{Regional_Indicator}))*/gu;
 const STRONG = /(\*\*|__)(.+?)\1/g;
 const EMPHASIS = /(^|[^\w*])([*_])(\S(?:.*?\S)?)\2(?![\w*])/g;
 const STRIKE = /~~(.+?)~~/g;
 const SPACES = /\s+/g;
 const SENTENCE_END = /[.!?…:;,]$/;
 const SENTENCE = /[\s\S]*?[.!?…]+["'”’»)\]]*(?=\s|$)|[\s\S]+$/g;
+const PLAIN = /^[\p{L}\p{M}\s.,!?;:'"’‘“”«»„()\-–—…]*$/u;
 
 const cleanLine = (line: string): string =>
   line
     .replace(LINE_MARKER, "")
     .replace(IMAGE, "")
     .replace(LINK, "$1")
-    .replace(URL, "")
+    .replace(URL, "$1")
     .replace(INLINE_CODE, "$1")
     .replace(HTML_TAG, "")
+    .replace(EMOJI, "")
     .replace(STRONG, "$2")
     .replace(EMPHASIS, "$1$3")
     .replace(STRIKE, "$1")
@@ -91,10 +97,14 @@ export function toReadingBlocks(markdown: string): string[] {
 
 export const hasSpeechText = (markdown: string): boolean => toSpeechText(markdown) !== "";
 
+const hasCodeOrTable = (markdown: string): boolean =>
+  markdown.includes("```") || markdown.split("\n").some((line) => TABLE_ROW.test(line));
+
 export const needsSummary = (markdown: string): boolean =>
-  markdown.includes("```") ||
-  markdown.split("\n").some((line) => TABLE_ROW.test(line)) ||
-  toSpeechText(markdown).length > SUMMARY_MIN_CHARS;
+  hasCodeOrTable(markdown) || toSpeechText(markdown).length > SUMMARY_MIN_CHARS;
+
+export const needsRewrite = (markdown: string): boolean =>
+  hasCodeOrTable(markdown) || !PLAIN.test(toSpeechText(markdown));
 
 const sentences = (text: string): string[] => (text.match(SENTENCE) ?? []).map((s) => s.trim()).filter(Boolean);
 

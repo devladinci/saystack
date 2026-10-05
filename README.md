@@ -31,10 +31,11 @@ saystack is pre-1.0: APIs may still change in minor versions, and every change i
 
 - **Speakable text.** Strip markdown, code, tables and rules out of a reply, split it into blocks and
   chunk it for streaming playback — so audio starts before the reply is complete.
-- **Speech rewriting.** Before a reply with a table, code or a lot of text is read aloud, a chat model
-  rewrites it for the ear: numbers, dates, money and links become the words a person would say, lists
-  become sentences, and code is announced rather than spelled out. Any OpenAI-compatible chat model
-  works, a 4B model on Ollama included. If the model fails, the reply is read as written.
+- **Speech rewriting.** Before a reply that a voice can't read as written is spoken — one with numbers,
+  symbols, links, code or a table — a chat model rewrites it for the ear, in the reply's own language:
+  money, percentages and units become words, lists and short tables become sentences, and code is
+  mentioned rather than spelled out. Numbers keep their exact digits; a rewrite that changes a number or
+  the language is thrown away, and the reply is read as written. Any OpenAI-compatible chat model works.
 - **Delivery style.** A rewrite may also name a style, and how that reaches the voice is the app's
   call: an extra field in the request body, or a tag prefixed to the text. Both the vocabulary and
   the channel come from the app (`IStyleMap`), so it fits an engine's `instructions` field, an
@@ -206,8 +207,10 @@ export function App({ children }: { children: ReactNode }) {
 ```
 
 `endpoint` and `headers` describe _your_ backend. `summarize` lets the server decide what a long reply
-should sound like before it is spoken: it receives `(id, markdown, signal)` and returns the shorter text
-to speak instead, or `null` to speak the reply as written. `styleMap` is your own style vocabulary and the
+should sound like before it is spoken: for a reply with code, a table or a lot of text, it receives
+`(id, markdown, signal)` and returns the shorter text to speak instead, or `null` to speak the reply as
+written. A `rewrite` works the same way for any reply a voice can't read as written, such as one with
+numbers or links; `shouldSummarize` and `shouldRewrite` change when each one runs. `styleMap` is your own style vocabulary and the
 channel it travels on, so a rewrite or a summary that answers with `{ text, style }` decides how the reply
 sounds — saystack ships no styles of its own, and a style nobody declared is dropped. The channels, and what
 an engine needs at its end, are in the [`@saystack/core`](https://github.com/devladinci/saystack/blob/main/packages/core#delivery-style)

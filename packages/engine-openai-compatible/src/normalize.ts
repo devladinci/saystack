@@ -1,7 +1,8 @@
 import type { INormalizeFn, INormalizeResult } from "@saystack/core";
 import { httpChatComplete } from "./chatCompletionsClient.js";
-import { buildNormalizeSystemPrompt, buildNormalizeUserPrompt } from "./normalizePrompt.js";
+import { buildAnswerShape, buildNormalizeSystemPrompt, buildNormalizeUserPrompt } from "./normalizePrompt.js";
 import type { IJsonSchemaFormat, ILlmChatClient } from "./llmTypes.js";
+import { checkRewrite } from "./rewriteCheck.js";
 import { normalizeBaseUrl } from "./sttAdapter.js";
 
 export interface IChatCompletionsSpec {
@@ -20,8 +21,7 @@ export function createLlmNormalizer(spec: IChatCompletionsSpec): INormalizeFn {
   return (text, languages) => normalizeWithChat(spec, text, languages);
 }
 
-function normalizeSchema(languages: readonly string[], styleChoices?: readonly string[]): IJsonSchemaFormat {
-  const language = languages.length > 0 ? { type: "string", enum: [...languages] } : { type: "string" };
+function normalizeSchema(styleChoices?: readonly string[]): IJsonSchemaFormat {
   const hasStyles = styleChoices !== undefined && styleChoices.length > 0;
 
   return {
@@ -29,15 +29,15 @@ function normalizeSchema(languages: readonly string[], styleChoices?: readonly s
     schema: {
       type: "object",
       properties: {
-        language,
         text: { type: "string" },
+        language: { type: "string" },
         // Only present when the caller offers styles; omitted otherwise, so the model cannot invent one.
         ...(hasStyles ? { style: { type: "string", enum: [...styleChoices] } } : {}),
       },
       // A style left optional is a style a model may skip — and, measured on a local 4-bit model, skip by
       // writing the style word into the spoken text instead ("Thoughtful, the plan is now…"). Required, the
       // same model answers cleanly and names the style in its own field.
-      required: hasStyles ? ["language", "text", "style"] : ["language", "text"],
+      required: hasStyles ? ["text", "language", "style"] : ["text", "language"],
       additionalProperties: false,
     },
   };
@@ -59,15 +59,8 @@ async function normalizeWithChat(
   }
 
   const timeoutMs = (spec.timeoutSeconds ?? 30) * 1000;
-  const system = spec.prompt ?? buildNormalizeSystemPrompt(languages);
-  const chatResponse = await runChat(
-    spec,
-    system,
-    buildNormalizeUserPrompt(text, spec.styleChoices),
-    timeoutMs,
-    languages,
-    spec.styleChoices,
-  );
+  const system = `${spec.prompt ?? buildNormalizeSystemPrompt(languages)} ${buildAnswerShape(spec.styleChoices)}`;
+  const chatResponse = await runChat(spec, system, buildNormalizeUserPrompt(text, spec.styleChoices), timeoutMs);
 
   if (!chatResponse.ok) {
     return {
@@ -87,6 +80,12 @@ async function normalizeWithChat(
     };
   }
 
+  const problem = checkRewrite(text, parsed.text);
+
+  if (problem !== null) {
+    return { ok: false, errorCode: "NORMALIZE_BAD_RESPONSE", message: problem };
+  }
+
   return {
     ok: true,
     normalizedText: parsed.text,
@@ -96,20 +95,13 @@ async function normalizeWithChat(
   };
 }
 
-function runChat(
-  spec: IChatCompletionsSpec,
-  system: string,
-  user: string,
-  timeoutMs: number,
-  languages: readonly string[],
-  styleChoices?: readonly string[],
-) {
+function runChat(spec: IChatCompletionsSpec, system: string, user: string, timeoutMs: number) {
   const request = {
     model: spec.model,
     system,
     user,
     timeoutMs,
-    jsonSchema: normalizeSchema(languages, styleChoices),
+    jsonSchema: normalizeSchema(spec.styleChoices),
     ...(spec.disableThinking !== undefined ? { disableThinking: spec.disableThinking } : {}),
     ...(spec.token !== undefined ? { token: spec.token } : {}),
   };

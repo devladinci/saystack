@@ -62,8 +62,10 @@ export function App() {
 
 The words are marked inside the element you pass to `useReadAloudMessage`, so render your markdown there. One
 provider reads one reply at a time across the chat. `endpoint` is your speech route, such as the one
-`@saystack/server` serves. The provider also takes `headers` (an object or a function), `rewrite` and `summarize`
-to change what a long reply sounds like before it is spoken. Instead of `endpoint`, pass `synthesize` to bring the
+`@saystack/server` serves. The provider also takes `headers` (an object or a function), `rewrite` to turn a reply
+with numbers, symbols, links, code or a table into words a voice can read, and `summarize` to read a reply with
+code, a table or a lot of text as a shorter one; `shouldRewrite` and `shouldSummarize` change when each one runs.
+Instead of `endpoint`, pass `synthesize` to bring the
 audio from anywhere else (it still plays through the aura and the player), or a whole `driver` of your own.
 `<ReadAloudAura anchor={ref} />` puts the glow around another element, or the page edges with `null`.
 

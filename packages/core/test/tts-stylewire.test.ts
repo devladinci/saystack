@@ -14,7 +14,7 @@ const TAG_MAP: IStyleMap = {
   rules: [{ value: "amusement", label: "amused" }],
 };
 
-const LONG = "A long original reply that needs a summary. ".repeat(20);
+const LONG = "A long original reply that the rewrite replaces. ".repeat(20);
 
 function makeDriver(marksFor?: (text: string) => readonly { charIndex: number; time: number }[]): {
   driver: ITtsDriver;
@@ -51,6 +51,7 @@ describe("speech session — the style a rewrite chose", () => {
   it("a declared field channel carries the mapped value on every chunk", async () => {
     const { driver, seen } = makeDriver();
     const session = createSpeechSession(driver, {
+      shouldRewrite: () => true,
       styleMap: FIELD_MAP,
       rewrite: async () => ({ text: "First line here. Second line here.", style: "amused" }),
     });
@@ -64,6 +65,7 @@ describe("speech session — the style a rewrite chose", () => {
   it("a declared tag channel pastes the tag into the text instead", async () => {
     const { driver, seen } = makeDriver();
     const session = createSpeechSession(driver, {
+      shouldRewrite: () => true,
       styleMap: TAG_MAP,
       rewrite: async () => ({ text: "First line here. Second line here.", style: "amused" }),
     });
@@ -77,6 +79,7 @@ describe("speech session — the style a rewrite chose", () => {
   it("a style nobody declared is dropped, not forwarded", async () => {
     const { driver, seen } = makeDriver();
     const session = createSpeechSession(driver, {
+      shouldRewrite: () => true,
       styleMap: FIELD_MAP,
       rewrite: async () => ({ text: "First line here. Second line here.", style: "sexy" }),
     });
@@ -89,6 +92,7 @@ describe("speech session — the style a rewrite chose", () => {
   it("with no map at all the rewrite's style never reaches the engine", async () => {
     const { driver, seen } = makeDriver();
     const session = createSpeechSession(driver, {
+      shouldRewrite: () => true,
       rewrite: async () => ({ text: "First line here. Second line here.", style: "amused" }),
     });
 
@@ -100,7 +104,10 @@ describe("speech session — the style a rewrite chose", () => {
 
   it("a rewrite that returns plain text behaves exactly as before", async () => {
     const { driver, seen } = makeDriver();
-    const session = createSpeechSession(driver, { rewrite: async () => "First line here. Second line here." });
+    const session = createSpeechSession(driver, {
+      shouldRewrite: () => true,
+      rewrite: async () => "First line here. Second line here.",
+    });
 
     await session.speak(LONG);
 
@@ -133,6 +140,7 @@ describe("speech session — the style map is read when speech starts", () => {
     const { driver, seen } = makeDriver();
     const later = { map: undefined as IStyleMap | undefined };
     const session = createSpeechSession(driver, {
+      shouldRewrite: () => true,
       get styleMap() {
         return later.map;
       },
@@ -213,6 +221,7 @@ describe("speech session — word timings under a tag channel", () => {
       ];
     });
     const session = createSpeechSession(driver, {
+      shouldRewrite: () => true,
       styleMap: TAG_MAP,
       rewrite: async () => ({ text: "First line here.", style: "amused" }),
     });
@@ -236,6 +245,7 @@ describe("speech session — the style channel and its rules come from one map",
     });
 
     const session = createSpeechSession(driver, {
+      shouldRewrite: () => true,
       get styleMap() {
         return later.map;
       },
@@ -261,6 +271,7 @@ describe("speech session — a chunk stays inside the operator's character limit
   it("leaves room for the tag the channel adds, so short chunks are not refused", async () => {
     const { driver, seen } = makeDriver();
     const session = createSpeechSession(driver, {
+      shouldRewrite: () => true,
       styleMap: TAG_MAP,
       rewrite: async () => ({ text: LONG, style: "amused" }),
     });
