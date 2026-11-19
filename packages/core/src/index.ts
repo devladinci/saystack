@@ -11,6 +11,16 @@ export type {
   UnheardPolicy,
 } from "./config.js";
 
+export type {
+  CleanupErrorCode,
+  ICleanupFn,
+  ICleanupInput,
+  ICleanupResult,
+  IContextTurn,
+  IConversationContextOptions,
+} from "./cleanup.js";
+export { conversationContext, needsCleanup } from "./cleanup.js";
+
 export type { IDictationInput, ILiveTranscription, LiveTranscriptionFactory } from "./dictation.js";
 
 export type { ILiveTranscriptionOptions, IPcmSource } from "./liveTranscription.js";

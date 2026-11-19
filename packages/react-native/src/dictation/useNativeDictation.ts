@@ -10,6 +10,9 @@ import { createNativeRecorder } from "../audio/nativeRecorder.js";
 export interface IRealtimeOptions {
   url: string | (() => string);
   params?: Readonly<Record<string, unknown>>;
+  // How long to wait for the final text after the last word. A server that cleans transcripts up with a slow
+  // model needs more than the default.
+  finishTimeoutMs?: number;
 }
 
 export interface IUseNativeDictationOptions extends Omit<
@@ -43,11 +46,13 @@ export function useNativeDictation({
   const [isStreaming, setIsStreaming] = useState(false);
   const realtimeRef = useRef(realtime);
   const languageRef = useRef(options.language);
+  const contextRef = useRef(options.context);
   const onInsertRef = useRef(onInsert);
 
   useEffect(() => {
     realtimeRef.current = realtime;
     languageRef.current = options.language;
+    contextRef.current = options.context;
     onInsertRef.current = onInsert;
   });
 
@@ -68,7 +73,9 @@ export function useNativeDictation({
         onText,
         onReady: () => setIsStreaming(true),
         ...(languageRef.current === undefined ? {} : { language: languageRef.current }),
+        ...(contextRef.current === undefined ? {} : { context: contextRef.current }),
         ...(current?.params === undefined ? {} : { params: current.params }),
+        ...(current?.finishTimeoutMs === undefined ? {} : { finishTimeoutMs: current.finishTimeoutMs }),
       });
     },
     [recorder],

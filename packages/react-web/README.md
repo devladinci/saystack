@@ -126,6 +126,12 @@ Add `realtime: { url }` to stream words while they are said, `useFieldInput` to 
 and the realtime socket, for example with the browser's own speech recognition.
 [`examples/voice-chat`](https://github.com/devladinci/saystack/tree/main/examples/voice-chat) wires them all.
 
+Pass `context` — what the conversation has been about, such as `conversationContext(messages)` from
+`@saystack/core` — and it travels with the upload and the live stream. A server that
+[cleans transcripts up](https://github.com/devladinci/saystack/blob/main/packages/server#dictation-cleanup) reads
+it to tell a misheard `peer` from the `PR` under discussion. When that cleanup runs on a slow model, give the live
+stream longer to finish with `realtime: { url, finishTimeoutMs }`.
+
 ## Related packages
 
 [`@saystack/react`](https://www.npmjs.com/package/@saystack/react),

@@ -96,6 +96,50 @@ Pass it as `createVoiceRoutes({ ..., realtime })`. On Node, `serve` also needs a
 [`examples/voice-chat/server.ts`](https://github.com/devladinci/saystack/blob/main/examples/voice-chat/server.ts).
 Browsers cannot set headers on a WebSocket, so add `authorize: (c) => boolean` to check a query token or a cookie.
 
+## Dictation cleanup
+
+Give the routes a cleaner and every transcript is tidied before it is sent back, on the upload route and at the
+end of a live one:
+
+```ts
+import { createLlmTranscriptCleaner } from "@saystack/engine-openai-compatible";
+
+createVoiceRoutes({
+  getSettings: () => settings,
+  createSttAdapter: (engine) => createOpenAiSttAdapter(engine),
+  createTtsAdapter: (engine) => createOpenAiTtsAdapter(engine, { voice: "marin" }),
+  cleanup: {
+    clean: createLlmTranscriptCleaner({ url, token, model: "gpt-6-luna" }),
+    vocabulary: ["saystack"],
+  },
+});
+```
+
+A client sends what the conversation has been about as `context`: a multipart field on the upload, and a field of
+the live route's `start` message. The dictation hooks do both when they are given a `context`. With it the cleaner
+can tell a misheard `peer` from the `PR` under discussion.
+
+Cleanup never costs the user their words. When the cleaner fails, is refused by its own check or runs out of time,
+the transcript goes out as it was heard.
+
+| Option            | Default                                                         | What it does                                                                             |
+| ----------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `clean`           |                                                                 | The cleaner, an `ICleanupFn`                                                             |
+| `vocabulary`      | none                                                            | Names and terms that may be spoken, spelled as they are written                          |
+| `shouldClean`     | context or vocabulary to check against, or `needsCleanup(text)` | Whether a transcript is worth the round trip                                             |
+| `timeoutMs`       | `4000`                                                          | How long a cleanup may take before the transcript goes out as heard                      |
+| `warmUp`          | `false`                                                         | Calls the cleaner when a live dictation starts, so a model that loads on demand is ready |
+| `maxContextChars` | `4000`                                                          | Only the end of a longer context is passed on                                            |
+| `onResult`        | none                                                            | Told what was heard, what was sent and why, for your logs                                |
+
+A local model that unloads when idle answers its first call late, and that first transcript would go out as it
+was heard. `warmUp: true` wakes it when the speaker starts instead.
+
+The model writes the transcript back in full, so a long dictation on a slow model can run out of time. A live
+dictation tells the server how long it will wait for its final text (eight seconds unless the client changes it),
+and a cleanup that would not make it is cut short, so the words arrive as they were heard instead of late. To
+give a slow model the time it needs, raise `timeoutMs` and the client's `realtime.finishTimeoutMs` together.
+
 ## Related packages
 
 [`@saystack/core`](https://www.npmjs.com/package/@saystack/core),

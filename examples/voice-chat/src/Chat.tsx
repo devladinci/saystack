@@ -1,5 +1,6 @@
+import { conversationContext } from "@saystack/core";
 import { ReadAloudAura, ReadAloudPlayer, useReadAloud } from "@saystack/react-web";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { askChat } from "./chatApi.js";
 import type { IChatMessage } from "./ChatMessage.js";
@@ -30,6 +31,7 @@ export function Chat() {
   const [isAutoRead, setIsAutoRead] = useState(true);
   const [notice, setNotice] = useState<string | null>(null);
   const { speak } = useReadAloud();
+  const context = useMemo(() => conversationContext(messages.filter((message) => message !== WELCOME)), [messages]);
 
   const handleSend = async (text: string): Promise<void> => {
     const question: IChatMessage = { id: crypto.randomUUID(), role: "user", text };
@@ -77,7 +79,7 @@ export function Chat() {
       </div>
       <footer className="app__dock">
         <ReadAloudPlayer />
-        <Composer isWaiting={isWaiting} onSend={handleSend} />
+        <Composer isWaiting={isWaiting} context={context} onSend={handleSend} />
       </footer>
     </main>
   );

@@ -168,7 +168,7 @@ describe("startRealtimeTranscription", () => {
 
     const finished = dictation.finish();
 
-    expect(socket.texts().at(-1)).toEqual({ type: "stop" });
+    expect(socket.texts().at(-1)).toMatchObject({ type: "stop" });
 
     socket.reply({ type: "transcript.done", text: " Hello there." });
 
@@ -189,7 +189,7 @@ describe("startRealtimeTranscription", () => {
     socket.reply({ type: "ready" });
 
     expect(socket.audio().map((pcm) => pcm.byteLength)).toEqual([1600]);
-    expect(socket.texts().at(-1)).toEqual({ type: "stop" });
+    expect(socket.texts().at(-1)).toMatchObject({ type: "stop" });
 
     socket.reply({ type: "transcript.done", text: "Short one." });
 

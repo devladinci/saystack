@@ -3,8 +3,10 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import type { WSEvents } from "hono/ws";
 
+import { cleanTranscript, warmCleaner } from "./cleanTranscript.js";
 import { engineFields } from "./engineFields.js";
 import { readAudioInput } from "./readAudioInput.js";
+import type { IRealtimeStart } from "./realtimeBridge.js";
 import { createRealtimeBridge } from "./realtimeBridge.js";
 import { statusForErrorCode } from "./statusForErrorCode.js";
 import { statusForSpeechErrorCode } from "./statusForSpeechErrorCode.js";
@@ -89,8 +91,14 @@ export function createVoiceRoutes(deps: IVoiceServerDeps): Hono {
       return c.json({ errorCode: result.errorCode, message: result.message }, statusForErrorCode(result.errorCode));
     }
 
+    const text = await cleanTranscript(deps.cleanup, result.text, {
+      context: read.context,
+      languages: settings.config.languages,
+      signal: c.req.raw.signal,
+    });
+
     return c.json({
-      text: result.text,
+      text,
       ...(result.language !== undefined ? { language: result.language } : {}),
       ...(result.durationSeconds !== undefined ? { durationSeconds: result.durationSeconds } : {}),
     });
@@ -111,6 +119,16 @@ export function createVoiceRoutes(deps: IVoiceServerDeps): Hono {
         .transcribe({ audio: wav, mimeType: "audio/wav", filename: "audio.wav" });
     };
 
+    const refine = (text: string, start: IRealtimeStart, signal: AbortSignal): Promise<string> => {
+      const settings = deps.getSettings();
+
+      return cleanTranscript(deps.cleanup, text, {
+        context: start.context,
+        languages: settings.ok ? settings.config.languages : [],
+        signal,
+      });
+    };
+
     app.get(
       "/audio/transcriptions/realtime",
       realtime.upgradeWebSocket(async (c) => {
@@ -126,11 +144,16 @@ export function createVoiceRoutes(deps: IVoiceServerDeps): Hono {
               return { ok: false, errorCode: "NO_ADAPTER", message: "no stt engine configured" };
             }
 
-            return realtime.createAdapter(settings.config.stt).openRealtime(start);
+            warmCleaner(deps.cleanup, settings.config.languages);
+
+            return realtime
+              .createAdapter(settings.config.stt)
+              .openRealtime(start.language === undefined ? {} : { language: start.language });
           },
           {
             ...(realtime.maxBytes === undefined ? {} : { maxBytes: realtime.maxBytes }),
             ...(realtime.finalPass === false ? {} : { finalize }),
+            ...(deps.cleanup === undefined ? {} : { refine }),
           },
         );
       }),

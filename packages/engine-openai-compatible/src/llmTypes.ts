@@ -13,6 +13,7 @@ export interface ILlmChatRequest {
   disableThinking?: boolean;
   jsonSchema?: IJsonSchemaFormat;
   token?: string;
+  signal?: AbortSignal;
 }
 
 export type ILlmChatResponse = { ok: true; content: string } | { ok: false; errorCode: LlmErrorCode; message: string };
