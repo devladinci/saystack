@@ -182,6 +182,36 @@ describe("sendDictation (sender, direct)", () => {
     expect(body.get("language")).toBe("bg");
   });
 
+  it("sends the conversation's context as it stands when the recording ends, and no blank one", async () => {
+    setVoiceRecorder(blobRecorder());
+    const fetchSpy = vi.fn(
+      async (_input: RequestInfo | URL, _init?: RequestInit) =>
+        new Response(JSON.stringify({ text: "review the PR" }), { status: 200 }),
+    );
+    vi.stubGlobal("fetch", fetchSpy);
+    const { result, rerender } = renderHook(({ context }) => useDictation({ endpoint: ENDPOINT, context }), {
+      initialProps: { context: "user: an older message" },
+    });
+
+    act(() => {
+      result.current.handlePressStart();
+    });
+    rerender({ context: "user: I opened PR 42" });
+    await act(async () => {
+      await result.current.handlePressEnd();
+    });
+    rerender({ context: "   " });
+    act(() => {
+      result.current.handlePressStart();
+    });
+    await act(async () => {
+      await result.current.handlePressEnd();
+    });
+
+    expect((fetchSpy.mock.calls[0]?.[1]?.body as FormData).get("context")).toBe("user: I opened PR 42");
+    expect((fetchSpy.mock.calls[1]?.[1]?.body as FormData).has("context")).toBe(false);
+  });
+
   it("non-json garbage response parses as TRANSCRIPTION_FAILED, not a crash", async () => {
     vi.stubGlobal("fetch", async () => new Response("<html>oops</html>", { status: 500 }));
 

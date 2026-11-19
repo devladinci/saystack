@@ -30,18 +30,26 @@ ENGINE=omlx ENGINE_TOKEN=… LLM_URL=https://ollama.com/v1 LLM_TOKEN=… LLM_MOD
 
 Model names change; check your provider's current list if a default is refused.
 
-| Variable            | Default                          |
-| ------------------- | -------------------------------- |
-| `ENGINE`            | `openai`                         |
-| `ENGINE_URL`        | the preset's server              |
-| `ENGINE_TOKEN`      | none                             |
-| `STT_MODEL`         | the preset's                     |
-| `TTS_MODEL`         | the preset's                     |
-| `TTS_VOICE`         | the preset's (`marin` on OpenAI) |
-| `REALTIME_PROTOCOL` | the preset's: `openai` or `omlx` |
-| `REALTIME_MODEL`    | the preset's, else `STT_MODEL`   |
-| `LLM_URL`           | `ENGINE_URL`                     |
-| `LLM_TOKEN`         | `ENGINE_TOKEN`                   |
-| `LLM_MODEL`         | the preset's                     |
-| `LANGUAGES`         | `en` (comma-separated)           |
-| `PORT` / `API_PORT` | `5180` / `5181`                  |
+Dictated words are cleaned up by the chat model before they settle in the composer: fillers and repeats go, and
+the last messages of the chat are sent along as context, so a misheard `peer` becomes the `PR` you were talking
+about. The server logs what it heard and what it sent. `VOCABULARY` adds your own names and terms, and
+`CLEANUP=off` shows the transcripts as they were heard.
+
+| Variable             | Default                          |
+| -------------------- | -------------------------------- |
+| `ENGINE`             | `openai`                         |
+| `ENGINE_URL`         | the preset's server              |
+| `ENGINE_TOKEN`       | none                             |
+| `STT_MODEL`          | the preset's                     |
+| `TTS_MODEL`          | the preset's                     |
+| `TTS_VOICE`          | the preset's (`marin` on OpenAI) |
+| `REALTIME_PROTOCOL`  | the preset's: `openai` or `omlx` |
+| `REALTIME_MODEL`     | the preset's, else `STT_MODEL`   |
+| `LLM_URL`            | `ENGINE_URL`                     |
+| `LLM_TOKEN`          | `ENGINE_TOKEN`                   |
+| `LLM_MODEL`          | the preset's                     |
+| `LANGUAGES`          | `en` (comma-separated)           |
+| `CLEANUP`            | on; `off` leaves transcripts raw |
+| `CLEANUP_TIMEOUT_MS` | `4000` on OpenAI, else `8000`    |
+| `VOCABULARY`         | none (comma-separated)           |
+| `PORT` / `API_PORT`  | `5180` / `5181`                  |

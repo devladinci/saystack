@@ -227,3 +227,147 @@ describe("createRealtimeBridge final pass", () => {
     expect(sent.at(-1)).toEqual({ type: "transcript.done", text: " Streamed." });
   });
 });
+
+describe("createRealtimeBridge refine", () => {
+  it("gives the final text and the start message's context to refine, and sends what it returns", async () => {
+    const fake = fakeSession();
+    const refine = vi.fn(async (heard: string) => heard.replace("peer", "PR").trim());
+    const events = createRealtimeBridge(async () => ({ ok: true, session: fake.session }), { refine });
+    const { ws, sent, closed } = client();
+
+    events.onMessage?.(text({ type: "start", language: "en", context: "user: PR 42 is up" }), ws);
+    await settle();
+    events.onMessage?.(text({ type: "stop" }), ws);
+    fake.finish({ ok: true, text: " review the peer" });
+    await settle();
+
+    expect(refine).toHaveBeenCalledWith(
+      " review the peer",
+      { language: "en", context: "user: PR 42 is up" },
+      expect.any(AbortSignal),
+    );
+    expect(sent.at(-1)).toEqual({ type: "transcript.done", text: "review the PR" });
+    expect(closed).toEqual([1000]);
+  });
+
+  it("refines the final pass's text, not the stream's", async () => {
+    const fake = fakeSession();
+    const refine = vi.fn(async (heard: string) => `${heard}!`);
+    const events = createRealtimeBridge(async () => ({ ok: true, session: fake.session }), {
+      finalize: async () => ({ ok: true, text: "One clean pass." }),
+      refine,
+    });
+    const { ws, sent } = client();
+
+    events.onMessage?.(text({ type: "start" }), ws);
+    await settle();
+    events.onMessage?.(text({ type: "stop" }), ws);
+    fake.finish({ ok: true, text: " echoed echoed" });
+    await settle();
+
+    expect(refine).toHaveBeenCalledWith("One clean pass.", {}, expect.any(AbortSignal));
+    expect(sent.at(-1)).toEqual({ type: "transcript.done", text: "One clean pass.!" });
+  });
+
+  it("sends the text as it was when refine throws", async () => {
+    const fake = fakeSession();
+    const events = createRealtimeBridge(async () => ({ ok: true, session: fake.session }), {
+      refine: async () => {
+        throw new Error("cleaner is down");
+      },
+    });
+    const { ws, sent } = client();
+
+    events.onMessage?.(text({ type: "start" }), ws);
+    await settle();
+    events.onMessage?.(text({ type: "stop" }), ws);
+    fake.finish({ ok: true, text: "As heard." });
+    await settle();
+
+    expect(sent.at(-1)).toEqual({ type: "transcript.done", text: "As heard." });
+  });
+
+  it("aborts refine and sends nothing when the client leaves first", async () => {
+    const fake = fakeSession();
+    let signal: AbortSignal | undefined;
+    let release: (value: string) => void = () => undefined;
+    const events = createRealtimeBridge(async () => ({ ok: true, session: fake.session }), {
+      refine: (_heard, _start, given) => {
+        signal = given;
+
+        return new Promise((resolve) => {
+          release = resolve;
+        });
+      },
+    });
+    const { ws, sent } = client();
+
+    events.onMessage?.(text({ type: "start" }), ws);
+    await settle();
+    events.onMessage?.(text({ type: "stop" }), ws);
+    fake.finish({ ok: true, text: "As heard." });
+    await settle();
+    events.onClose?.(new Event("close") as CloseEvent, ws);
+    release("Too late.");
+    await settle();
+
+    expect(signal?.aborted).toBe(true);
+    expect(sent).toEqual([{ type: "ready" }]);
+  });
+
+  it("stops refine before the client stops waiting, and sends the text as it was", async () => {
+    const fake = fakeSession();
+    let signal: AbortSignal | undefined;
+    const events = createRealtimeBridge(async () => ({ ok: true, session: fake.session }), {
+      refine: (heard, _start, given) => {
+        signal = given;
+
+        return new Promise((resolve) => {
+          given.addEventListener("abort", () => resolve(heard));
+        });
+      },
+    });
+    const { ws, sent } = client();
+
+    events.onMessage?.(text({ type: "start" }), ws);
+    await settle();
+    events.onMessage?.(text({ type: "stop", waitMs: 1050 }), ws);
+    fake.finish({ ok: true, text: "As heard." });
+    await new Promise((resolve) => setTimeout(resolve, 400));
+
+    expect(signal?.aborted).toBe(true);
+    expect(sent.at(-1)).toEqual({ type: "transcript.done", text: "As heard." });
+  });
+
+  it("does not start refine when the client is about to stop waiting", async () => {
+    const fake = fakeSession();
+    const refine = vi.fn(async (heard: string) => `${heard}!`);
+    const events = createRealtimeBridge(async () => ({ ok: true, session: fake.session }), { refine });
+    const { ws, sent } = client();
+
+    events.onMessage?.(text({ type: "start" }), ws);
+    await settle();
+    events.onMessage?.(text({ type: "stop", waitMs: 800 }), ws);
+    fake.finish({ ok: true, text: "As heard." });
+    await settle();
+
+    expect(refine).not.toHaveBeenCalled();
+    expect(sent.at(-1)).toEqual({ type: "transcript.done", text: "As heard." });
+  });
+
+  it("does not refine a failed transcription", async () => {
+    const fake = fakeSession();
+    const refine = vi.fn(async (heard: string) => heard);
+    const events = createRealtimeBridge(async () => ({ ok: true, session: fake.session }), { refine });
+    const { ws, sent } = client();
+
+    events.onMessage?.(text({ type: "start" }), ws);
+    await settle();
+    events.onMessage?.(text({ type: "stop" }), ws);
+    fake.finish({ ok: false, errorCode: "ENGINE_UNAVAILABLE", message: "busy" });
+    await settle();
+
+    expect(refine).not.toHaveBeenCalled();
+    expect(sent.at(-1)).toMatchObject({ type: "error", errorCode: "ENGINE_UNAVAILABLE" });
+  });
+});

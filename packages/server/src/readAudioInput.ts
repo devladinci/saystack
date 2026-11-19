@@ -110,6 +110,7 @@ async function readMultipart(body: Uint8Array, contentType: string): Promise<IAu
   const filename = typeof rawName === "string" && rawName.length > 0 ? rawName : undefined;
   const prompt = form.get("prompt");
   const language = form.get("language");
+  const context = form.get("context");
 
   return {
     ok: true,
@@ -118,5 +119,6 @@ async function readMultipart(body: Uint8Array, contentType: string): Promise<IAu
     ...(filename !== undefined ? { filename } : {}),
     ...(typeof prompt === "string" && prompt.length > 0 ? { prompt } : {}),
     ...(typeof language === "string" && language.length > 0 ? { language } : {}),
+    ...(typeof context === "string" && context.trim().length > 0 ? { context } : {}),
   };
 }

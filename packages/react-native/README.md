@@ -94,7 +94,8 @@ export function App() {
 ```
 
 Endpoints must be absolute URLs, such as the routes `@saystack/server` serves. Add `realtime: { url }` to
-`useNativeDictation` to stream words while they are said. `voiceTheme("dark", overrides)` builds a theme, and a
+`useNativeDictation` to stream words while they are said, and `context` (what the conversation has been about) for
+a server that [cleans transcripts up](https://github.com/devladinci/saystack/blob/main/packages/server#dictation-cleanup). `voiceTheme("dark", overrides)` builds a theme, and a
 spotlight's `container` prop mounts it in a full-window host. `ReadAloudProvider` also takes `rewrite`, to turn a
 reply with numbers, symbols, links, code or a table into words a voice can read, and `summarize`, to read a reply
 with code, a table or a lot of text as a shorter one; `shouldRewrite` and `shouldSummarize` change when each runs.

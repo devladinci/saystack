@@ -4,7 +4,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const web = vi.hoisted(() => ({
   stream: { id: "mic" } as unknown as MediaStream,
-  started: [] as { url: string; stream: () => MediaStream | null }[],
+  started: [] as {
+    url: string;
+    stream: () => MediaStream | null;
+    params?: Record<string, unknown>;
+    finishTimeoutMs?: number;
+  }[],
   finishWith: null as string | null,
 }));
 
@@ -67,6 +72,36 @@ describe("useWebDictation", () => {
     expect(web.started[0]?.stream()).toBe(web.stream);
     expect(shown).toEqual(["Hello"]);
     expect(ended).toEqual(["Hello there."]);
+  });
+
+  it("opens the stream with the conversation's context beside the app's own params", async () => {
+    const { result, rerender } = renderHook(
+      ({ context }: { context?: string }) =>
+        useWebDictation({
+          endpoint: "/stt",
+          realtime: { url: "ws://daemon/stt/stream", params: { model: "m" }, finishTimeoutMs: 20_000 },
+          ...(context === undefined ? {} : { context }),
+        }),
+      { initialProps: { context: "user: I opened PR 42" } as { context?: string } },
+    );
+
+    act(() => {
+      result.current.handlePressStart();
+    });
+    await act(async () => {
+      result.current.handlePressEnd();
+    });
+    rerender({});
+    act(() => {
+      result.current.handlePressStart();
+    });
+    await act(async () => {
+      result.current.handlePressEnd();
+    });
+
+    expect(web.started[0]?.params).toEqual({ model: "m", context: "user: I opened PR 42" });
+    expect(web.started[0]?.finishTimeoutMs).toBe(20_000);
+    expect(web.started[1]?.params).toEqual({ model: "m" });
   });
 
   it("only transcribes the recording when no realtime endpoint is given", async () => {

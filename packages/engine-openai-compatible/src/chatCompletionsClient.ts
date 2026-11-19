@@ -43,7 +43,10 @@ export async function httpChatComplete(
     const response = await fetchFn(url, {
       method: "POST",
       headers,
-      signal: AbortSignal.timeout(timeoutMs),
+      signal:
+        request.signal === undefined
+          ? AbortSignal.timeout(timeoutMs)
+          : AbortSignal.any([request.signal, AbortSignal.timeout(timeoutMs)]),
       body: JSON.stringify({
         model: request.model,
         messages: [
@@ -51,7 +54,11 @@ export async function httpChatComplete(
           { role: "user", content: request.user },
         ],
         temperature: 0,
-        ...(request.disableThinking === true ? { chat_template_kwargs: { enable_thinking: false } } : {}),
+        // Servers switch thinking off in different ways: a chat-template flag (oMLX, vLLM, llama.cpp) or
+        // the standard reasoning effort (Ollama, OpenAI). Each ignores the other's.
+        ...(request.disableThinking === true
+          ? { chat_template_kwargs: { enable_thinking: false }, reasoning_effort: "none" }
+          : {}),
         ...(request.jsonSchema !== undefined
           ? {
               response_format: {

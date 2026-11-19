@@ -5,6 +5,8 @@ import { useRef, useState } from "react";
 
 interface IProps {
   isWaiting: boolean;
+  // What the chat has been about, so the server can tell a misheard "peer" from the "PR" under discussion.
+  context: string;
   onSend: (text: string) => void;
 }
 
@@ -18,14 +20,16 @@ const DICTATION_ERRORS: Readonly<Record<string, string>> = {
 const realtimeUrl = (): string =>
   `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/voice/audio/transcriptions/realtime`;
 
-export function Composer({ isWaiting, onSend }: IProps) {
+export function Composer({ isWaiting, context, onSend }: IProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const fieldRef = useRef<HTMLTextAreaElement>(null);
   const [draft, setDraft] = useState("");
   const input = useFieldInput(fieldRef, setDraft);
   const dictation = useWebDictation({
     endpoint: "/voice/audio/transcriptions",
-    realtime: { url: realtimeUrl },
+    // Long enough for the server to clean a long dictation up on a local model.
+    realtime: { url: realtimeUrl, finishTimeoutMs: 15_000 },
+    context,
     input,
   });
   const isRecording = dictation.state === "recording";

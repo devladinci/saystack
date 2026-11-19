@@ -21,6 +21,7 @@ No peer dependencies. It needs Node 22 or newer.
 | Live dictation       | `WS /v1/realtime?intent=transcription` | `createOpenAiRealtimeSttAdapter`                     |
 | Live dictation, oMLX | `WS /v1/audio/transcriptions/realtime` | `createOmlxRealtimeSttAdapter` (oMLX's own protocol) |
 | Speech rewriting     | `POST /v1/chat/completions`            | `createLlmNormalizer`                                |
+| Dictation cleanup    | `POST /v1/chat/completions`            | `createLlmTranscriptCleaner`                         |
 
 `listSpeechModels` lists the speech models a server offers.
 
@@ -74,6 +75,54 @@ rewrite that changes, adds or leaves out a number, or switches to another writin
 `NORMALIZE_BAD_RESPONSE`, and the reply is read as written instead. The `languages` you pass are a hint about which
 languages to expect, not a target. The prompt spells out the answer's JSON shape as well as sending it as
 `response_format`, so servers that ignore structured output, such as Ollama's cloud models, work too.
+
+## Dictation cleanup
+
+`createLlmTranscriptCleaner` tidies what a speech engine heard so it reads the way the speaker would have typed it.
+It fixes punctuation and capitals, takes out filler sounds, words said twice and false starts, keeps only the
+correction when the speaker corrects themselves, and repairs slips of grammar with as few changes as it can.
+
+```ts
+import { createLlmTranscriptCleaner } from "@saystack/engine-openai-compatible";
+
+const clean = createLlmTranscriptCleaner({ url: "https://api.openai.com/v1", token, model: "gpt-6-luna" });
+
+const result = await clean({
+  text: "um can you review the peer now and uh tell me if it's ready to merge",
+  context: "user: I just opened PR 42 with the login fix.",
+  vocabulary: ["saystack"],
+  languages: ["en"],
+});
+// { ok: true, text: "Can you review the PR now and tell me if it's ready to merge?" }
+```
+
+- **`context`** is what the conversation has been about, such as its last few messages
+  (`conversationContext` from `@saystack/core` builds it). The model reads it for one thing: to recognise a name or
+  a term the speech engine misheard as a word that sounds alike. Its names and acronyms are also listed for the
+  model, and a term taken from it is written the way the context writes it.
+- **`vocabulary`** is your own list of names and terms, written exactly as you spell them. What was heard that
+  is spelled almost like one of them, such as `SASTAC` for `saystack` or `kuber netties` for `Kubernetes`, is
+  pointed out to the model as a maybe.
+- **`languages`** is a hint about what to expect. A transcript in any other language stays in that language.
+
+The transcript is speech to clean, never instructions: a dictated question is cleaned, not answered, and a
+dictated command is not carried out. That is checked rather than hoped for. Every answer is compared word by word
+with what was heard, and it comes back as `CLEANUP_REJECTED` when it
+
+- lost most of what was said, or left a passage out (an answer, a summary, a translation, a cut-off ending),
+- added words of its own, or more than a few terms from the context, or a term where nothing was said,
+- added a number or a currency sign that was not spoken, or
+- carried the prompt's own tags.
+
+Two small things are repaired without asking: a term's capitals, and a Latin letter that slipped into a Cyrillic
+word because it looks the same. A refused answer is asked for once more, with the reason (`retry: false` keeps it
+to one call). When the result is
+not `ok`, show the transcript as it was heard. What the check cannot see is a single word swapped for another:
+choose a model you trust with that, and keep the `context` to the conversation.
+
+The model writes the whole transcript back, so the time a cleanup takes grows with its length; `maxChars` (4000)
+leaves longer transcripts alone. `timeoutSeconds` is 10, and `disableThinking` switches a reasoning model's
+thinking off, which a cleanup does not need.
 
 ## Delivery style
 

@@ -10,6 +10,8 @@ import type {
   SttErrorCode,
 } from "@saystack/core";
 import type { Context } from "hono";
+
+import type { ICleanupDeps } from "./cleanTranscript.js";
 import type { UpgradeWebSocket } from "hono/ws";
 
 export type ServerErrorCode = "BAD_SETTINGS" | SttErrorCode;
@@ -29,6 +31,8 @@ export interface IVoiceServerDeps {
   createSttAdapter: (engineConfig: ISttEngineConfig) => ISttAdapter;
   createTtsAdapter: (engineConfig: ITtsEngineConfig) => ITtsAdapter;
   realtime?: IRealtimeRouteDeps;
+  // Cleans up every transcript before it is sent back, on the upload route and at the end of a live one.
+  cleanup?: ICleanupDeps;
   maxBodyBytes?: number;
   maxTextChars?: number;
   // Body keys a client may set on the engine request — for example an "instructions" field. Empty by
@@ -55,5 +59,13 @@ export interface IErrorResponse {
 }
 
 export type IAudioReadResult =
-  | { ok: true; audio: Uint8Array; mimeType?: string; filename?: string; prompt?: string; language?: string }
+  | {
+      ok: true;
+      audio: Uint8Array;
+      mimeType?: string;
+      filename?: string;
+      prompt?: string;
+      language?: string;
+      context?: string;
+    }
   | { ok: false; errorCode: SttErrorCode; message?: string };
