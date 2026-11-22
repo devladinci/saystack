@@ -182,6 +182,11 @@ export function useDictation(options: IUseDictationOptions = {}): IUseDictationR
 
     sessionRef.current = null;
     setState("transcribing");
+
+    if (session.live !== null) {
+      optionsRef.current.input?.wait?.();
+    }
+
     void finish(session);
   };
 

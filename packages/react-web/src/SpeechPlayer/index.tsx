@@ -1,9 +1,9 @@
-import type { IAuraStyle } from "@saystack/core";
+import type { IAuraStyle, ISpeechPosition, ISpeechState } from "@saystack/core";
 import { tokenizeWords } from "@saystack/core";
 import type { IPlayerLabels, ISpeechHookResult } from "@saystack/react";
 import { DEFAULT_PLAYER_LABELS, estimateDurations, formatClock, useSpeechProgress } from "@saystack/react";
 import type { SpectrumLineState } from "@saystack/web";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { SpectrumLine } from "../SpectrumLine.js";
 import type { PlayerIconName } from "./PlayerIcon.js";
@@ -26,8 +26,76 @@ const RESTART_AFTER_SECONDS = 1.5;
 
 const DEFAULT_AUTO_HIDE_MS = 30_000;
 
-export default function SpeechPlayer({
+// How long the player takes to leave; the stylesheet's leaving transition lasts as long.
+const LEAVE_MS = 240;
+
+type Presence = "gone" | "here" | "leaving";
+
+interface IView {
+  state: ISpeechState;
+  position: ISpeechPosition;
+}
+
+// The player opens and closes its own height, so the page around it moves over instead of jumping, and it
+// stays on screen while it leaves, showing what it showed last.
+export default function SpeechPlayer(props: IProps) {
+  const { speech } = props;
+  const [state] = speech;
+  const position = useSpeechProgress(speech);
+  const isShown = state.phase !== "idle";
+  const lastRef = useRef<IView | null>(null);
+  const [presence, setPresence] = useState<Presence>(isShown ? "here" : "gone");
+
+  if (isShown && presence !== "here") {
+    setPresence("here");
+  }
+
+  if (!isShown && presence === "here") {
+    setPresence("leaving");
+  }
+
+  useEffect(() => {
+    if (isShown) {
+      lastRef.current = { state, position };
+    }
+  });
+
+  useEffect(() => {
+    if (presence !== "leaving") {
+      return;
+    }
+
+    const timer = setTimeout(() => setPresence("gone"), LEAVE_MS);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [presence]);
+
+  const view = isShown ? { state, position } : lastRef.current;
+
+  if (view === null || (!isShown && presence === "gone")) {
+    return null;
+  }
+
+  return (
+    <div className="saystack-player-reveal" data-leaving={isShown ? undefined : ""}>
+      <div className="saystack-player-reveal__clip">
+        <PlayerBody {...props} view={view} isLeaving={!isShown} />
+      </div>
+    </div>
+  );
+}
+
+interface IBodyProps extends IProps {
+  view: IView;
+  isLeaving: boolean;
+}
+
+function PlayerBody({
   speech,
+  view,
+  isLeaving,
   levels,
   style,
   labels,
@@ -35,9 +103,9 @@ export default function SpeechPlayer({
   onLocate,
   onClose,
   className,
-}: IProps) {
-  const [state, api] = speech;
-  const position = useSpeechProgress(speech);
+}: IBodyProps) {
+  const [, api] = speech;
+  const { state, position } = view;
   const text: IPlayerLabels = {
     ...DEFAULT_PLAYER_LABELS,
     ...labels,
@@ -54,7 +122,7 @@ export default function SpeechPlayer({
   };
 
   useEffect(() => {
-    if (phase !== "done" || autoHideMs <= 0) {
+    if (phase !== "done" || autoHideMs <= 0 || isLeaving) {
       return;
     }
 
@@ -63,11 +131,7 @@ export default function SpeechPlayer({
     return () => {
       clearTimeout(timer);
     };
-  }, [phase, autoHideMs, onClose, api]);
-
-  if (phase === "idle") {
-    return null;
-  }
+  }, [phase, autoHideMs, onClose, api, isLeaving]);
 
   const chunk = chunks[chunkIndex];
   const words = chunk === undefined ? [] : tokenizeWords(chunk.text);
@@ -80,6 +144,7 @@ export default function SpeechPlayer({
   const isEnded = phase === "done" || phase === "error";
 
   const primary: Record<typeof phase, [PlayerIconName, string]> = {
+    idle: ["play", text.resume],
     loading: ["pause", text.stop],
     playing: ["pause", text.pause],
     paused: ["play", text.resume],
@@ -135,7 +200,9 @@ export default function SpeechPlayer({
     <section
       className={className === undefined ? "saystack-player" : `saystack-player ${className}`}
       aria-label={text.region}
+      aria-hidden={isLeaving ? true : undefined}
       data-phase={phase}
+      data-status={message === null ? undefined : ""}
     >
       <div className="saystack-player__main">
         <button

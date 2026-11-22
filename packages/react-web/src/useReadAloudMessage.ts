@@ -19,6 +19,8 @@ export interface IReadAloudMessage {
 export interface IReadAloudMessageOptions {
   // Stacking of the word and block marks; see IReadAlongOptions.zIndex.
   zIndex?: number;
+  // Whether the page scrolls to keep the word being read in view; see IReadAlongOptions.follow.
+  follow?: boolean;
 }
 
 const NO_ROOT: RefObject<Element | null> = { current: null };
@@ -27,7 +29,7 @@ const NO_ROOT: RefObject<Element | null> = { current: null };
 export function useReadAloudMessage(
   id: ReadAloudId,
   root?: RefObject<Element | null>,
-  { zIndex }: IReadAloudMessageOptions = {},
+  { zIndex, follow }: IReadAloudMessageOptions = {},
 ): IReadAloudMessage {
   const store = useReadAloudStore();
   const view = useSyncExternalStore(
@@ -50,6 +52,7 @@ export function useReadAloudMessage(
   useReadAlong(root ?? NO_ROOT, speech, {
     isActive: root !== undefined && phase !== "idle" && !isSummary,
     ...(zIndex === undefined ? {} : { zIndex }),
+    ...(follow === undefined ? {} : { follow }),
   });
 
   const speak = useCallback((markdown: string) => store.speak(id, markdown), [store, id]);

@@ -66,7 +66,8 @@ export function createSpectrumLine(canvas: HTMLCanvasElement, options: ISpectrum
     const colors = isLight ? palette.cssLight : palette.css;
     const source = state === "live" ? levels?.() : undefined;
     work += ((state === "working" ? 1 : 0) - work) * (1 - Math.exp(-dt / 0.2));
-    const head = ((now / 1000) * 0.9) % 1.3;
+    // While working, the bands swell one after another, the same shapes the voice makes, at rest.
+    const ripple = (now / 1000) * 3.2;
     const middle = height / 2;
     const room = middle - 2;
     const spacing = 0.92 / colors.length;
@@ -86,7 +87,8 @@ export function createSpectrumLine(canvas: HTMLCanvasElement, options: ISpectrum
     }
 
     colors.forEach((color, index) => {
-      const target = source?.[index] ?? 0;
+      const idle = work * (0.2 + 0.16 * Math.sin(ripple - index * 0.85));
+      const target = Math.max(source?.[index] ?? 0, idle);
       right[index] = (right[index] ?? 0) + (target - (right[index] ?? 0)) * (1 - Math.exp(-dt / 0.04));
       left[index] = (left[index] ?? 0) + (target - (left[index] ?? 0)) * (1 - Math.exp(-dt / 0.12));
       energy += (right[index] ?? 0) + (left[index] ?? 0);
@@ -105,8 +107,7 @@ export function createSpectrumLine(canvas: HTMLCanvasElement, options: ISpectrum
         const band =
           (right[index] ?? 0) * Math.exp(-zRight * zRight) * weight +
           (left[index] ?? 0) * Math.exp(-zLeft * zLeft) * (1 - weight);
-        const sweep = work * Math.exp(-(((distance - head + index * 0.04) / 0.1) ** 2)) * 0.55;
-        const lift = Math.min(1, band + sweep) * room;
+        const lift = Math.min(1, band) * room;
         lifts.push(lift);
         peak = Math.max(peak, lift);
       }

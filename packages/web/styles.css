@@ -5,21 +5,22 @@
 }
 
 .saystack-read-along-word {
-  border-radius: var(--saystack-word-radius, 7px);
-  background: var(--saystack-word-background, color-mix(in srgb, currentColor 13%, transparent));
-  box-shadow: inset 0 0 0 1px var(--saystack-word-edge, color-mix(in srgb, currentColor 24%, transparent));
+  border-radius: var(--saystack-word-radius, 6px);
+  background: var(--saystack-word-background, color-mix(in srgb, currentColor 11%, transparent));
+  box-shadow: inset 0 0 0 1px var(--saystack-word-edge, color-mix(in srgb, currentColor 7%, transparent));
   transition:
     transform 0.16s cubic-bezier(0.2, 0.7, 0.3, 1),
     width 0.16s cubic-bezier(0.2, 0.7, 0.3, 1),
     height 0.16s ease,
-    opacity 0.25s ease;
+    opacity 0.18s ease;
 }
 
 .saystack-read-along-block {
   border-radius: var(--saystack-block-radius, 18px);
+  background: var(--saystack-block-background, color-mix(in srgb, currentColor 4%, transparent));
   box-shadow:
-    0 0 0 2px var(--saystack-block-edge, color-mix(in srgb, currentColor 22%, transparent)),
-    0 0 28px -6px var(--saystack-block-glow, color-mix(in srgb, currentColor 30%, transparent));
+    0 0 0 1.5px var(--saystack-block-edge, color-mix(in srgb, currentColor 16%, transparent)),
+    0 0 24px -8px var(--saystack-block-glow, color-mix(in srgb, currentColor 22%, transparent));
   transition:
     transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1),
     width 0.3s cubic-bezier(0.2, 0.7, 0.3, 1),
@@ -27,8 +28,30 @@
     opacity 0.3s ease;
 }
 
+/* While a message is read, a click on a word moves the reading there. */
+.saystack-read-along-seekable {
+  cursor: pointer;
+}
+
+/* How far the unread words have dimmed. Registered, so the read-along can animate it on its root. */
+@property --saystack-unread-fade {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 ::highlight(saystack-unread) {
   color: var(--saystack-unread-color, rgb(128 133 142));
+}
+
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+  ::highlight(saystack-unread) {
+    color: color-mix(
+      in srgb,
+      var(--saystack-unread-color, rgb(128 133 142)) calc(var(--saystack-unread-fade, 1) * 100%),
+      currentColor
+    );
+  }
 }
 
 .saystack-streaming {
@@ -87,6 +110,10 @@
   background: currentColor;
   vertical-align: -0.2em;
   animation: saystack-caret 1.1s steps(1) infinite;
+}
+
+.saystack-streaming-settling .saystack-streaming-caret {
+  display: none;
 }
 
 @keyframes saystack-word-in {

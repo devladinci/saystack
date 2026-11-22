@@ -48,6 +48,11 @@ export async function readAloud(reply: Element, markdown: string): Promise<void>
 Call it from a click, so the browser lets audio play. `endpoint` receives `{ text }` as JSON and returns audio,
 which is what `@saystack/server` serves. Clicking a word while it plays seeks there.
 
+The page scrolls to keep the word being read in view, until the reader scrolls by hand. `readAlong.locate()`
+brings the word back and follows it again; so does a `saystack-locate` event dispatched on the element
+(`LOCATE_EVENT`), which is how a player's locate button reaches a read-along it knows nothing about. Pass
+`follow: false` to leave the scrolling to the page.
+
 ## Delivery style
 
 The driver posts whatever the speech session attached to the words, so a `styleMap` on
@@ -80,8 +85,13 @@ export async function glowWhileListening(button: Element): Promise<() => void> {
 ```
 
 Also in the package: `createWebRecorder`, `capturePcm` and `startRealtimeTranscription` for dictation,
-`createStreamingInput` and `createFieldInput` to write dictated words into a field as they arrive, and
+`createStreamingInput` and `createFieldInput` to write dictated words into a field as they arrive (they shimmer
+while the final text is awaited, and a final text that differs forms in place), and
 `createSpectrumLine`. The styles use CSS variables such as `--saystack-word-background` that you can override.
+
+A field too small for a dictation is kept scrolled to its newest words. A field you grow to fit its text should
+hide its overflow while it does (`overflow-y: hidden`): that tells saystack there is nothing to scroll, so the
+text stays put while the field's height changes.
 
 ## Related packages
 

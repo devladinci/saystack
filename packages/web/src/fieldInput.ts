@@ -24,6 +24,11 @@ export function createFieldInput(
 
   return {
     show,
+    wait() {
+      if (isShowing) {
+        streaming.hold();
+      }
+    },
     end(text) {
       if (text === null) {
         if (isShowing) {
@@ -39,7 +44,7 @@ export function createFieldInput(
 
       isShowing = false;
       streaming.update(text, "");
-      onValue(streaming.end());
+      onValue(streaming.settle());
     },
   };
 }

@@ -1,5 +1,6 @@
 import type { IAuraStyle } from "@saystack/core";
 import type { IPlayerLabels } from "@saystack/react";
+import { LOCATE_EVENT } from "@saystack/web";
 
 import SpeechPlayer from "./SpeechPlayer/index.js";
 import { useReadAloud } from "./useReadAloud.js";
@@ -15,8 +16,14 @@ interface IProps {
 export function ReadAloudPlayer({ style, labels, autoHideMs, onClose, className }: IProps) {
   const { speech, anchor, readLevels } = useReadAloud();
 
+  // The read-along knows which word is being read and brings that into view; with no words marked, the
+  // message itself is the best there is to show.
   const handleLocate = (): void => {
-    anchor?.scrollIntoView({ block: "center", behavior: "smooth" });
+    const isAnswered = anchor?.dispatchEvent(new CustomEvent(LOCATE_EVENT, { cancelable: true })) === false;
+
+    if (!isAnswered) {
+      anchor?.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
   };
 
   return (

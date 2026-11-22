@@ -19,6 +19,75 @@ describe("SpeechPlayer", () => {
     expect(container.innerHTML).toBe("");
   });
 
+  it("keeps showing what it showed while it leaves, then goes", () => {
+    vi.useFakeTimers();
+    const playing = fakeSpeech({ phase: "playing", chunks: CHUNKS, chunkIndex: 0 });
+    const { container, rerender } = render(<SpeechPlayer speech={playing.result} />);
+
+    expect(container.querySelector(".saystack-player-reveal")?.hasAttribute("data-leaving")).toBe(false);
+
+    rerender(<SpeechPlayer speech={fakeSpeech({ phase: "idle" }).result} />);
+
+    expect(container.querySelector(".saystack-player-reveal")?.hasAttribute("data-leaving")).toBe(true);
+    expect(container.querySelector(".saystack-player")?.getAttribute("aria-hidden")).toBe("true");
+    expect(container.querySelector(".saystack-player__word--now")?.textContent).toBe("two");
+
+    act(() => {
+      vi.advanceTimersByTime(240);
+    });
+
+    expect(container.innerHTML).toBe("");
+  });
+
+  it("stays when reading starts again while it leaves", () => {
+    vi.useFakeTimers();
+    const playing = fakeSpeech({ phase: "playing", chunks: CHUNKS, chunkIndex: 0 });
+    const { container, rerender } = render(<SpeechPlayer speech={playing.result} />);
+
+    rerender(<SpeechPlayer speech={fakeSpeech({ phase: "idle" }).result} />);
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    rerender(<SpeechPlayer speech={fakeSpeech({ phase: "loading", chunks: CHUNKS, chunkIndex: -1 }).result} />);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+
+    expect(container.querySelector(".saystack-player-reveal")?.hasAttribute("data-leaving")).toBe(false);
+    expect(container.querySelector(".saystack-player")?.hasAttribute("aria-hidden")).toBe(false);
+    expect(screen.getByText("Preparing audio…")).toBeTruthy();
+  });
+
+  it("does not ask to be closed again while it leaves", () => {
+    vi.useFakeTimers();
+    const onClose = vi.fn();
+    const done = fakeSpeech({ phase: "done", chunks: CHUNKS, chunkIndex: 1 });
+    const { rerender } = render(<SpeechPlayer speech={done.result} autoHideMs={100} onClose={onClose} />);
+
+    rerender(<SpeechPlayer speech={fakeSpeech({ phase: "idle" }).result} autoHideMs={100} onClose={onClose} />);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("marks itself while a status takes the place of the words", () => {
+    const status = (state: Parameters<typeof fakeSpeech>[0]): boolean => {
+      const { container, unmount } = render(<SpeechPlayer speech={fakeSpeech(state).result} />);
+      const has = container.querySelector(".saystack-player")?.hasAttribute("data-status") === true;
+
+      unmount();
+
+      return has;
+    };
+
+    expect(status({ phase: "loading", chunks: CHUNKS, chunkIndex: -1 })).toBe(true);
+    expect(status({ phase: "playing", chunks: CHUNKS, chunkIndex: 0 })).toBe(false);
+    expect(status({ phase: "done", chunks: CHUNKS, chunkIndex: 1 })).toBe(true);
+    expect(status({ phase: "error", chunks: CHUNKS, chunkIndex: 0 })).toBe(true);
+  });
+
   it("says it is preparing, and stops when asked", () => {
     const { result, api } = fakeSpeech({ phase: "loading", chunks: CHUNKS, chunkIndex: -1 });
     render(<SpeechPlayer speech={result} />);

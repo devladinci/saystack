@@ -111,13 +111,17 @@ const sentences = (text: string): string[] => (text.match(SENTENCE) ?? []).map((
 export function speechChunks(text: string, reserve = 0): string[] {
   const chunks: string[] = [];
   let current = "";
-  // Anything the caller adds in front of a chunk — a style tag — counts against the same budget.
-  let limit = Math.max(1, FIRST_CHUNK_CHARS - reserve);
+  // Anything the caller adds in front of a chunk — a style tag — counts against the same budget. The budget
+  // grows on its own and the reserve comes off each chunk once: taken off the grown limit instead, it would
+  // be subtracted again at every step and shrink the chunks to a letter each.
+  let budget = FIRST_CHUNK_CHARS;
+  let limit = Math.max(1, budget - reserve);
 
   const flush = () => {
     chunks.push(current);
     current = "";
-    limit = Math.max(1, Math.min(MAX_CHUNK_CHARS, Math.round(limit * CHUNK_GROWTH)) - reserve);
+    budget = Math.min(MAX_CHUNK_CHARS, Math.round(budget * CHUNK_GROWTH));
+    limit = Math.max(1, budget - reserve);
   };
 
   for (const sentence of sentences(text)) {

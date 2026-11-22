@@ -6,6 +6,7 @@ import { askChat } from "./chatApi.js";
 import type { IChatMessage } from "./ChatMessage.js";
 import { ChatMessage } from "./ChatMessage.js";
 import { Composer } from "./Composer.js";
+import { useThreadScroll } from "./useThreadScroll.js";
 
 const WELCOME: IChatMessage = {
   id: "welcome",
@@ -32,6 +33,8 @@ export function Chat() {
   const [notice, setNotice] = useState<string | null>(null);
   const { speak } = useReadAloud();
   const context = useMemo(() => conversationContext(messages.filter((message) => message !== WELCOME)), [messages]);
+
+  useThreadScroll(scroller, `${messages.length}:${isWaiting}:${notice ?? ""}`);
 
   const handleSend = async (text: string): Promise<void> => {
     const question: IChatMessage = { id: crypto.randomUUID(), role: "user", text };
@@ -70,7 +73,7 @@ export function Chat() {
         </label>
       </header>
       <div ref={setScroller} className="app__thread">
-        <ReadAloudAura clip={scroller} />
+        <ReadAloudAura clip={scroller} padding={8} />
         {messages.map((message) => (
           <ChatMessage key={message.id} message={message} />
         ))}
