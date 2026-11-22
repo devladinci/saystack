@@ -1,5 +1,20 @@
 # @saystack/react-native
 
+## 0.4.0
+
+### Minor Changes
+
+- 803527d: `useNativeDictation` sends its `context` with the upload and in the live stream's `start` message. `realtime.finishTimeoutMs` sets how long a live dictation waits for its final text, for a server whose cleanup runs on a slow model.
+
+### Patch Changes
+
+- Updated dependencies [803527d]
+- Updated dependencies [803527d]
+- Updated dependencies [2532b80]
+- Updated dependencies [2532b80]
+  - @saystack/core@0.4.0
+  - @saystack/react@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

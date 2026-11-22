@@ -1,6 +1,6 @@
 {
   "name": "@saystack/engine-openai-compatible",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "description": "saystack engine for OpenAI-compatible servers: speech-to-text, text-to-speech, realtime transcription and speech rewriting.",
   "license": "MIT",
   "author": "DeVladinci",
