@@ -1,5 +1,6 @@
 import type { INormalizeFn, INormalizeResult } from "@saystack/core";
 import { httpChatComplete } from "./chatCompletionsClient.js";
+import { readJsonAnswer } from "./jsonAnswer.js";
 import { buildAnswerShape, buildNormalizeSystemPrompt, buildNormalizeUserPrompt } from "./normalizePrompt.js";
 import type { IJsonSchemaFormat, ILlmChatClient } from "./llmTypes.js";
 import { checkRewrite } from "./rewriteCheck.js";
@@ -130,41 +131,24 @@ function toNormalizeErrorCode(code: "LLM_UNAVAILABLE" | "LLM_TIMEOUT" | "LLM_RET
 }
 
 export function parseNormalized(content: string): { text: string; language: string; style?: string } | null {
-  const stripped = stripFences(content);
+  const record = readJsonAnswer(content);
 
-  try {
-    const parsed = JSON.parse(stripped) as unknown;
-
-    if (typeof parsed !== "object" || parsed === null) {
-      return null;
-    }
-
-    const record = parsed as Record<string, unknown>;
-    const text = record.text;
-    const language = record.language;
-
-    if (typeof text !== "string" || text.trim().length === 0) {
-      return null;
-    }
-
-    if (typeof language !== "string" || language.trim().length === 0) {
-      return null;
-    }
-
-    return { text, language: language.trim(), ...readStyle(record) };
-  } catch {
-    return extractLooseJson(stripped);
-  }
-}
-
-function stripFences(content: string): string {
-  const fenced = content.match(/```(?:json)?\s*([\s\S]*?)```/);
-
-  if (fenced !== null) {
-    return (fenced[1] ?? content).trim();
+  if (record === null) {
+    return null;
   }
 
-  return content.trim();
+  const text = record.text;
+  const language = record.language;
+
+  if (typeof text !== "string" || text.trim().length === 0) {
+    return null;
+  }
+
+  if (typeof language !== "string" || language.trim().length === 0) {
+    return null;
+  }
+
+  return { text, language: language.trim(), ...readStyle(record) };
 }
 
 // A style is optional and only ever a string; anything else is left to the caller's map to reject.
@@ -172,37 +156,4 @@ function readStyle(record: Record<string, unknown>): { style?: string } {
   const style = record.style;
 
   return typeof style === "string" && style.trim().length > 0 ? { style: style.trim() } : {};
-}
-
-function extractLooseJson(content: string): { text: string; language: string; style?: string } | null {
-  const start = content.indexOf("{");
-  const end = content.lastIndexOf("}");
-
-  if (start === -1 || end <= start) {
-    return null;
-  }
-
-  try {
-    const parsed = JSON.parse(content.slice(start, end + 1)) as unknown;
-
-    if (typeof parsed !== "object" || parsed === null) {
-      return null;
-    }
-
-    const record = parsed as Record<string, unknown>;
-    const text = record.text;
-    const language = record.language;
-
-    if (typeof text !== "string" || text.trim().length === 0) {
-      return null;
-    }
-
-    if (typeof language !== "string" || language.trim().length === 0) {
-      return null;
-    }
-
-    return { text, language: language.trim(), ...readStyle(record) };
-  } catch {
-    return null;
-  }
 }

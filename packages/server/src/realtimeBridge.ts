@@ -4,17 +4,27 @@ import type { WSContext, WSEvents } from "hono/ws";
 
 export interface IRealtimeStart {
   language?: string;
+  // What the conversation has been about, for refine.
+  context?: string;
 }
 
 export interface IRealtimeBridgeOptions {
   maxBytes?: number;
   finalize?: (wav: Uint8Array) => Promise<ISttTranscribeResult>;
+  // The last word on the final text, such as a cleanup. It must return the text it was given when it cannot improve it.
+  refine?: (text: string, start: IRealtimeStart, signal: AbortSignal) => Promise<string>;
 }
 
 interface IClientMessage {
   type?: unknown;
   language?: unknown;
+  context?: unknown;
+  waitMs?: unknown;
 }
+
+// The final text has to reach the client before it gives up waiting, so refine stops this long before that.
+const REPLY_MARGIN_MS = 750;
+const MIN_REFINE_MS = 250;
 
 // 16 kHz mono PCM16 is 32 KB a second: about thirteen minutes, like the upload limit.
 const DEFAULT_MAX_BYTES = 25 * 1024 * 1024;
@@ -37,8 +47,10 @@ const send = (ws: WSContext, message: Record<string, unknown>): void => {
 // flush can revise its last words and echo them (oMLX's Whisper does).
 export function createRealtimeBridge(
   open: (start: IRealtimeStart) => Promise<ISttRealtimeResult>,
-  { maxBytes = DEFAULT_MAX_BYTES, finalize }: IRealtimeBridgeOptions = {},
+  { maxBytes = DEFAULT_MAX_BYTES, finalize, refine }: IRealtimeBridgeOptions = {},
 ): WSEvents {
+  const closed = new AbortController();
+  let started: IRealtimeStart = {};
   let session: ISttRealtimeSession | null = null;
   let isStarted = false;
   let isStopping = false;
@@ -57,8 +69,8 @@ export function createRealtimeBridge(
     session?.release();
   };
 
-  const start = async (ws: WSContext, language: string | undefined): Promise<void> => {
-    const result = await open(language === undefined ? {} : { language });
+  const start = async (ws: WSContext): Promise<void> => {
+    const result = await open(started);
 
     if (isOver) {
       if (result.ok) {
@@ -82,7 +94,19 @@ export function createRealtimeBridge(
     send(ws, { type: "ready" });
   };
 
-  const stop = async (ws: WSContext, current: ISttRealtimeSession): Promise<void> => {
+  // The time refine may take: until the client stops waiting, when it said how long that is.
+  const refineSignal = (stoppedAt: number, waitMs: number | undefined): AbortSignal | null => {
+    if (waitMs === undefined) {
+      return closed.signal;
+    }
+
+    const left = waitMs - REPLY_MARGIN_MS - (Date.now() - stoppedAt);
+
+    return left < MIN_REFINE_MS ? null : AbortSignal.any([closed.signal, AbortSignal.timeout(left)]);
+  };
+
+  const stop = async (ws: WSContext, current: ISttRealtimeSession, waitMs: number | undefined): Promise<void> => {
+    const stoppedAt = Date.now();
     isStopping = true;
     const [streamed, final] = await Promise.all([
       current.stop(),
@@ -99,8 +123,18 @@ export function createRealtimeBridge(
       return;
     }
 
+    const signal = refine === undefined ? null : refineSignal(stoppedAt, waitMs);
+    const text =
+      refine === undefined || signal === null
+        ? result.text
+        : await refine(result.text, started, signal).catch(() => result.text);
+
+    if (isOver) {
+      return;
+    }
+
     isOver = true;
-    send(ws, { type: "transcript.done", text: result.text });
+    send(ws, { type: "transcript.done", text });
     ws.close(1000, "done");
   };
 
@@ -115,12 +149,24 @@ export function createRealtimeBridge(
 
         if (message.type === "start" && !isStarted) {
           isStarted = true;
-          void start(ws, typeof message.language === "string" ? message.language : undefined);
+          started = {
+            ...(typeof message.language === "string" ? { language: message.language } : {}),
+            ...(typeof message.context === "string" && message.context.trim() !== ""
+              ? { context: message.context }
+              : {}),
+          };
+          void start(ws);
           return;
         }
 
         if (message.type === "stop" && session !== null && !isStopping) {
-          void stop(ws, session);
+          const { waitMs } = message;
+
+          void stop(
+            ws,
+            session,
+            typeof waitMs === "number" && Number.isFinite(waitMs) && waitMs > 0 ? waitMs : undefined,
+          );
         }
 
         return;
@@ -146,6 +192,7 @@ export function createRealtimeBridge(
     },
     onClose() {
       isOver = true;
+      closed.abort();
       session?.release();
       session = null;
     },

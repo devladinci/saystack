@@ -11,6 +11,8 @@ export interface ILiveTranscriptionOptions {
   onText: (text: string) => void;
   onReady?: () => void;
   language?: string;
+  // What the conversation has been about, for a server that cleans the transcript up.
+  context?: string;
   params?: Readonly<Record<string, unknown>>;
   finishTimeoutMs?: number;
 }
@@ -53,6 +55,7 @@ export function startLiveTranscription({
   onText,
   onReady,
   language,
+  context,
   params = {},
   finishTimeoutMs = 8000,
 }: ILiveTranscriptionOptions): ILiveTranscription {
@@ -106,7 +109,8 @@ export function startLiveTranscription({
 
   const sendStop = (): void => {
     if (isLive && socket?.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify({ type: "stop" }));
+      // waitMs tells the server how long this side waits for the final text, so it can fit its work in.
+      socket.send(JSON.stringify({ type: "stop", waitMs: finishTimeoutMs }));
     }
   };
 
@@ -116,7 +120,14 @@ export function startLiveTranscription({
     end(null);
   } else {
     socket.addEventListener("open", () => {
-      socket.send(JSON.stringify({ ...params, type: "start", ...(language === undefined ? {} : { language }) }));
+      socket.send(
+        JSON.stringify({
+          ...params,
+          type: "start",
+          ...(language === undefined ? {} : { language }),
+          ...(context === undefined || context.trim() === "" ? {} : { context }),
+        }),
+      );
     });
 
     socket.addEventListener("message", (event) => {

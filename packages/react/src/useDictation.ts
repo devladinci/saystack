@@ -21,7 +21,14 @@ interface ISession {
 const recorderFor = (recorder?: IPlatformRecorder): IVoiceRecorderResult =>
   recorder === undefined ? getVoiceRecorder() : { ok: true, recorder };
 
-const transcribeWith = ({ transcribe, endpoint, headers, prompt, language }: IUseDictationOptions): TranscribeFn => {
+const transcribeWith = ({
+  transcribe,
+  endpoint,
+  headers,
+  prompt,
+  language,
+  context,
+}: IUseDictationOptions): TranscribeFn => {
   if (transcribe !== undefined) {
     return transcribe;
   }
@@ -31,6 +38,7 @@ const transcribeWith = ({ transcribe, endpoint, headers, prompt, language }: IUs
       signal,
       ...(prompt === undefined ? {} : { prompt }),
       ...(language === undefined ? {} : { language }),
+      ...(context === undefined ? {} : { context }),
       ...(headers === undefined ? {} : { headers }),
     });
 };

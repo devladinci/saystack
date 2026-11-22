@@ -45,6 +45,11 @@ saystack is pre-1.0: APIs may still change in minor versions, and every change i
   word-level timings when the engine provides them.
 - **Dictation.** Stream recognised words into a composer as they are said, with a realtime WebSocket
   path and a plain upload path.
+- **Dictation cleanup.** Before dictated words settle in the composer, a chat model tidies them the way the
+  speaker would have typed them: punctuation, filler sounds, words said twice, slips of grammar. Give it the
+  conversation so far and it can tell a misheard `peer` from the `PR` under discussion. It cleans a question
+  instead of answering it and never translates, and a cleanup that is no longer the same message is thrown
+  away, so the words arrive as they were heard.
 - **A voice UI.** A spectral aura that reacts to the voice, a read-aloud player, a per-message speaker
   button, mobile dictation/read-aloud spotlights.
 - **Engines behind a seam.** `ISttAdapter`, `ITtsAdapter` and `ISttRealtimeAdapter` are the only things
@@ -63,15 +68,15 @@ number of bands while the voice plays, on desktop or on a phone, then copy the c
 
 ## Packages
 
-| Package                                                                   | What it is                                                                                                 |
-| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| [`@saystack/core`](packages/core)                                         | Engine-agnostic core: text, chunking, sessions, timings, aura and audio maths. No runtime dependencies.    |
-| [`@saystack/web`](packages/web)                                           | Browser audio: WebAudio unlock, recording, PCM capture, read-along over live DOM ranges, the WebGL aura.   |
-| [`@saystack/react`](packages/react)                                       | Shared React state for speech and dictation. Not bound to any platform.                                    |
-| [`@saystack/react-web`](packages/react-web)                               | React components and hooks for the web: read-aloud, the player, dictation, the aura.                       |
-| [`@saystack/react-native`](packages/react-native)                         | The same ideas for React Native: spotlights, captions, native recording and playback.                      |
-| [`@saystack/server`](packages/server)                                     | Optional Hono routes and a realtime WebSocket bridge that keep engine tokens on the server.                |
-| [`@saystack/engine-openai-compatible`](packages/engine-openai-compatible) | An engine for any OpenAI-compatible `/v1` server: STT, TTS, OpenAI Realtime live dictation, normalization. |
+| Package                                                                   | What it is                                                                                                          |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| [`@saystack/core`](packages/core)                                         | Engine-agnostic core: text, chunking, sessions, timings, aura and audio maths. No runtime dependencies.             |
+| [`@saystack/web`](packages/web)                                           | Browser audio: WebAudio unlock, recording, PCM capture, read-along over live DOM ranges, the WebGL aura.            |
+| [`@saystack/react`](packages/react)                                       | Shared React state for speech and dictation. Not bound to any platform.                                             |
+| [`@saystack/react-web`](packages/react-web)                               | React components and hooks for the web: read-aloud, the player, dictation, the aura.                                |
+| [`@saystack/react-native`](packages/react-native)                         | The same ideas for React Native: spotlights, captions, native recording and playback.                               |
+| [`@saystack/server`](packages/server)                                     | Optional Hono routes and a realtime WebSocket bridge that keep engine tokens on the server.                         |
+| [`@saystack/engine-openai-compatible`](packages/engine-openai-compatible) | An engine for any OpenAI-compatible `/v1` server: STT, TTS, OpenAI Realtime live dictation, normalization, cleanup. |
 
 ## Engines
 
@@ -84,15 +89,17 @@ number of bands while the voice plays, on desktop or on a phone, then copy the c
 | Live dictation       | `WS /v1/realtime?intent=transcription` | `createOpenAiRealtimeSttAdapter`                     |
 | Live dictation, oMLX | `WS /v1/audio/transcriptions/realtime` | `createOmlxRealtimeSttAdapter` (oMLX's own protocol) |
 | Speech rewriting     | `POST /v1/chat/completions`            | `createLlmNormalizer`                                |
+| Dictation cleanup    | `POST /v1/chat/completions`            | `createLlmTranscriptCleaner`                         |
 
 Each piece takes its own URL and model, so they can point at different servers — for example a local
-server for speech and a hosted model for rewriting. Any other engine plugs in by implementing
+server for speech and a hosted model for rewriting and cleanup. Any other engine plugs in by implementing
 `ISttAdapter`, `ITtsAdapter` or `ISttRealtimeAdapter` from `@saystack/core`.
 
-Tested end to end against oMLX (all of the above), and against [Speaches](https://speaches.ai) with
-Ollama (upload dictation, read aloud and speech rewriting). The OpenAI Realtime adapter is tested against
-a fake server that follows OpenAI's published protocol; it has not yet been run against OpenAI itself.
-Speaches 0.1 speaks an older version of that protocol, so live dictation does not work with it yet.
+Tested end to end against oMLX (all of the above, with dictation cleanup on Ollama), and against
+[Speaches](https://speaches.ai) with Ollama (upload dictation, read aloud and speech rewriting). The
+OpenAI Realtime adapter is tested against a fake server that follows OpenAI's published protocol; it
+has not yet been run against OpenAI itself. Speaches 0.1 speaks an older version of that protocol,
+so live dictation does not work with it yet.
 
 ## React Native
 

@@ -10,6 +10,9 @@ import { useRecorderLevels } from "./useRecorderLevels.js";
 export interface IRealtimeOptions {
   url: string | (() => string);
   params?: Readonly<Record<string, unknown>>;
+  // How long to wait for the final text after the last word. A server that cleans transcripts up with a slow
+  // model needs more than the default.
+  finishTimeoutMs?: number;
 }
 
 // recorder and live replace the microphone and the realtime socket, e.g. with a clip or the browser's own recognition.
@@ -43,25 +46,30 @@ export function useWebDictation({
   const recorder = customRecorder ?? microphone;
   const realtimeRef = useRef(realtime);
   const languageRef = useRef(options.language);
+  const contextRef = useRef(options.context);
   const recorderRef = useRef(recorder);
 
   useEffect(() => {
     realtimeRef.current = realtime;
     languageRef.current = options.language;
+    contextRef.current = options.context;
     recorderRef.current = recorder;
   });
 
   const live = useCallback<LiveTranscriptionFactory>((active, onText) => {
     const current = realtimeRef.current;
     const url = current === undefined ? "" : typeof current.url === "function" ? current.url() : current.url;
+    const context = contextRef.current?.trim() ?? "";
 
     return startRealtimeTranscription({
       url,
       stream: () => active.stream ?? null,
       onText,
       context: sharedAudioContext(),
+      // The conversation's context travels in the start message, next to the app's own params.
+      params: { ...current?.params, ...(context === "" ? {} : { context }) },
       ...(languageRef.current === undefined ? {} : { language: languageRef.current }),
-      ...(current?.params === undefined ? {} : { params: current.params }),
+      ...(current?.finishTimeoutMs === undefined ? {} : { finishTimeoutMs: current.finishTimeoutMs }),
     });
   }, []);
 

@@ -4,12 +4,14 @@ import type { IConfig, ISttEngineConfig } from "@saystack/core";
 import { styleChoices, validateConfig } from "@saystack/core";
 import {
   createLlmNormalizer,
+  createLlmTranscriptCleaner,
   createOmlxRealtimeSttAdapter,
   createOpenAiRealtimeSttAdapter,
   createOpenAiSttAdapter,
   createOpenAiTtsAdapter,
   maxAudioTokens,
 } from "@saystack/engine-openai-compatible";
+import type { ICleanupReport } from "@saystack/server";
 import { createVoiceRoutes } from "@saystack/server";
 import { Hono } from "hono";
 import { createServer } from "vite";
@@ -112,6 +114,34 @@ const rewriteForSpeech = createLlmNormalizer({
   ...chatToken,
 });
 
+const vocabulary = (env.VOCABULARY ?? "")
+  .split(",")
+  .map((term) => term.trim())
+  .filter((term) => term !== "");
+
+const cleanup =
+  env.CLEANUP === "off"
+    ? {}
+    : {
+        cleanup: {
+          clean: createLlmTranscriptCleaner({
+            url: chatUrl,
+            model: chatModel,
+            ...(preset.disablesThinking ? { disableThinking: true } : {}),
+            ...chatToken,
+          }),
+          vocabulary,
+          timeoutMs: Number(env.CLEANUP_TIMEOUT_MS ?? (presetName === "openai" ? 4000 : 8000)),
+          // A hosted model is always loaded; a local one may have gone idle since the last dictation.
+          warmUp: presetName !== "openai",
+          onResult: ({ outcome, heard, text, message, ms }: ICleanupReport) => {
+            console.log(
+              `cleanup ${outcome} in ${ms} ms${message === undefined ? "" : ` (${message})`}: "${heard}" → "${text}"`,
+            );
+          },
+        },
+      };
+
 const app = new Hono();
 
 app.route(
@@ -121,6 +151,7 @@ app.route(
     createSttAdapter: (engine) => createOpenAiSttAdapter(engine),
     createTtsAdapter: (engine) => createOpenAiTtsAdapter(engine, ttsOptions),
     realtime: { upgradeWebSocket, createAdapter: createRealtimeAdapter },
+    ...cleanup,
   }),
 );
 

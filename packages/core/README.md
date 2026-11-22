@@ -80,6 +80,30 @@ declared is dropped rather than guessed at, and saystack ships no styles of its 
 are those pieces if you are wiring an engine or a UI of your own. With no map at all, speech is exactly what it
 was before.
 
+## Dictation cleanup
+
+A cleaner is an `ICleanupFn`: it takes what a speech engine heard, with the conversation's `context`, your
+`vocabulary` and the `languages` to expect, and answers `{ ok: true, text }` or a coded failure, after which the
+transcript is used as it was heard. `@saystack/engine-openai-compatible` has one built on a chat model, and
+`@saystack/server` runs it on every transcript.
+
+```ts
+import { conversationContext, needsCleanup } from "@saystack/core";
+
+needsCleanup("Sounds good, thanks."); // false: nothing a writer would not have typed
+needsCleanup("um so ship it on on friday"); // true: a filler, a word said twice, no capitals
+
+conversationContext([
+  { role: "user", text: "I just opened PR 42." },
+  { role: "assistant", text: "I can review it once CI is green." },
+]);
+// "user: I just opened PR 42.\nassistant: I can review it once CI is green."
+```
+
+`needsCleanup` is the default answer to whether a transcript is worth a model call when there is no context to
+check its terms against. `conversationContext` turns the end of a chat into the context a cleaner reads, newest
+turn last, within `maxChars` (1500).
+
 ## Your own engine
 
 An engine implements `ITtsAdapter`, `ISttAdapter` or `ISttRealtimeAdapter`. Failures come back as coded results

@@ -28,6 +28,7 @@ Tests that talk to a real engine are skipped unless you point them at one:
 | `ENGINE_URL`, `ENGINE_TOKEN`, `STT_MODEL`               | live transcription             |
 | the above plus `TTS_MODEL` (and `TTS_VOICE` for OpenAI) | live speech through the routes |
 | `LLM_URL`, `LLM_TOKEN`, `LLM_MODEL`                     | the live speech rewriter       |
+| `LLM_URL`, `LLM_MODEL` (and `LLM_TOKEN` if needed)      | the live transcript cleaner    |
 
 ## Playground
 

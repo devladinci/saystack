@@ -1,3 +1,4 @@
+import type { ICleanupInput, ICleanupResult } from "@saystack/core";
 import type { UpgradeWebSocket, WSEvents } from "hono/ws";
 import { createWSMessageEvent, WSContext } from "hono/ws";
 import { describe, expect, it } from "vitest";
@@ -122,6 +123,96 @@ describe("createVoiceRoutes — capabilities", () => {
     await app.request("/capabilities");
 
     expect(seen).toEqual(["http://first", "http://second"]);
+  });
+});
+
+describe("createVoiceRoutes — transcript cleanup", () => {
+  const upload = (context?: string): RequestInit => {
+    const form = new FormData();
+    form.append("file", new Blob([AUDIO_BYTES], { type: "audio/webm" }), "rec.webm");
+
+    if (context !== undefined) {
+      form.append("context", context);
+    }
+
+    return { method: "POST", body: form };
+  };
+
+  const hearing = (text: string): Pick<IVoiceServerDeps, "createSttAdapter" | "getSettings"> => ({
+    getSettings: () => ({ ok: true, config: { languages: ["en"], stt: STT_CONFIG } }),
+    createSttAdapter: () => ({
+      capabilities: { streaming: false, interimResults: false, wordTimings: false, languages: [] },
+      transcribe: async () => ({ ok: true, text, language: "en", durationSeconds: 2 }),
+    }),
+  });
+
+  it("sends back the cleaned transcript, and gives the cleaner the upload's context", async () => {
+    const seen: ICleanupInput[] = [];
+    const deps = makeDeps({
+      ...hearing("um can you review the peer"),
+      cleanup: {
+        clean: async (input) => {
+          seen.push(input);
+          return { ok: true, text: "Can you review the PR?" };
+        },
+      },
+    });
+
+    const res = await createVoiceRoutes(deps).request("/audio/transcriptions", upload("user: PR 42 is up"));
+
+    expect(await res.json()).toEqual({ text: "Can you review the PR?", language: "en", durationSeconds: 2 });
+    expect(seen[0]).toMatchObject({
+      text: "um can you review the peer",
+      context: "user: PR 42 is up",
+      languages: ["en"],
+    });
+  });
+
+  it("sends back what was heard when the cleaner cannot clean it", async () => {
+    const deps = makeDeps({
+      ...hearing("um can you review the peer"),
+      cleanup: {
+        clean: async () => ({ ok: false, errorCode: "CLEANUP_REJECTED", message: "the cleanup added words" }),
+      },
+    });
+
+    const res = await createVoiceRoutes(deps).request("/audio/transcriptions", upload());
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ text: "um can you review the peer" });
+  });
+
+  it("does not call the cleaner when the engine heard nothing or failed", async () => {
+    let calls = 0;
+    const clean = async (): Promise<ICleanupResult> => {
+      calls += 1;
+      return { ok: true, text: "x" };
+    };
+    const silent = makeDeps({ ...hearing(""), cleanup: { clean } });
+    const failing = makeDeps({
+      createSttAdapter: () => ({
+        capabilities: { streaming: false, interimResults: false, wordTimings: false, languages: [] },
+        transcribe: async () => ({ ok: false, errorCode: "ENGINE_UNAVAILABLE" }),
+      }),
+      cleanup: { clean },
+    });
+
+    expect(
+      await (await createVoiceRoutes(silent).request("/audio/transcriptions", upload("user: hi"))).json(),
+    ).toMatchObject({
+      text: "",
+    });
+    expect((await createVoiceRoutes(failing).request("/audio/transcriptions", upload())).status).toBe(502);
+    expect(calls).toBe(0);
+  });
+
+  it("leaves transcripts alone when no cleanup is configured", async () => {
+    const res = await createVoiceRoutes(makeDeps(hearing("um hello"))).request(
+      "/audio/transcriptions",
+      upload("user: hi"),
+    );
+
+    expect(await res.json()).toMatchObject({ text: "um hello" });
   });
 });
 
@@ -753,6 +844,66 @@ describe("createVoiceRoutes realtime", () => {
     expect(JSON.parse(sent[0] ?? "{}")).toMatchObject({ type: "error", errorCode: "BAD_TOKEN" });
     expect(closed).toEqual([4001]);
     expect(opened).toBe(0);
+  });
+
+  it("cleans the final text of a realtime stream, with the context its start message brought", async () => {
+    const cleaned: ICleanupInput[] = [];
+    const upgrade: { createEvents?: (c: unknown) => WSEvents | Promise<WSEvents> } = {};
+    const upgradeWebSocket = ((factory: (c: unknown) => WSEvents | Promise<WSEvents>) => {
+      upgrade.createEvents = factory;
+      return async () => new Response("upgraded");
+    }) as unknown as UpgradeWebSocket;
+    const opened: unknown[] = [];
+    const session = {
+      capabilities: { streaming: true, interimResults: true, wordTimings: false, languages: [] },
+      feedPcm16: () => undefined,
+      onDelta: () => undefined,
+      onError: () => undefined,
+      stop: async () => ({ ok: true as const, text: "um review the peer" }),
+      release: () => undefined,
+    };
+    const routes = createVoiceRoutes(
+      makeDeps({
+        getSettings: () => ({ ok: true, config: { languages: ["en", "bg"], stt: STT_CONFIG } }),
+        realtime: {
+          upgradeWebSocket,
+          finalPass: false,
+          createAdapter: () => ({
+            capabilities: session.capabilities,
+            openRealtime: async (input) => {
+              opened.push(input);
+              return { ok: true, session };
+            },
+          }),
+        },
+        cleanup: {
+          clean: async (input) => {
+            cleaned.push(input);
+            return { ok: true, text: "Review the PR." };
+          },
+        },
+      }),
+    );
+    const sent: string[] = [];
+    const ws = new WSContext({ send: (data) => sent.push(String(data)), close: () => undefined, readyState: 1 });
+
+    await routes.request("/audio/transcriptions/realtime");
+    const events = (await upgrade.createEvents?.({})) ?? null;
+    events?.onMessage?.(
+      createWSMessageEvent(JSON.stringify({ type: "start", language: "en", context: "user: PR 42 is up" })),
+      ws,
+    );
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    events?.onMessage?.(createWSMessageEvent(JSON.stringify({ type: "stop" })), ws);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(opened).toEqual([{ language: "en" }]);
+    expect(cleaned[0]).toMatchObject({
+      text: "um review the peer",
+      context: "user: PR 42 is up",
+      languages: ["en", "bg"],
+    });
+    expect(JSON.parse(sent.at(-1) ?? "{}")).toEqual({ type: "transcript.done", text: "Review the PR." });
   });
 
   it("has no realtime route unless one is configured", async () => {

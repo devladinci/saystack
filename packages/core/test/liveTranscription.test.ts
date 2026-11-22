@@ -55,6 +55,30 @@ const start = () => {
 };
 
 describe("startLiveTranscription", () => {
+  it("opens with the language and the conversation's context, and leaves a blank context out", () => {
+    startLiveTranscription({
+      url: "ws://daemon/stt/stream",
+      source: fakeSource(),
+      onText: () => undefined,
+      language: "en",
+      context: "user: I opened PR 42",
+      params: { model: "m" },
+    });
+    FakeSocket.last?.open();
+    const withContext = FakeSocket.last?.texts();
+
+    startLiveTranscription({
+      url: "ws://daemon/stt/stream",
+      source: fakeSource(),
+      onText: () => undefined,
+      context: " ",
+    });
+    FakeSocket.last?.open();
+
+    expect(withContext).toEqual([{ model: "m", type: "start", language: "en", context: "user: I opened PR 42" }]);
+    expect(FakeSocket.last?.texts()).toEqual([{ type: "start" }]);
+  });
+
   it("streams any PCM source once the engine is ready", async () => {
     const { live, source, socket, heard } = start();
 
@@ -67,7 +91,7 @@ describe("startLiveTranscription", () => {
     const finished = live.finish();
     socket.reply({ type: "transcript.done", text: "On the phone." });
 
-    expect(socket.texts()).toEqual([{ type: "start" }, { type: "stop" }]);
+    expect(socket.texts()).toEqual([{ type: "start" }, { type: "stop", waitMs: 8000 }]);
     expect(socket.audio().map((pcm) => pcm.byteLength)).toEqual([3200, 1600]);
     expect(heard).toEqual(["<ready>", "On the", "On the phone."]);
     await expect(finished).resolves.toBe("On the phone.");

@@ -66,7 +66,9 @@ export function VoiceControls({ driver, recorder, reply, onText }: IProps) {
 `useSpeech` returns the session state (`phase`, `chunks`, `errorCode`) and an api to `speak`, `pause`, `resume`,
 `stop` and `seek`. `useDictation` records until `handlePressEnd`, posts the take to `endpoint` as a multipart
 `file`, and calls `onText` with the transcript. Errors arrive as codes such as `MIC_PERMISSION_DENIED` or
-`ENGINE_UNAVAILABLE`, so the wording stays yours.
+`ENGINE_UNAVAILABLE`, so the wording stays yours. Give it `context`, what the conversation has been about, and a
+server that [cleans transcripts up](https://github.com/devladinci/saystack/blob/main/packages/server#dictation-cleanup)
+can tell a misheard term from the word it sounds like.
 
 `createReadAloud` is the store behind both `ReadAloudProvider`s: one speech session for a whole chat, keyed by
 message id.

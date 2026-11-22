@@ -28,6 +28,35 @@ function capture() {
 }
 
 describe("httpChatComplete", () => {
+  it("switches thinking off both ways servers understand, and only when asked to", async () => {
+    const { fetchFn, sentBody } = capture();
+
+    await httpChatComplete({ ...REQUEST, disableThinking: true }, "http://engine/v1/chat/completions", fetchFn);
+    await httpChatComplete(REQUEST, "http://engine/v1/chat/completions", fetchFn);
+
+    expect(sentBody(0).chat_template_kwargs).toEqual({ enable_thinking: false });
+    expect(sentBody(0).reasoning_effort).toBe("none");
+    expect("chat_template_kwargs" in sentBody(1)).toBe(false);
+    expect("reasoning_effort" in sentBody(1)).toBe(false);
+  });
+
+  it("stops when the caller's signal aborts, and says so as a timeout", async () => {
+    const caller = new AbortController();
+    const fetchFn = (_url: string | URL | Request, init?: RequestInit) =>
+      new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError")));
+      });
+    const pending = httpChatComplete(
+      { ...REQUEST, signal: caller.signal },
+      "http://engine/v1/chat/completions",
+      fetchFn,
+    );
+
+    caller.abort();
+
+    expect(await pending).toMatchObject({ ok: false, errorCode: "LLM_TIMEOUT" });
+  });
+
   it("omits response_format when no schema is requested", async () => {
     const { fetchFn, sentBody } = capture();
 
