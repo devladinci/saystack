@@ -1,6 +1,6 @@
 import type { WebSocketServerLike } from "@hono/node-server";
 import { serve, upgradeWebSocket } from "@hono/node-server";
-import type { IConfig, ISttEngineConfig } from "@saystack/core";
+import type { IConfig, ISttEngineConfig, ISttRealtimeAdapter } from "@saystack/core";
 import { styleChoices, validateConfig } from "@saystack/core";
 import {
   createLlmNormalizer,
@@ -12,7 +12,7 @@ import {
   maxAudioTokens,
 } from "@saystack/engine-openai-compatible";
 import type { ICleanupReport } from "@saystack/server";
-import { createVoiceRoutes } from "@saystack/server";
+import { createRollingRealtimeSttAdapter, createVoiceRoutes } from "@saystack/server";
 import { Hono } from "hono";
 import { createServer } from "vite";
 import { WebSocketServer } from "ws";
@@ -24,7 +24,7 @@ interface IPreset {
   sttModel: string;
   ttsModel: string;
   voice?: string;
-  realtime: "openai" | "omlx";
+  realtime: "openai" | "omlx" | "rolling";
   realtimeModel?: string;
   chatModel?: string;
   capsAudioTokens: boolean;
@@ -50,7 +50,7 @@ const PRESETS: Readonly<Record<string, IPreset>> = {
     url: "http://127.0.0.1:7777/v1",
     sttModel: "whisper-large-v3-turbo",
     ttsModel: "higgs_audio_v3-tts-4b",
-    realtime: "omlx",
+    realtime: "rolling",
     capsAudioTokens: true,
     disablesThinking: true,
     styles: true,
@@ -95,10 +95,18 @@ const settings = validateConfig(config);
 
 const realtimeModelName = env.REALTIME_MODEL ?? preset.realtimeModel;
 const realtimeModel = realtimeModelName === undefined ? {} : { model: realtimeModelName };
-const createRealtimeAdapter =
-  (env.REALTIME_PROTOCOL ?? preset.realtime) === "openai"
-    ? (engine: ISttEngineConfig) => createOpenAiRealtimeSttAdapter(engine, realtimeModel)
-    : (engine: ISttEngineConfig) => createOmlxRealtimeSttAdapter(engine, realtimeModel);
+const realtimeProtocol = env.REALTIME_PROTOCOL ?? preset.realtime;
+
+// "rolling" needs no realtime endpoint: the live words come from the file model, heard again every half second.
+const createRealtimeAdapter = (engine: ISttEngineConfig): ISttRealtimeAdapter => {
+  if (realtimeProtocol === "rolling") {
+    return createRollingRealtimeSttAdapter(createOpenAiSttAdapter(engine));
+  }
+
+  return realtimeProtocol === "openai"
+    ? createOpenAiRealtimeSttAdapter(engine, realtimeModel)
+    : createOmlxRealtimeSttAdapter(engine, realtimeModel);
+};
 
 const SYSTEM_PROMPT = [
   "You are the assistant in a voice chat demo.",
@@ -106,11 +114,14 @@ const SYSTEM_PROMPT = [
   "Keep answers to two to five sentences unless the user asks for code, a list or a table.",
 ].join(" ");
 
+// A voice that does not read inline tags would say them out loud, so another TTS_MODEL can switch them off.
+const hasStyles = env.SPEECH_STYLES === undefined ? preset.styles : env.SPEECH_STYLES !== "off";
+
 const rewriteForSpeech = createLlmNormalizer({
   url: chatUrl,
   model: chatModel,
   ...(preset.disablesThinking ? { disableThinking: true } : {}),
-  ...(preset.styles ? { styleChoices: styleChoices(speechStyleMap) } : {}),
+  ...(hasStyles ? { styleChoices: styleChoices(speechStyleMap) } : {}),
   ...chatToken,
 });
 
@@ -166,6 +177,21 @@ app.post("/voice/rewrite", async (c) => {
   });
 });
 
+// How each server is asked to answer without thinking first. The other server's switch is not harmless:
+// `reasoning_effort: "none"` made a local model on Ollama write its reasoning into the answer itself.
+const quietChat = preset.disablesThinking
+  ? { chat_template_kwargs: { enable_thinking: false } }
+  : { reasoning_effort: "none" };
+
+const THINKING_END = "</think>";
+
+// A model that thinks anyway may leave that in the reply, sometimes with only the closing tag.
+const withoutThinking = (content: string): string => {
+  const end = content.lastIndexOf(THINKING_END);
+
+  return (end === -1 ? content : content.slice(end + THINKING_END.length)).replace(/<think>[\s\S]*$/, "").trim();
+};
+
 app.post("/api/chat", async (c) => {
   const body: { messages?: unknown } = await c.req.json().catch(() => ({}));
   const messages = Array.isArray(body.messages) ? body.messages : [];
@@ -178,7 +204,7 @@ app.post("/api/chat", async (c) => {
     body: JSON.stringify({
       model: chatModel,
       messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
-      reasoning_effort: "none",
+      ...quietChat,
     }),
   }).catch(() => null);
 
@@ -189,7 +215,7 @@ app.post("/api/chat", async (c) => {
   const reply: { choices?: { message?: { content?: unknown } }[] } = await response.json();
   const content = reply.choices?.[0]?.message?.content;
 
-  return c.json({ text: typeof content === "string" ? content : "" });
+  return c.json({ text: typeof content === "string" ? withoutThinking(content) : "" });
 });
 
 // ws types its options with `| undefined`, which exactOptionalPropertyTypes will not match to node-server's.

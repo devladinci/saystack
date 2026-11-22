@@ -26,6 +26,47 @@
   font-size: 13.5px;
   line-height: 1.4;
   container: saystack-player / inline-size;
+  animation: saystack-player-in 0.32s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* The player's own height, opening and closing, so whatever sits around it moves over instead of jumping.
+   --saystack-player-gap is space below the player that opens and closes with it. */
+.saystack-player-reveal {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.34s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@starting-style {
+  .saystack-player-reveal {
+    grid-template-rows: 0fr;
+  }
+}
+
+.saystack-player-reveal[data-leaving] {
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.24s cubic-bezier(0.4, 0, 0.7, 0.3);
+}
+
+/* While the height changes the player is cut at the bottom edge of its row. Around the other edges, and
+   under it once it is open, a shadow the host gives it has room. */
+.saystack-player-reveal__clip {
+  min-height: 0;
+  animation: saystack-player-uncut 0.34s both;
+}
+
+.saystack-player-reveal[data-leaving] .saystack-player-reveal__clip {
+  clip-path: inset(-64px -64px 0 -64px);
+  animation: none;
+}
+
+.saystack-player-reveal__clip > .saystack-player {
+  margin-bottom: var(--saystack-player-gap, 0px);
+}
+
+.saystack-player-reveal[data-leaving] .saystack-player {
+  animation: saystack-player-out 0.2s cubic-bezier(0.4, 0, 1, 1) both;
+  pointer-events: none;
 }
 
 .saystack-player__main {
@@ -86,10 +127,10 @@
 .saystack-player__spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid currentColor;
-  border-right-color: transparent;
+  border: 2px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-top-color: currentColor;
   border-radius: 50%;
-  animation: saystack-spin 0.8s linear infinite;
+  animation: saystack-spin 0.9s cubic-bezier(0.5, 0.15, 0.5, 0.85) infinite;
 }
 
 .saystack-spectrum {
@@ -113,10 +154,6 @@
   color: var(--saystack-player-muted);
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.saystack-player[data-phase="loading"] .saystack-player__status {
-  animation: saystack-breathe 1.4s ease-in-out infinite;
 }
 
 .saystack-player[data-phase="error"] .saystack-player__status {
@@ -172,12 +209,24 @@
   align-items: center;
   gap: 3px;
   height: 14px;
+  overflow: hidden;
+}
+
+/* Before the first chunk there are no parts to show, so the track itself says that work is under way. */
+.saystack-player[data-phase="loading"] .saystack-player__track:empty::before {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--saystack-player-faint) 50%, transparent 100%) 0 0 / 40% 100%
+    no-repeat var(--saystack-player-track);
+  content: "";
+  animation: saystack-track-load 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .saystack-player__segment {
   position: relative;
   flex: 1 1 0;
-  min-width: 4px;
+  min-width: 2px;
   height: 14px;
   padding: 0;
   border: 0;
@@ -211,15 +260,48 @@
   transform-origin: left;
 }
 
+.saystack-player__segment--now::before {
+  background: var(--saystack-player-faint);
+}
+
 @keyframes saystack-spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-@keyframes saystack-breathe {
-  50% {
-    opacity: 0.45;
+@keyframes saystack-player-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+}
+
+@keyframes saystack-player-out {
+  to {
+    opacity: 0;
+    transform: translateY(6px) scale(0.985);
+  }
+}
+
+@keyframes saystack-player-uncut {
+  from,
+  80% {
+    clip-path: inset(-64px -64px 0 -64px);
+  }
+
+  to {
+    clip-path: inset(-64px);
+  }
+}
+
+@keyframes saystack-track-load {
+  from {
+    background-position: -70% 0;
+  }
+
+  to {
+    background-position: 170% 0;
   }
 }
 
@@ -233,6 +315,11 @@
   .saystack-player__time {
     display: none;
   }
+
+  /* While a status shows there is no part to skip to, and a narrow player needs the room for the words. */
+  .saystack-player[data-status] .saystack-player__button:disabled {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -242,8 +329,19 @@
     transition: none;
   }
 
+  .saystack-player-reveal,
+  .saystack-player-reveal[data-leaving] {
+    transition: none;
+  }
+
+  .saystack-player-reveal__clip {
+    animation-duration: 1ms;
+  }
+
+  .saystack-player,
+  .saystack-player-reveal[data-leaving] .saystack-player,
   .saystack-player__spinner,
-  .saystack-player[data-phase="loading"] .saystack-player__status {
+  .saystack-player[data-phase="loading"] .saystack-player__track:empty::before {
     animation: none;
   }
 }

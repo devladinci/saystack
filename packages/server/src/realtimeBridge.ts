@@ -44,7 +44,9 @@ const send = (ws: WSContext, message: Record<string, unknown>): void => {
 
 // One WebSocket connection of the realtime transcription protocol, for Hono's upgradeWebSocket.
 // With finalize, the last text comes from one pass over the whole recording: a stream's closing
-// flush can revise its last words and echo them (oMLX's Whisper does).
+// flush can revise its last words and echo them (oMLX's Whisper does). The recording is then the
+// source of truth: a stream that breaks costs the live words, never the text, and when the speaker
+// stops the stream is closed without waiting for its flush.
 export function createRealtimeBridge(
   open: (start: IRealtimeStart) => Promise<ISttRealtimeResult>,
   { maxBytes = DEFAULT_MAX_BYTES, finalize, refine }: IRealtimeBridgeOptions = {},
@@ -53,9 +55,11 @@ export function createRealtimeBridge(
   let started: IRealtimeStart = {};
   let session: ISttRealtimeSession | null = null;
   let isStarted = false;
+  let isReady = false;
   let isStopping = false;
   let isOver = false;
   let received = 0;
+  let heard = "";
   const recording: Uint8Array[] = [];
 
   const fail = (ws: WSContext, errorCode: SttErrorCode, detail?: string): void => {
@@ -85,12 +89,23 @@ export function createRealtimeBridge(
     }
 
     session = result.session;
-    session.onDelta((delta) => {
+    session.onDelta((delta, fullText) => {
+      heard = fullText;
+
       if (!isOver && !(isStopping && finalize !== undefined)) {
         send(ws, { type: "transcript.delta", delta });
       }
     });
-    session.onError((errorCode, message) => fail(ws, errorCode, message));
+    session.onError((errorCode, message) => {
+      if (finalize === undefined) {
+        fail(ws, errorCode, message);
+        return;
+      }
+
+      session?.release();
+      session = null;
+    });
+    isReady = true;
     send(ws, { type: "ready" });
   };
 
@@ -105,14 +120,41 @@ export function createRealtimeBridge(
     return left < MIN_REFINE_MS ? null : AbortSignal.any([closed.signal, AbortSignal.timeout(left)]);
   };
 
-  const stop = async (ws: WSContext, current: ISttRealtimeSession, waitMs: number | undefined): Promise<void> => {
+  const flushStream = (): Promise<ISttTranscribeResult> =>
+    session === null
+      ? Promise.resolve({ ok: false, errorCode: "TRANSCRIPTION_FAILED", message: "the stream ended early" })
+      : session.stop().catch((): ISttTranscribeResult => ({
+          ok: false,
+          errorCode: "TRANSCRIPTION_FAILED",
+          message: "the stream did not close",
+        }));
+
+  // The recording is what gets transcribed, so the stream is closed at once. Left to flush, an engine can
+  // spend seconds on it (oMLX's Whisper does after a silence) and hold the pass over the recording up behind
+  // it. Should that pass fail, the words streamed so far are the text: they are what the speaker saw.
+  const transcribeRecording = async (
+    pass: (wav: Uint8Array) => Promise<ISttTranscribeResult>,
+  ): Promise<ISttTranscribeResult> => {
+    session?.release();
+    session = null;
+
+    const final = await pass(pcm16ToWav(recording)).catch((): ISttTranscribeResult | null => null);
+
+    if (final !== null && final.ok) {
+      return final;
+    }
+
+    if (heard.trim() !== "") {
+      return { ok: true, text: heard };
+    }
+
+    return final ?? { ok: false, errorCode: "TRANSCRIPTION_FAILED", message: "the recording could not be transcribed" };
+  };
+
+  const stop = async (ws: WSContext, waitMs: number | undefined): Promise<void> => {
     const stoppedAt = Date.now();
     isStopping = true;
-    const [streamed, final] = await Promise.all([
-      current.stop(),
-      finalize === undefined ? Promise.resolve(null) : finalize(pcm16ToWav(recording)),
-    ]);
-    const result = final !== null && final.ok ? final : streamed;
+    const result = await (finalize === undefined ? flushStream() : transcribeRecording(finalize));
 
     if (isOver) {
       return;
@@ -159,20 +201,16 @@ export function createRealtimeBridge(
           return;
         }
 
-        if (message.type === "stop" && session !== null && !isStopping) {
+        if (message.type === "stop" && isReady && !isStopping) {
           const { waitMs } = message;
 
-          void stop(
-            ws,
-            session,
-            typeof waitMs === "number" && Number.isFinite(waitMs) && waitMs > 0 ? waitMs : undefined,
-          );
+          void stop(ws, typeof waitMs === "number" && Number.isFinite(waitMs) && waitMs > 0 ? waitMs : undefined);
         }
 
         return;
       }
 
-      if (session === null || !(event.data instanceof ArrayBuffer)) {
+      if (!isReady || !(event.data instanceof ArrayBuffer)) {
         return;
       }
 
@@ -184,7 +222,7 @@ export function createRealtimeBridge(
       }
 
       const pcm = new Uint8Array(event.data);
-      session.feedPcm16(pcm);
+      session?.feedPcm16(pcm);
 
       if (finalize !== undefined) {
         recording.push(pcm);

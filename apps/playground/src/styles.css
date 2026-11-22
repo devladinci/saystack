@@ -412,6 +412,7 @@ button {
   outline: none;
   background: transparent;
   color: var(--text);
+  transition: height 0.18s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 
 .field textarea::placeholder {
@@ -1146,14 +1147,11 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .m-dock {
+  --saystack-player-gap: 8px;
+
   display: flex;
   flex-direction: column;
-  gap: 8px;
   padding: 8px 12px 26px;
-}
-
-.m-player:empty {
-  display: none;
 }
 
 .m-backdrop {

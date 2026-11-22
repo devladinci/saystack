@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createAura } from "../src/aura/createAura.js";
 import { createFieldInput } from "../src/fieldInput.js";
@@ -6,6 +6,7 @@ import { createSpectrumLine } from "../src/spectrumLine.js";
 import { createStreamingInput } from "../src/streamingInput.js";
 
 afterEach(() => {
+  vi.useRealTimers();
   document.body.replaceChildren();
 });
 
@@ -46,6 +47,151 @@ describe("createStreamingInput", () => {
     expect(document.querySelector(".saystack-streaming")).toBeNull();
   });
 
+  it("shows every word as unsettled while the final text is awaited", () => {
+    const field = document.createElement("textarea");
+    document.body.append(field);
+    const streaming = createStreamingInput(field);
+
+    streaming.begin();
+    streaming.update("review the peer", "");
+    streaming.hold();
+    const held = Array.from(document.querySelectorAll(".saystack-streaming-word"), (word) =>
+      word.classList.contains("saystack-streaming-interim"),
+    );
+    streaming.update("Review the PR.", "");
+    const settled = Array.from(document.querySelectorAll(".saystack-streaming-word"), (word) =>
+      word.classList.contains("saystack-streaming-interim"),
+    );
+
+    expect(held).toEqual([true, true, true]);
+    expect(settled).toEqual([false, false, false]);
+  });
+
+  it("keeps the words up until a changed final text has finished arriving, then restores the field", () => {
+    vi.useFakeTimers();
+    const field = document.createElement("textarea");
+    field.style.color = "red";
+    document.body.append(field);
+    const streaming = createStreamingInput(field);
+
+    streaming.begin();
+    streaming.update("review the peer", "");
+    vi.advanceTimersByTime(2000);
+    streaming.update("Review the PR.", "");
+
+    expect(streaming.settle()).toBe("Review the PR.");
+    expect(document.querySelector(".saystack-streaming-settling")).not.toBeNull();
+    expect(field.style.color).toBe("transparent");
+
+    vi.advanceTimersByTime(600);
+
+    expect(document.querySelector(".saystack-streaming")).toBeNull();
+    expect(field.style.color).toBe("red");
+  });
+
+  it("settles at once when no word changed, when the user types, and when dictation starts again", () => {
+    vi.useFakeTimers();
+    const field = document.createElement("textarea");
+    document.body.append(field);
+    const streaming = createStreamingInput(field);
+
+    streaming.begin();
+    streaming.update("hello there", "");
+    vi.advanceTimersByTime(2000);
+    streaming.settle();
+    const afterUnchanged = document.querySelector(".saystack-streaming");
+
+    streaming.begin();
+    streaming.update("new words", "");
+    streaming.settle();
+    field.dispatchEvent(new Event("input"));
+    const afterTyping = document.querySelector(".saystack-streaming");
+
+    streaming.begin();
+    streaming.update("more words", "");
+    streaming.settle();
+    streaming.begin();
+    streaming.update("again", "");
+    const words = Array.from(document.querySelectorAll(".saystack-streaming-word"), (word) => word.textContent);
+
+    expect(afterUnchanged).toBeNull();
+    expect(afterTyping).toBeNull();
+    expect(words).toEqual(["again"]);
+  });
+
+  it("keeps the newest words in view in a field too small for them", () => {
+    const field = document.createElement("textarea");
+    Object.defineProperty(field, "scrollHeight", { value: 240, configurable: true });
+    document.body.append(field);
+    const streaming = createStreamingInput(field);
+
+    streaming.begin();
+    streaming.update("a dictation longer than the field", "");
+
+    expect(field.scrollTop).toBe(240);
+    expect(document.querySelector(".saystack-streaming")?.scrollTop).toBe(240);
+  });
+
+  it("leaves a field alone that hides its overflow, since its host grows it to fit", () => {
+    const field = document.createElement("textarea");
+    field.style.overflowY = "hidden";
+    Object.defineProperty(field, "scrollHeight", { value: 240, configurable: true });
+    document.body.append(field);
+    const streaming = createStreamingInput(field);
+
+    streaming.begin();
+    streaming.update("a dictation the field is growing for", "");
+
+    expect(field.scrollTop).toBe(0);
+    expect(document.querySelector(".saystack-streaming")?.scrollTop).toBe(0);
+  });
+
+  it("keeps the end of a single line in view", () => {
+    const field = document.createElement("input");
+    Object.defineProperty(field, "scrollWidth", { value: 900, configurable: true });
+    document.body.append(field);
+    const streaming = createStreamingInput(field);
+
+    streaming.begin();
+    streaming.update("a dictation wider than the field", "");
+
+    expect(field.scrollLeft).toBe(900);
+  });
+
+  it("stays over a field that changes size, without waiting for the next frame", () => {
+    let resize: () => void = () => undefined;
+
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        constructor(callback: () => void) {
+          resize = callback;
+        }
+
+        observe(): void {}
+
+        disconnect(): void {}
+      },
+    );
+
+    const field = document.createElement("textarea");
+    const box = vi.spyOn(field, "getBoundingClientRect").mockReturnValue(new DOMRect(10, 500, 300, 36));
+    document.body.append(field);
+    const streaming = createStreamingInput(field);
+
+    streaming.begin();
+    streaming.update("hello", "");
+    box.mockReturnValue(new DOMRect(10, 476, 300, 60));
+    resize();
+
+    const mirror = document.querySelector<HTMLElement>(".saystack-streaming");
+
+    expect(mirror?.style.height).toBe("60px");
+    expect(mirror?.style.transform).toBe("translate(10px, 476px)");
+
+    vi.unstubAllGlobals();
+  });
+
   it("returns what was typed before when cancelled", () => {
     const field = document.createElement("textarea");
     field.value = "typed";
@@ -61,6 +207,7 @@ describe("createStreamingInput", () => {
 
 describe("createFieldInput", () => {
   it("streams the words after what was typed and hands the value back", () => {
+    vi.useFakeTimers();
     const field = document.createElement("textarea");
     field.value = "Note:";
     document.body.append(field);
@@ -72,7 +219,24 @@ describe("createFieldInput", () => {
     input.end("Buy milk.");
 
     expect(values).toEqual(["Note: buy", "Note: buy milk", "Note: Buy milk."]);
+
+    vi.advanceTimersByTime(600);
+
     expect(document.querySelector(".saystack-streaming")).toBeNull();
+  });
+
+  it("marks the streamed words as unsettled while it waits, and does nothing when none were streamed", () => {
+    const field = document.createElement("textarea");
+    document.body.append(field);
+    const input = createFieldInput(field, { onValue: () => undefined });
+
+    input.wait?.();
+    const before = document.querySelector(".saystack-streaming");
+    input.show("review the peer");
+    input.wait?.();
+
+    expect(before).toBeNull();
+    expect(document.querySelectorAll(".saystack-streaming-interim")).toHaveLength(3);
   });
 
   it("gives back what was typed when the dictation is dropped", () => {

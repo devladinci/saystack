@@ -101,7 +101,7 @@ interface IMessageProps {
 }
 
 describe("useReadAlong", () => {
-  it("highlights the message being read", () => {
+  it("highlights the message being read, and lets the dimming fade before taking it away", async () => {
     const registry = new Map<string, FakeHighlight>();
     vi.stubGlobal("Highlight", FakeHighlight);
     vi.stubGlobal("CSS", { highlights: registry });
@@ -129,7 +129,9 @@ describe("useReadAlong", () => {
 
     rerender(<Message isActive={false} />);
 
-    expect(registry.has("saystack-read")).toBe(false);
+    await vi.waitFor(() => {
+      expect(registry.has("saystack-read")).toBe(false);
+    });
   });
 });
 

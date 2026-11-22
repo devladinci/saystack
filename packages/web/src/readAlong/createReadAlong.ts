@@ -14,6 +14,8 @@ export interface IReadAlongOptions {
   isDimmed?: boolean;
   // The marks float above the page by default; set this to tuck them under the app's own layers.
   zIndex?: number;
+  // Scrolls the word being read back into view when it leaves it, until the reader scrolls by hand. On by default.
+  follow?: boolean;
   onSeek?: (target: IReadAlongSeek) => void;
 }
 
@@ -21,10 +23,16 @@ export interface IReadAlong {
   setChunks(chunks: readonly ISpeechChunk[]): void;
   setPosition(position: ISpeechPosition): void;
   setDimmed(isDimmed: boolean): void;
+  // Brings the word being read into view and follows it again.
+  locate(): void;
   finish(): void;
   clear(): void;
   destroy(): void;
 }
+
+// Dispatched on the root by whoever wants the word being read in view, such as a player's locate button.
+// It is cancelled when a read-along answers it.
+export const LOCATE_EVENT = "saystack-locate";
 
 interface ISpoken {
   chunkIndex: number;
@@ -45,6 +53,43 @@ export const UNREAD_HIGHLIGHT = "saystack-unread";
 const PILL_PADDING_X = 4;
 
 const PILL_PADDING_Y = 1;
+
+const RING_PADDING = 6;
+
+const ROOT_CLASS = "saystack-read-along";
+
+// On a root whose words can be clicked to move the reading there.
+const SEEKABLE_CLASS = "saystack-read-along-seekable";
+
+// How far the unread words have dimmed, from 0 to 1. Registered in the stylesheet, so it can be animated.
+const FADE_PROPERTY = "--saystack-unread-fade";
+
+const FADE_MS = 300;
+
+// The share of the visible height kept clear above and below the word being read.
+const FOLLOW_EDGE = 0.2;
+
+const FOLLOW_REST = 0.32;
+
+const FOLLOW_PAUSE_MS = 400;
+
+const SCROLL_KEYS: readonly string[] = ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "];
+
+interface IMark {
+  element: HTMLDivElement;
+  isShown: boolean;
+  top: number;
+}
+
+const prefersReducedMotion = (): boolean =>
+  typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const withoutTransition = (element: HTMLElement, change: () => void): void => {
+  element.style.transition = "none";
+  change();
+  void element.offsetWidth;
+  element.style.transition = "";
+};
 
 const highlightRegistry = (): HighlightRegistry | null =>
   typeof CSS !== "undefined" && "highlights" in CSS && typeof Highlight !== "undefined" ? CSS.highlights : null;
@@ -138,6 +183,9 @@ function align(chunks: readonly ISpeechChunk[], page: IPage): IAlignment {
   return { spoken, chunkStarts, pageOf, blockOf };
 }
 
+// How many read-alongs hold a root: one that is fading out must not undo what the next one has set up.
+const holders = new WeakMap<Element, number>();
+
 export function createReadAlong(root: Element, options: IReadAlongOptions = {}): IReadAlong {
   const blocks = options.blocks ?? DEFAULT_BLOCKS;
   const onSeek = options.onSeek;
@@ -148,13 +196,42 @@ export function createReadAlong(root: Element, options: IReadAlongOptions = {}):
   let isStale = false;
   let current = -1;
   let block: Element | null = null;
+  let shownBlock: Element | null = null;
   let isActive = false;
   let repositionFrame = 0;
   let painted: { read: Highlight; unread: Highlight } | null = null;
+  let isFollowing = options.follow ?? true;
+  let followedAt = -Infinity;
+  let fade: Animation | null = null;
+  let unpaintTimer: ReturnType<typeof setTimeout> | undefined;
   const clipper = scrollParent(root);
-  const pill = overlay("saystack-read-along-word", options.zIndex);
-  const ring = overlay("saystack-read-along-block", options.zIndex);
-  document.body.append(pill, ring);
+  const pill: IMark = { element: overlay("saystack-read-along-word", options.zIndex), isShown: false, top: 0 };
+  const ring: IMark = { element: overlay("saystack-read-along-block", options.zIndex), isShown: false, top: 0 };
+  document.body.append(pill.element, ring.element);
+  root.classList.add(ROOT_CLASS);
+  root.classList.toggle(SEEKABLE_CLASS, onSeek !== undefined);
+  holders.set(root, (holders.get(root) ?? 0) + 1);
+
+  // The unread words dim and come back gradually: the highlight reads this property off the root.
+  const fadeTo = (target: 0 | 1): void => {
+    if (!(root instanceof HTMLElement)) {
+      return;
+    }
+
+    const from = getComputedStyle(root).getPropertyValue(FADE_PROPERTY).trim();
+    fade?.cancel();
+    fade = null;
+    root.style.setProperty(FADE_PROPERTY, String(target));
+
+    if (from === "" || from === String(target) || typeof root.animate !== "function" || prefersReducedMotion()) {
+      return;
+    }
+
+    fade = root.animate([{ [FADE_PROPERTY]: from }, { [FADE_PROPERTY]: String(target) }], {
+      duration: FADE_MS,
+      easing: "ease",
+    });
+  };
 
   const paintHighlights = (readBefore: number): void => {
     const registry = highlightRegistry();
@@ -179,37 +256,106 @@ export function createReadAlong(root: Element, options: IReadAlongOptions = {}):
     painted = { read, unread };
   };
 
-  const place = (element: HTMLDivElement, box: DOMRect | null, padX: number, padY: number): void => {
+  const hide = (mark: IMark): void => {
+    mark.element.style.opacity = "0";
+    mark.isShown = false;
+  };
+
+  // A mark glides from word to word along a line. Anywhere else it takes its new place at once: when it was
+  // hidden, when the page moved under it, and when the next word is on another line, where it fades in rather
+  // than streak across the text.
+  const place = (mark: IMark, box: DOMRect | null, padX: number, padY: number, isInstant: boolean): void => {
     const bounds = clipper?.getBoundingClientRect();
     const isVisible =
       box !== null && box.width > 0 && (bounds === undefined || (box.bottom > bounds.top && box.top < bounds.bottom));
 
     if (!isVisible || box === null) {
-      element.style.opacity = "0";
+      hide(mark);
       return;
+    }
+
+    const { element } = mark;
+    const apply = (): void => {
+      element.style.transform = `translate(${(box.left - padX).toFixed(1)}px, ${(box.top - padY).toFixed(1)}px)`;
+      element.style.width = `${(box.width + padX * 2).toFixed(1)}px`;
+      element.style.height = `${(box.height + padY * 2).toFixed(1)}px`;
+    };
+    const isOnAnotherLine = Math.abs(box.top - mark.top) > box.height * 0.6;
+
+    if (!mark.isShown || (!isInstant && isOnAnotherLine)) {
+      withoutTransition(element, () => {
+        apply();
+        element.style.opacity = "0";
+      });
+    } else if (isInstant) {
+      withoutTransition(element, apply);
+    } else {
+      apply();
     }
 
     element.style.opacity = "1";
-    element.style.transform = `translate(${(box.left - padX).toFixed(1)}px, ${(box.top - padY).toFixed(1)}px)`;
-    element.style.width = `${(box.width + padX * 2).toFixed(1)}px`;
-    element.style.height = `${(box.height + padY * 2).toFixed(1)}px`;
+    mark.isShown = true;
+    mark.top = box.top;
   };
 
-  const reposition = (): void => {
-    repositionFrame = 0;
-
-    if (!isActive) {
-      return;
-    }
-
+  const placeMarks = (isInstant: boolean): void => {
     const word = page.words[current];
     place(
       pill,
       block === null && word !== undefined ? word.range.getBoundingClientRect() : null,
       PILL_PADDING_X,
       PILL_PADDING_Y,
+      isInstant,
     );
-    place(ring, block?.getBoundingClientRect() ?? null, 6, 6);
+    place(ring, block?.getBoundingClientRect() ?? null, RING_PADDING, RING_PADDING, isInstant);
+  };
+
+  const reposition = (): void => {
+    repositionFrame = 0;
+
+    if (isActive) {
+      placeMarks(true);
+    }
+  };
+
+  const spot = (): DOMRect | null =>
+    block?.getBoundingClientRect() ?? page.words[current]?.range.getBoundingClientRect() ?? null;
+
+  const scrollTo = (box: DOMRect, isForced: boolean): void => {
+    const bounds = clipper?.getBoundingClientRect() ?? new DOMRect(0, 0, window.innerWidth, window.innerHeight);
+    const edge = Math.min(120, bounds.height * FOLLOW_EDGE);
+    const isInView =
+      box.top >= bounds.top + edge && Math.min(box.bottom, box.top + bounds.height / 2) <= bounds.bottom - edge;
+    const now = performance.now();
+
+    if (!isForced && (isInView || now - followedAt < FOLLOW_PAUSE_MS)) {
+      return;
+    }
+
+    const scroller = clipper ?? window;
+    followedAt = now;
+
+    if (typeof scroller.scrollBy === "function") {
+      scroller.scrollBy({
+        top: box.top - bounds.top - bounds.height * FOLLOW_REST,
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+      });
+    }
+  };
+
+  const follow = (): void => {
+    const box = spot();
+
+    if (isFollowing && box !== null) {
+      scrollTo(box, false);
+    }
+  };
+
+  // Scrolling by hand means the reader wants to look elsewhere; the page stops following until asked to.
+  const handleScrollIntent = (event: Event): void => {
+    if (!(event instanceof KeyboardEvent) || SCROLL_KEYS.includes(event.key)) {
+      isFollowing = false;
+    }
   };
 
   const scheduleReposition = (): void => {
@@ -235,19 +381,17 @@ export function createReadAlong(root: Element, options: IReadAlongOptions = {}):
     }
 
     isActive = true;
+    isFollowing = options.follow ?? true;
+    clearTimeout(unpaintTimer);
+    fadeTo(1);
     window.addEventListener("scroll", scheduleReposition, { capture: true, passive: true });
     window.addEventListener("resize", scheduleReposition);
+    window.addEventListener("wheel", handleScrollIntent, { capture: true, passive: true });
+    window.addEventListener("touchmove", handleScrollIntent, { capture: true, passive: true });
+    window.addEventListener("keydown", handleScrollIntent, { capture: true });
   };
 
-  const clear = (): void => {
-    isActive = false;
-    current = -1;
-    block = null;
-    pill.style.opacity = "0";
-    ring.style.opacity = "0";
-    window.removeEventListener("scroll", scheduleReposition, { capture: true });
-    window.removeEventListener("resize", scheduleReposition);
-
+  const unpaint = (): void => {
     const registry = highlightRegistry();
 
     if (registry !== null && painted !== null) {
@@ -261,6 +405,52 @@ export function createReadAlong(root: Element, options: IReadAlongOptions = {}):
     }
 
     painted = null;
+  };
+
+  const deactivate = (): void => {
+    isActive = false;
+    current = -1;
+    block = null;
+    shownBlock = null;
+    hide(pill);
+    hide(ring);
+    window.removeEventListener("scroll", scheduleReposition, { capture: true });
+    window.removeEventListener("resize", scheduleReposition);
+    window.removeEventListener("wheel", handleScrollIntent, { capture: true });
+    window.removeEventListener("touchmove", handleScrollIntent, { capture: true });
+    window.removeEventListener("keydown", handleScrollIntent, { capture: true });
+  };
+
+  const isDimming = (): boolean => isActive && painted !== null && painted.unread.size > 0;
+
+  // The unread words keep their dimming until it has faded out, so stopping does not snap them back.
+  const clear = (): void => {
+    const wasDimming = isDimming();
+    deactivate();
+    fadeTo(0);
+    clearTimeout(unpaintTimer);
+
+    if (wasDimming && fade !== null) {
+      unpaintTimer = setTimeout(unpaint, FADE_MS);
+    } else {
+      unpaint();
+    }
+  };
+
+  const locate = (): void => {
+    const box = spot();
+    isFollowing = options.follow ?? true;
+
+    if (isActive && box !== null) {
+      scrollTo(box, true);
+    }
+  };
+
+  const handleLocate = (event: Event): void => {
+    if (isActive && spot() !== null) {
+      event.preventDefault();
+      locate();
+    }
   };
 
   const handleClick = (event: Event): void => {
@@ -294,6 +484,7 @@ export function createReadAlong(root: Element, options: IReadAlongOptions = {}):
   };
 
   root.addEventListener("click", handleClick);
+  root.addEventListener(LOCATE_EVENT, handleLocate);
 
   return {
     setChunks(next) {
@@ -325,12 +516,15 @@ export function createReadAlong(root: Element, options: IReadAlongOptions = {}):
         pageIndex = alignment.pageOf[back] ?? -1;
       }
 
-      if (pageIndex !== current || block !== null) {
-        current = pageIndex;
-        paintHighlights(block === null ? pageIndex : pageIndex + 1);
+      if (pageIndex === current && block === shownBlock) {
+        return;
       }
 
-      reposition();
+      current = pageIndex;
+      shownBlock = block;
+      paintHighlights(block === null ? pageIndex : pageIndex + 1);
+      placeMarks(false);
+      follow();
     },
     setDimmed(next) {
       isDimmed = next;
@@ -339,21 +533,52 @@ export function createReadAlong(root: Element, options: IReadAlongOptions = {}):
         paintHighlights(current);
       }
     },
+    locate,
     finish() {
       block = null;
+      shownBlock = null;
       current = -1;
-      pill.style.opacity = "0";
-      ring.style.opacity = "0";
+      hide(pill);
+      hide(ring);
       paintHighlights(page.words.length);
     },
     clear,
     destroy() {
-      clear();
+      const wasDimming = isDimming();
+      deactivate();
+      clearTimeout(unpaintTimer);
       cancelAnimationFrame(repositionFrame);
       observer.disconnect();
       root.removeEventListener("click", handleClick);
-      pill.remove();
-      ring.remove();
+      root.removeEventListener(LOCATE_EVENT, handleLocate);
+
+      const leave = (): void => {
+        const left = (holders.get(root) ?? 1) - 1;
+        holders.set(root, left);
+        unpaint();
+        fade?.cancel();
+        pill.element.remove();
+        ring.element.remove();
+
+        if (left === 0) {
+          root.classList.remove(ROOT_CLASS, SEEKABLE_CLASS);
+
+          if (root instanceof HTMLElement) {
+            root.style.removeProperty(FADE_PROPERTY);
+          }
+        }
+      };
+
+      // Dimmed words fade back before the highlight is taken away; with nothing dimmed it goes at once.
+      if (wasDimming && holders.get(root) === 1) {
+        fadeTo(0);
+      }
+
+      if (wasDimming && fade !== null) {
+        setTimeout(leave, FADE_MS);
+      } else {
+        leave();
+      }
     },
   };
 }

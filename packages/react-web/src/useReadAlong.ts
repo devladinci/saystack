@@ -9,12 +9,14 @@ export interface IUseReadAlongOptions {
   isDimmed?: boolean;
   blocks?: string;
   zIndex?: number;
+  // Whether the page scrolls to keep the word being read in view; see IReadAlongOptions.follow.
+  follow?: boolean;
 }
 
 export function useReadAlong(
   root: RefObject<Element | null>,
   [state, api]: ISpeechHookResult,
-  { isActive, isDimmed = true, blocks, zIndex }: IUseReadAlongOptions,
+  { isActive, isDimmed = true, blocks, zIndex, follow }: IUseReadAlongOptions,
 ): void {
   const [readAlong, setReadAlong] = useState<IReadAlong | null>(null);
   const isDimmedRef = useRef(isDimmed);
@@ -35,6 +37,7 @@ export function useReadAlong(
       isDimmed: isDimmedRef.current,
       ...(blocks === undefined ? {} : { blocks }),
       ...(zIndex === undefined ? {} : { zIndex }),
+      ...(follow === undefined ? {} : { follow }),
       onSeek: ({ chunkIndex, seconds }) => {
         api.seek(chunkIndex, seconds);
       },
@@ -45,7 +48,7 @@ export function useReadAlong(
       next.destroy();
       setReadAlong(null);
     };
-  }, [root, isActive, blocks, zIndex, api]);
+  }, [root, isActive, blocks, zIndex, follow, api]);
 
   useEffect(() => {
     readAlong?.setChunks(state.chunks);

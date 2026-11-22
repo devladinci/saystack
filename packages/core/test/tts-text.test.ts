@@ -74,6 +74,38 @@ describe("toSpeechText", () => {
     expect(chunks.join("")).toContain("First sentence");
   });
 });
+describe("speechChunks", () => {
+  const reply = Array.from(
+    { length: 40 },
+    (_, index) => `Sentence number ${index + 1} says a little more than the one before it did.`,
+  ).join(" ");
+
+  it("starts small so speech begins early, then grows to the largest chunk", () => {
+    const sizes = speechChunks(reply).map((chunk) => chunk.length);
+
+    expect(sizes[0]).toBeLessThanOrEqual(80);
+    expect(Math.max(...sizes)).toBeGreaterThan(200);
+    expect(Math.max(...sizes)).toBeLessThanOrEqual(300);
+  });
+
+  it("keeps growing when room is reserved for a style tag, and leaves that room in every chunk", () => {
+    const reserve = 25;
+    const plain = speechChunks(reply);
+    const tagged = speechChunks(reply, reserve);
+    const sizes = tagged.map((chunk) => chunk.length);
+
+    expect(sizes[0]).toBeLessThanOrEqual(80 - reserve);
+    expect(Math.max(...sizes)).toBeLessThanOrEqual(300 - reserve);
+    expect(sizes.slice(0, -1).every((size) => size > 20)).toBe(true);
+    expect(tagged.length).toBeLessThan(plain.length * 2);
+    expect(tagged.join(" ")).toBe(reply);
+  });
+
+  it("never falls below one character when the reserve is larger than the budget", () => {
+    expect(speechChunks("abc def", 500).join("")).toBe("abcdef");
+  });
+});
+
 describe("needsRewrite", () => {
   it("asks for a rewrite when a voice cannot read the reply as written", () => {
     expect(needsRewrite("The meeting is at 3 pm on Friday.")).toBe(true);

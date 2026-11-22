@@ -22,7 +22,7 @@ export type { AuraMode, AuraState, IAura, IAuraAnchorOptions, IAuraOptions } fro
 export { createAura } from "./aura/createAura.js";
 
 export type { IReadAlong, IReadAlongOptions, IReadAlongSeek } from "./readAlong/createReadAlong.js";
-export { createReadAlong, READ_HIGHLIGHT, UNREAD_HIGHLIGHT } from "./readAlong/createReadAlong.js";
+export { createReadAlong, LOCATE_EVENT, READ_HIGHLIGHT, UNREAD_HIGHLIGHT } from "./readAlong/createReadAlong.js";
 export { DEFAULT_BLOCKS } from "./readAlong/scanPage.js";
 
 export type { IStreamingInput, IWordEntrance } from "./streamingInput.js";

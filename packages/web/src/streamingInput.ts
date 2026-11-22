@@ -1,7 +1,12 @@
 export interface IStreamingInput {
   begin(base?: string): void;
   update(finalText: string, interimText: string): string;
+  // Shows every word as not yet settled, for the wait between the last word and the final text.
+  hold(): void;
   end(): string;
+  // Like end, but the words stay up until the last of them has finished arriving, so a final text
+  // that differs from what was streamed forms in place instead of snapping in.
+  settle(): string;
   cancel(): string;
   destroy(): void;
 }
@@ -82,6 +87,9 @@ export function createStreamingInput(field: HTMLTextAreaElement | HTMLInputEleme
   let savedColor = "";
   let savedCaret = "";
   let frame = 0;
+  let settleTimer: ReturnType<typeof setTimeout> | undefined;
+  // A field that grows with its text changes size under the words, and is followed within the same frame.
+  const resizes = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => follow());
 
   const follow = (): void => {
     frame = 0;
@@ -100,8 +108,21 @@ export function createStreamingInput(field: HTMLTextAreaElement | HTMLInputEleme
     mirror.style.transform = `translate(${box.left}px, ${box.top}px)`;
     mirror.style.width = `${box.width}px`;
     mirror.style.height = `${box.height}px`;
+
+    // Words arrive at the end, so the end is what stays in view, in the field as much as over it: a
+    // dictation longer than the field would otherwise go on below its edge, unseen. A field that hides
+    // its overflow is one its host grows to fit, and is left as it is.
+    if (!(field instanceof HTMLTextAreaElement)) {
+      field.scrollLeft = field.scrollWidth;
+      mirror.scrollLeft = field.scrollLeft;
+      return;
+    }
+
+    if (computed.overflowY !== "hidden" && computed.overflowY !== "clip") {
+      field.scrollTop = field.scrollHeight;
+    }
+
     mirror.scrollTop = field.scrollTop;
-    mirror.scrollLeft = field.scrollLeft;
   };
 
   const scheduleFollow = (): void => {
@@ -143,10 +164,15 @@ export function createStreamingInput(field: HTMLTextAreaElement | HTMLInputEleme
   };
 
   const stopStreaming = (): void => {
+    clearTimeout(settleTimer);
+    settleTimer = undefined;
     isStreaming = false;
     shown = [];
     mirror.replaceChildren();
     mirror.remove();
+    mirror.classList.remove("saystack-streaming-settling");
+    field.removeEventListener("input", stopStreaming);
+    resizes?.disconnect();
     field.style.color = savedColor;
     field.style.caretColor = savedCaret;
     window.removeEventListener("scroll", scheduleFollow, { capture: true });
@@ -156,6 +182,10 @@ export function createStreamingInput(field: HTMLTextAreaElement | HTMLInputEleme
 
   return {
     begin(from) {
+      if (settleTimer !== undefined) {
+        stopStreaming();
+      }
+
       if (isStreaming) {
         return;
       }
@@ -172,6 +202,7 @@ export function createStreamingInput(field: HTMLTextAreaElement | HTMLInputEleme
       window.addEventListener("scroll", scheduleFollow, { capture: true, passive: true });
       window.addEventListener("resize", scheduleFollow);
       field.addEventListener("scroll", scheduleFollow, { passive: true });
+      resizes?.observe(field);
       render([]);
       follow();
     },
@@ -199,12 +230,42 @@ export function createStreamingInput(field: HTMLTextAreaElement | HTMLInputEleme
         words.map((word) => word.text),
       );
     },
+    hold() {
+      if (!isStreaming || settleTimer !== undefined) {
+        return;
+      }
+
+      shown = shown.map((word) => ({ ...word, isFinal: false }));
+      render(shown);
+    },
     end() {
       const text = joinText(
         base,
         shown.map((word) => word.text),
       );
       stopStreaming();
+
+      return text;
+    },
+    settle() {
+      const text = joinText(
+        base,
+        shown.map((word) => word.text),
+      );
+      const now = performance.now();
+      const left = shown.reduce((most, word) => Math.max(most, ENTER_MS - (now - word.bornAt)), 0);
+
+      if (!isStreaming || left <= 0 || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true) {
+        stopStreaming();
+
+        return text;
+      }
+
+      // The field already holds the text; typing into it must not wait for the words to finish arriving.
+      mirror.classList.add("saystack-streaming-settling");
+      field.addEventListener("input", stopStreaming);
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(stopStreaming, left);
 
       return text;
     },

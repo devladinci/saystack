@@ -211,7 +211,7 @@ describe("createRealtimeBridge final pass", () => {
     expect(closed).toEqual([1000]);
   });
 
-  it("keeps the stream's own text when the final pass fails", async () => {
+  it("answers with the words streamed so far when the final pass fails", async () => {
     const fake = fakeSession();
     const events = createRealtimeBridge(async () => ({ ok: true, session: fake.session }), {
       finalize: async () => ({ ok: false, errorCode: "ENGINE_UNAVAILABLE", message: "busy" }),
@@ -220,11 +220,136 @@ describe("createRealtimeBridge final pass", () => {
 
     events.onMessage?.(text({ type: "start" }), ws);
     await settle();
+    fake.delta(" Streamed", " Streamed");
+    fake.delta(" so far.", " Streamed so far.");
     events.onMessage?.(text({ type: "stop" }), ws);
-    fake.finish({ ok: true, text: " Streamed." });
     await settle();
 
-    expect(sent.at(-1)).toEqual({ type: "transcript.done", text: " Streamed." });
+    expect(sent.at(-1)).toEqual({ type: "transcript.done", text: " Streamed so far." });
+  });
+
+  it("closes the stream as soon as the speaker stops, without asking it to flush", async () => {
+    const fake = fakeSession();
+    const stop = vi.spyOn(fake.session, "stop");
+    let answer: (result: ISttTranscribeResult) => void = () => undefined;
+    const events = createRealtimeBridge(async () => ({ ok: true, session: fake.session }), {
+      finalize: () =>
+        new Promise((resolve) => {
+          answer = resolve;
+        }),
+    });
+    const { ws, sent } = client();
+
+    events.onMessage?.(text({ type: "start" }), ws);
+    await settle();
+    events.onMessage?.(text({ type: "stop" }), ws);
+    await settle();
+
+    expect(fake.release).toHaveBeenCalledOnce();
+    expect(stop).not.toHaveBeenCalled();
+    expect(sent).toEqual([{ type: "ready" }]);
+
+    answer({ ok: true, text: "From the recording." });
+    await settle();
+
+    expect(sent.at(-1)).toEqual({ type: "transcript.done", text: "From the recording." });
+  });
+});
+
+describe("createRealtimeBridge — the recording outlives the stream", () => {
+  it("answers from the final pass when the stream fails to flush after the last word", async () => {
+    const fake = fakeSession();
+    const events = createRealtimeBridge(async () => ({ ok: true, session: fake.session }), {
+      finalize: async () => ({ ok: true, text: "The whole recording." }),
+    });
+    const { ws, sent, closed } = client();
+
+    events.onMessage?.(text({ type: "start" }), ws);
+    await settle();
+    events.onMessage?.(pcm(3200), ws);
+    events.onMessage?.(text({ type: "stop" }), ws);
+    fake.fail("TIMEOUT", "the transcript did not finish in time");
+    fake.finish({ ok: false, errorCode: "TIMEOUT", message: "the transcript did not finish in time" });
+    await settle();
+
+    expect(sent).toEqual([{ type: "ready" }, { type: "transcript.done", text: "The whole recording." }]);
+    expect(closed).toEqual([1000]);
+  });
+
+  it("does not wait for the stream's flush once the final pass has the text", async () => {
+    const fake = fakeSession();
+    const events = createRealtimeBridge(async () => ({ ok: true, session: fake.session }), {
+      finalize: async () => ({ ok: true, text: "The whole recording." }),
+    });
+    const { ws, sent } = client();
+
+    events.onMessage?.(text({ type: "start" }), ws);
+    await settle();
+    events.onMessage?.(text({ type: "stop" }), ws);
+    await settle();
+
+    expect(sent.at(-1)).toEqual({ type: "transcript.done", text: "The whole recording." });
+  });
+
+  it("keeps recording after the stream breaks mid-sentence, and answers from the final pass", async () => {
+    const fake = fakeSession();
+    const heard: Uint8Array[] = [];
+    const events = createRealtimeBridge(async () => ({ ok: true, session: fake.session }), {
+      finalize: async (wav) => {
+        heard.push(wav);
+
+        return { ok: true, text: "Everything that was said." };
+      },
+    });
+    const { ws, sent, closed } = client();
+
+    events.onMessage?.(text({ type: "start" }), ws);
+    await settle();
+    events.onMessage?.(pcm(3200), ws);
+    fake.delta(" Everything", " Everything");
+    fake.fail("ENGINE_UNAVAILABLE", "the engine dropped the stream");
+    events.onMessage?.(pcm(3200), ws);
+    events.onMessage?.(text({ type: "stop" }), ws);
+    await settle();
+
+    expect(sent).toEqual([
+      { type: "ready" },
+      { type: "transcript.delta", delta: " Everything" },
+      { type: "transcript.done", text: "Everything that was said." },
+    ]);
+    expect(heard[0]?.byteLength).toBe(44 + 6400);
+    expect(fake.audio).toEqual([3200]);
+    expect(fake.release).toHaveBeenCalled();
+    expect(closed).toEqual([1000]);
+  });
+
+  it("still fails when the stream breaks and there is no final pass to fall back on", async () => {
+    const fake = fakeSession();
+    const events = createRealtimeBridge(async () => ({ ok: true, session: fake.session }));
+    const { ws, sent, closed } = client();
+
+    events.onMessage?.(text({ type: "start" }), ws);
+    await settle();
+    fake.fail("ENGINE_UNAVAILABLE", "the engine dropped the stream");
+
+    expect(sent.at(-1)).toMatchObject({ type: "error", errorCode: "ENGINE_UNAVAILABLE" });
+    expect(closed).toEqual([1011]);
+  });
+
+  it("reports the final pass's failure when the stream is gone too", async () => {
+    const fake = fakeSession();
+    const events = createRealtimeBridge(async () => ({ ok: true, session: fake.session }), {
+      finalize: async () => ({ ok: false, errorCode: "ENGINE_UNAVAILABLE", message: "busy" }),
+    });
+    const { ws, sent } = client();
+
+    events.onMessage?.(text({ type: "start" }), ws);
+    await settle();
+    fake.fail("TIMEOUT", "stream lost");
+    events.onMessage?.(text({ type: "stop" }), ws);
+    await settle();
+
+    expect(sent.at(-1)).toMatchObject({ type: "error", errorCode: "ENGINE_UNAVAILABLE", detail: "busy" });
   });
 });
 

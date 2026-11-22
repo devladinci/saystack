@@ -69,6 +69,12 @@ Instead of `endpoint`, pass `synthesize` to bring the
 audio from anywhere else (it still plays through the aura and the player), or a whole `driver` of your own.
 `<ReadAloudAura anchor={ref} />` puts the glow around another element, or the page edges with `null`.
 
+The player opens and closes its own height, so what sits around it moves over instead of jumping. Give it the
+space you want under it as `--saystack-player-gap`, which opens and closes with it; a flex `gap` would stay
+behind when the player is gone. While a reply is read the page keeps the word being read in view until the
+reader scrolls by hand, and the player's locate button brings it back;
+`useReadAloudMessage(id, ref, { follow: false })` leaves the scrolling to you.
+
 ## Delivery style
 
 `ReadAloudProvider` also takes a `styleMap`, alongside `rewrite` and `summarize`. When a rewrite or a summary

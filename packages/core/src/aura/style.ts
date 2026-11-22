@@ -75,12 +75,13 @@ export const DEFAULT_AURA_STYLE: Readonly<IAuraStyle> = {
 };
 
 // Light adds up on dark backgrounds, so the same glow reads louder there than on light ones.
+// A crisp line with a short glow: around a block of text, a wide soft one reads as a smudge, not as light.
 export const MESSAGE_AURA_STYLE: Readonly<IAuraStyleOptions> = {
   outline: "full",
   placement: "top",
-  lift: 16,
-  dark: { lineWidth: 1.2, blur: 6, aura: 0.45, auraSize: 6, brightness: 0.28 },
-  light: { lineWidth: 1.8, blur: 2, aura: 0.75, auraSize: 8, brightness: 0.55 },
+  lift: 10,
+  dark: { lineWidth: 1.4, blur: 1.5, aura: 0.6, auraSize: 10, brightness: 0.42 },
+  light: { lineWidth: 1.6, blur: 1, aura: 0.9, auraSize: 10, brightness: 0.8 },
 };
 
 export function auraStyleFor(

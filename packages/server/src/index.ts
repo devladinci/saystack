@@ -11,6 +11,9 @@ export type {
 export type { IRealtimeStart, IRealtimeBridgeOptions } from "./realtimeBridge.js";
 export { createRealtimeBridge } from "./realtimeBridge.js";
 
+export type { IRollingRealtimeOptions } from "./rollingRealtime.js";
+export { createRollingRealtimeSttAdapter } from "./rollingRealtime.js";
+
 export type { ICleanupDeps, ICleanupHintsGiven, ICleanupReport, ICleanupRequest } from "./cleanTranscript.js";
 export { cleanTranscript } from "./cleanTranscript.js";
 

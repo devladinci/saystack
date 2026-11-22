@@ -278,6 +278,43 @@ describe("useDictation live", () => {
     expect(onText).not.toHaveBeenCalled();
   });
 
+  it("tells the input to wait once the speaker stops, but only when words were streamed into it", async () => {
+    setVoiceRecorder(blobRecorder());
+    mockFetchJson({ text: "uploaded" });
+    const calls: string[] = [];
+    const input: IDictationInput = {
+      show: () => calls.push("show"),
+      wait: () => calls.push("wait"),
+      end: () => calls.push("end"),
+    };
+    const live: LiveTranscriptionFactory = (_recorder, onText) => {
+      onText("hello");
+
+      return { isLive: true, finish: async () => "Hello.", cancel: () => undefined };
+    };
+    const streamed = renderHook(() => useDictation({ endpoint: ENDPOINT, input, live }));
+
+    act(() => {
+      streamed.result.current.handlePressStart();
+    });
+    await act(async () => {
+      await streamed.result.current.handlePressEnd();
+    });
+    const withStream = [...calls];
+    calls.length = 0;
+    const uploaded = renderHook(() => useDictation({ endpoint: ENDPOINT, input }));
+
+    act(() => {
+      uploaded.result.current.handlePressStart();
+    });
+    await act(async () => {
+      await uploaded.result.current.handlePressEnd();
+    });
+
+    expect(withStream).toEqual(["show", "wait", "end"]);
+    expect(calls).toEqual(["end"]);
+  });
+
   it("transcribes the recording when the stream broke off, and still writes into the input", async () => {
     mockFetchJson({ text: "From the recording." });
     const field = fakeInput();

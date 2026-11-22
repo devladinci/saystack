@@ -36,6 +36,7 @@ export function useFieldInput(field: RefObject<Field | null>, onValue: (value: s
 
     return {
       show: (text) => current()?.show(text),
+      wait: () => current()?.wait?.(),
       end: (text) => current()?.end(text),
     };
   });

@@ -96,6 +96,29 @@ Pass it as `createVoiceRoutes({ ..., realtime })`. On Node, `serve` also needs a
 [`examples/voice-chat/server.ts`](https://github.com/devladinci/saystack/blob/main/examples/voice-chat/server.ts).
 Browsers cannot set headers on a WebSocket, so add `authorize: (c) => boolean` to check a query token or a cookie.
 
+The words that stream in are for the eye. The text that comes back at the end is one pass of the file model over
+the whole recording, so a stream that stalls or breaks costs the live words and never the dictation; if that pass
+fails too, the words streamed so far are the text. `finalPass: false` takes the stream's own last text instead.
+
+An engine with no realtime endpoint can dictate live as well:
+
+```ts
+import { createOpenAiSttAdapter } from "@saystack/engine-openai-compatible";
+import { createRollingRealtimeSttAdapter } from "@saystack/server";
+import type { IRealtimeRouteDeps } from "@saystack/server";
+
+export const realtime: IRealtimeRouteDeps = {
+  upgradeWebSocket,
+  createAdapter: (engine) => createRollingRealtimeSttAdapter(createOpenAiSttAdapter(engine)),
+};
+```
+
+It sends the audio since the last pause to the file model every half second and passes a word on once two passes
+in a row agree on it, so words run about a second behind the voice. Nothing is sent while the speaker is silent,
+and a pause starts the next pass afresh. It suits a fast local model, such as Parakeet on oMLX; on a hosted model
+every pass is a request. `stepMs` sets how much new audio a pass waits for, `maxWindowMs` (30 seconds) how long a
+speaker may go on without a pause before the words so far are settled, and `quietLevel` what counts as silence.
+
 ## Dictation cleanup
 
 Give the routes a cleaner and every transcript is tidied before it is sent back, on the upload route and at the
