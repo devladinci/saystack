@@ -1,5 +1,18 @@
 # @saystack/react
 
+## 0.4.0
+
+### Minor Changes
+
+- 803527d: `useDictation` takes `context`, what the conversation has been about, and `sendDictation` sends it with the upload, so a server that cleans transcripts up can tell a misheard term from the word it sounds like.
+
+### Patch Changes
+
+- 2532b80: `useDictation` calls its input's `wait()` once the speaker stops, when words were streamed into it.
+- Updated dependencies [803527d]
+- Updated dependencies [2532b80]
+  - @saystack/core@0.4.0
+
 ## 0.3.0
 
 ### Minor Changes

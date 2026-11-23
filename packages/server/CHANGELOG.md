@@ -1,5 +1,20 @@
 # @saystack/server
 
+## 0.4.0
+
+### Minor Changes
+
+- 803527d: `createVoiceRoutes` takes `cleanup`: a cleaner that tidies every transcript before it is sent back, on the upload route and at the end of a live one. The upload reads a `context` field and the live route's `start` message carries one. A cleanup that fails, is refused or takes longer than `timeoutMs` (4 seconds) leaves the transcript as it was heard, `onResult` reports each outcome, and `warmUp` wakes a local model when a live dictation starts. `createRealtimeBridge` takes `refine` for the same step, and stops it before the client's `waitMs` runs out.
+- 2532b80: `createRollingRealtimeSttAdapter` gives live words from an engine that only takes whole files: the audio since the last pause is transcribed again every half second, and a word is passed on once two passes in a row agree on it. Nothing is sent while the speaker is silent.
+
+  With a final pass, the recording is what a live dictation's text comes from, whatever the stream does. A stream that fails no longer fails the dictation, the stream is closed as soon as the speaker stops instead of being waited on to flush, and if the final pass fails the words streamed so far are the text.
+
+### Patch Changes
+
+- Updated dependencies [803527d]
+- Updated dependencies [2532b80]
+  - @saystack/core@0.4.0
+
 ## 0.1.4
 
 ### Patch Changes
